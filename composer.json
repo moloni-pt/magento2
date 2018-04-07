@@ -1,0 +1,22 @@
+{
+    "name": "invoicing/module-moloni",
+    "description": "Module for Magento 2 by Moloni",
+    "type": "magento2-module",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "email": "apoio@moloni.com",
+            "name": "Moloni, lda"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Invoicing\\Moloni\\": ""
+        }
+    }
+}
