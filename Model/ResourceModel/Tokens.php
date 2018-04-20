@@ -18,37 +18,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+namespace Invoicing\Moloni\Model\ResourceModel;
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
-
-class Index extends \Magento\Framework\View\Element\Template
-{   
-    protected $_tokens;
+class Tokens extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+{
     
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Invoicing\Moloni\Model\TokensFactory $tokensFactory)
+		\Magento\Framework\Model\ResourceModel\Db\Context $context
+	)
 	{
-        $this->_tokens = $tokensFactory;
-        
 		parent::__construct($context);
 	}
-
-	public function sayHello()
+	
+	protected function _construct()
 	{
-		return __('Hello World');
+		$this->_init('moloni_tokens', 'id');
 	}
-    
-    public function getTokensCollection()
-    {
-        $tokens = $this->_tokens->create();
-        $collection = $tokens->getCollection();
-        foreach($collection as $item){
-            print_r(get_class_methods($item));
-			echo "<pre>";
-			print_r($item->getData());
-			echo "</pre>";
-		}
-        return $collection;
-    }
+
 }

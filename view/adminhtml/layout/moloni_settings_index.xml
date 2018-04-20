@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<page layout="admin-1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>
+            Moloni - Settings
+        </title>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Settings\Index" name="settings.index" template="Invoicing_Moloni::settings/index.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

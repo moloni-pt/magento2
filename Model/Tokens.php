@@ -19,36 +19,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Model;
 
-class Index extends \Magento\Framework\View\Element\Template
-{   
-    protected $_tokens;
-    
-    public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Invoicing\Moloni\Model\TokensFactory $tokensFactory)
+//use Invoicing\Moloni\Api\Data\TokensInterface;
+
+class Tokens extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
+{
+    const CACHE_TAG = 'moloni_tokens';
+
+	protected $_cacheTag = 'moloni_tokens';
+
+	protected $_eventPrefix = 'moloni_tokens';
+
+	protected function _construct()
 	{
-        $this->_tokens = $tokensFactory;
-        
-		parent::__construct($context);
+		$this->_init('Invoicing\Moloni\Model\ResourceModel\Tokens');
 	}
 
-	public function sayHello()
+	public function getIdentities()
 	{
-		return __('Hello World');
+		return [self::CACHE_TAG . '_' . $this->getId()];
+	}
+
+	public function getDefaultValues()
+	{
+		$values = [];
+
+		return $values;
 	}
     
-    public function getTokensCollection()
-    {
-        $tokens = $this->_tokens->create();
-        $collection = $tokens->getCollection();
-        foreach($collection as $item){
-            print_r(get_class_methods($item));
-			echo "<pre>";
-			print_r($item->getData());
-			echo "</pre>";
-		}
-        return $collection;
-    }
 }

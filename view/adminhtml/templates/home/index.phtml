@@ -1,1 +1,24 @@
-Hello home/index.phtml
+<style>
+table {  font-family: arial, sans-serif;  border-collapse: collapse;  width: 100%;  margin-top: 30px;}
+td, th {  border: 1px solid #dddddd;  text-align: left;  padding: 8px;  }
+tr:nth-child(even) { background-color: #dddddd; }
+.post-id{width:2%} .post-name{width:30%}
+
+</style>
+
+<table>
+  <tr>
+    <th class="post-id">Id</th>
+    <th class="post-name">Name</th>
+    <th>Content</th>
+  </tr>
+    <?php
+        foreach ($block->getTokensCollection() as $key=>$post){
+
+           
+        }
+    ?>
+</table>
+
+</body>
+</html>

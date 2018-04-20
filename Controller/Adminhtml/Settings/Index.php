@@ -2,30 +2,29 @@
 /**
  * Module for Magento 2 by Moloni
  * Copyright (C) 2017  Moloni, lda
- * 
+ *
  * This file is part of Invoicing/Moloni.
- * 
+ *
  * Invoicing/Moloni is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-namespace Invoicing\Moloni\Controller\Adminhtml\Home;
+namespace Invoicing\Moloni\Controller\Adminhtml\Settings;
 
 class Index extends \Magento\Backend\App\Action
 {
 
-    protected $_page;
-    protected $_moloni;
+    protected $resultPageFactory;
+
     /**
      * Constructor
      *
@@ -33,12 +32,10 @@ class Index extends \Magento\Backend\App\Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Invoicing\Moloni\Model\TokensFactory $resultTokenFactory
-    ) {
-        $this->_page = $resultPageFactory;
-        $this->_moloni = $resultTokenFactory;
+    \Magento\Backend\App\Action\Context $context, \Magento\Framework\View\Result\PageFactory $resultPageFactory
+    )
+    {
+        $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
 
@@ -49,9 +46,6 @@ class Index extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $moloni = $this->_moloni->create();
-        $collection = $moloni->getCollection();
-        
-        return $this->_page->create();
+        return $this->resultPageFactory->create();
     }
 }
