@@ -18,37 +18,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
-class Index extends \Magento\Framework\View\Element\Template
-{   
-    protected $_tokens;
-    
-    public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Invoicing\Moloni\Model\TokensFactory $tokensFactory)
-	{
-        $this->_tokens = $tokensFactory;
-        
-		parent::__construct($context);
-	}
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\Registry;
 
-	public function sayHello()
-	{
-		return __('Hello World');
-	}
-    
+class Index extends \Magento\Framework\View\Element\Template
+{
+
+    protected $_coreRegistry;
+    protected $_tokens;
+
+    public function __construct(Context $context, Registry $coreRegistry)
+    {   
+        $this->_coreRegistry = $coreRegistry;
+        parent::__construct($context);
+    }
+
+    public function sayHello()
+    {
+        return __('Hello World');
+    }
+
     public function getTokensCollection()
     {
-        $tokens = $this->_tokens->create();
-        $collection = $tokens->getCollection();
-        foreach($collection as $item){
-            print_r(get_class_methods($item));
-			echo "<pre>";
-			print_r($item->getData());
-			echo "</pre>";
-		}
-        return $collection;
+        return $this->_coreRegistry->registry('firstResult');
     }
 }

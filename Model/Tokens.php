@@ -18,34 +18,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace Invoicing\Moloni\Model;
 
-//use Invoicing\Moloni\Api\Data\TokensInterface;
+use Magento\Framework\Model\AbstractModel;
 
-class Tokens extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
+class Tokens extends AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
+
     const CACHE_TAG = 'moloni_tokens';
 
-	protected $_cacheTag = 'moloni_tokens';
+    protected $_cacheTag = 'moloni_tokens';
+    protected $_eventPrefix = 'moloni_tokens';
 
-	protected $_eventPrefix = 'moloni_tokens';
+    protected function _construct(array $data = [])
+    {
+        $this->_init(ResourceModel\Tokens::class);
+    }
 
-	protected function _construct()
-	{
-		$this->_init('Invoicing\Moloni\Model\ResourceModel\Tokens');
-	}
+    public function getIdentities()
+    {
+        return [self::CACHE_TAG . '_' . $this->getId()];
+    }
 
-	public function getIdentities()
-	{
-		return [self::CACHE_TAG . '_' . $this->getId()];
-	}
-
-	public function getDefaultValues()
-	{
-		$values = [];
-
-		return $values;
-	}
-    
+    public function getTokens()
+    {
+        $results = $this->getCollection()->setPageSize(1)->getData();
+        return isset($results[0]) ? $results[0] : false;
+    }
 }

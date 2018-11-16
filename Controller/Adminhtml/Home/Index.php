@@ -18,28 +18,48 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
-class Index extends \Magento\Backend\App\Action
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Registry;
+use Invoicing\Moloni\Model\TokensFactory;
+use Invoicing\Moloni\Model\MoloniFactory;
+
+class Index extends Action
 {
 
     protected $_page;
     protected $_moloni;
+    protected $_tokensFactory;
+    protected $_coreRegistry;
+
     /**
      * Constructor
      *
      * @param \Magento\Backend\App\Action\Context  $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Invoicing\Moloni\Model\TokensFactory $resultTokenFactory
-    ) {
+    public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry)
+    {
+        $this->_moloni = $moloniFactory;
         $this->_page = $resultPageFactory;
-        $this->_moloni = $resultTokenFactory;
+        $this->_tokensFactory = $tokensFactory;
+        $this->_coreRegistry = $coreRegistry;
         parent::__construct($context);
+
+        $this->_init();
+    }
+
+    public function _init()
+    {
+        $dbTokens = $this->_tokensFactory->create()->getTokens();
+        if (!$dbTokens && !isset($_GET['code'])) {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $redirect = $objectManager->get('\Magento\Framework\App\Response\Http');
+            $redirect->setRedirect('https://api.moloni.pt/v1/authorize/?response_type=code&client_id=devmagento2&redirect_uri=http://retron.warz/magento2/admin/moloni/home/');
+        }
     }
 
     /**
@@ -48,10 +68,12 @@ class Index extends \Magento\Backend\App\Action
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
-    {
-        $moloni = $this->_moloni->create();
-        $collection = $moloni->getCollection();
-        
+    {   
+        $url = 'https://api.moloni.pt/v1/grant/?grant_type=authorization_code&client_id=devmagento2&redirect_uri=http://retron.warz/magento2/admin/moloni/home/&client_secret=b349e4a794515326c808092d63c1af451ac96777&code='.$_GET['code'];
+        $teste = $this->_moloni->execute($url);
+        echo $url;
+
+        $this->_coreRegistry->register('firstResult', $teste);
         return $this->_page->create();
     }
 }
