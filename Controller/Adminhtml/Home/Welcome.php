@@ -20,20 +20,18 @@
  */
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Response\Http;
-use Magento\Framework\App\Response\RedirectInterface;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Registry;
 use Invoicing\Moloni\Model\TokensFactory;
 use Invoicing\Moloni\Model\MoloniFactory;
 
-class Index extends Action
+class Welcome extends Action
 {
 
     protected $_page;
-    protected $_moloniApi;
+    protected $_moloni;
     protected $_tokensFactory;
     protected $_coreRegistry;
 
@@ -43,32 +41,13 @@ class Index extends Action
      * @param \Magento\Backend\App\Action\Context  $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
-    public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, RedirectInterface $redirect, Http $response)
+    public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry)
     {
-        $this->_moloni = $moloniFactory->create();
+        $this->_moloni = $moloniFactory;
         $this->_page = $resultPageFactory;
         $this->_tokensFactory = $tokensFactory;
         $this->_coreRegistry = $coreRegistry;
-        $this->_redirect = $redirect;
-        $this->_response = $response;
-        
-        $this->_init();
-        
         parent::__construct($context);
-    }
-
-    public function _init()
-    {
-        if (!$this->_moloni->hasValidSession()) {
-            $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
-        }
-        //$this->_redirect->setRedirect('https://api.moloni.pt/v1/authorize/?response_type=code&client_id=devmagento2&redirect_uri=http://retron.warz/magento2/admin/moloni/home/');
-        /* $dbTokens = $this->_tokensFactory->create()->getTokens();
-          if (!$dbTokens && !isset($_GET['code'])) {
-          $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-          $redirect = ;
-          //$redirect->;
-          } */
     }
 
     /**
@@ -82,14 +61,8 @@ class Index extends Action
         #$teste = $this->_moloni->execute($url);
         #echo $url;
         #$this->_coreRegistry->register('firstResult', $teste);
-
         $resultPage = $this->_page->create();
-        $resultPage->getConfig()->getTitle()->set('');
+        $resultPage->getConfig()->getTitle()->set('Welcome to Moloni');
         return $resultPage;
-    }
-
-    public function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
     }
 }

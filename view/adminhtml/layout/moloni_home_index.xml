@@ -1,13 +1,18 @@
 <?xml version="1.0" ?>
-<page layout="admin-1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-	<head>
-        <title>
-            Moloni
-        </title>
-    </head>
-	<body>
-		<referenceContainer name="content">
-			<block class="Invoicing\Moloni\Block\Adminhtml\Home\Index" name="home.index" template="Invoicing_Moloni::home/index.phtml"/>
-		</referenceContainer>
-	</body>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="menu">
+            <action method="setActive">
+                <argument name="itemId" xsi:type="string">Invoicing_Moloni::home</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="page.title">
+            <action method="setTitleClass">
+                <argument name="class" xsi:type="string">Moloni</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Home\Index" name="home.index" template="Invoicing_Moloni::home/index.phtml"/>
+        </referenceContainer>
+    </body>
 </page>

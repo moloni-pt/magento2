@@ -18,39 +18,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Invoicing\Moloni\Model;
+namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
-use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\Registry;
 
-class Tokens extends AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
+class Welcome extends \Magento\Framework\View\Element\Template
 {
 
-    const CACHE_TAG = 'moloni_tokens';
+    protected $_coreRegistry;
+    protected $_tokens;
 
-    protected $_cacheTag = 'moloni_tokens';
-    protected $_eventPrefix = 'moloni_tokens';
-    protected $tokensRow;
-
-    protected function _construct(array $data = [])
-    {
-        $this->_init(ResourceModel\Tokens::class);
+    public function __construct(Context $context, Registry $coreRegistry)
+    {   
+        $this->_coreRegistry = $coreRegistry;
+        parent::__construct($context);
     }
 
-    public function getIdentities()
+    public function sayHello()
     {
-        return [self::CACHE_TAG . '_' . $this->getId()];
+        return __('Hello World');
     }
 
-    public function getTokens()
+    public function getTokensCollection()
     {
-        if ($this->tokensRow == null) {
-            $collection = $this->getCollection();
-
-            if ($collection->getSize()) {
-                $this->tokensRow = $collection->getFirstItem();
-            }
-        }
-
-        return $this->tokensRow;
+        return $this->_coreRegistry->registry('firstResult');
     }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="styles"/>
+    <body>
+        <referenceBlock name="menu">
+            <action method="setActive">
+                <argument name="itemId" xsi:type="string">Invoicing_Moloni::index</argument>
+            </action>
+        </referenceBlock>
+
+        <referenceContainer name="content">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Home\Welcome" name="home.welcome" template="Invoicing_Moloni::home/welcome.phtml"/>        
+        </referenceContainer>
+    </body>
+</page>
