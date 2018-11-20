@@ -47,15 +47,8 @@ class Welcome extends Action
         $this->_page = $resultPageFactory;
         $this->_tokensFactory = $tokensFactory;
         $this->_coreRegistry = $coreRegistry;
-
-        $this->_init();
-
-        parent::__construct($context);
-    }
-
-    public function _init()
-    {
         
+        parent::__construct($context);
     }
 
     /**

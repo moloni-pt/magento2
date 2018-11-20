@@ -19,10 +19,13 @@ class Moloni
 
     const API_URL = 'https://api.moloni.pt/v1/';
 
-    protected $activeTokens;
     protected $curl;
+    protected $tokens;
+    protected $activeTokens;
     protected $dateTime;
-    protected $tokensFactory;
+    // Error handling
+    public $hasError = false;
+    public $errorMessages = array();
 
     /**
      * @param Context                             $context
@@ -32,23 +35,50 @@ class Moloni
     {
         $this->curl = $curl;
         $this->dateTime = $dateTime;
-        $this->tokensFactory = $tokensFactory;
+        $this->tokens = $tokensFactory->create();
     }
 
     public function execute($url, $params = false)
     {
         //if the method is get
-        $this->curl->get($url);
+        $this->curl->post($url, $params);
+        $raw = $this->curl->getBody();
+        
+        if(!empty($raw)){
+            $response = json_decode($raw, true);
+        }
+        
         //if the method is post
         //response will contain the output in form of JSON string
-        $response = $this->curl->getBody();
+        
+        print_r($response);
+        exit;
+        
         return $response;
+    }
+
+    public function getAuthenticationUrl($developerId, $callbackUrl)
+    {
+        $activeTokens = $this->tokens->getTokens();
+        if (!empty($developerId) && !empty($callbackUrl)) {
+            return self::API_URL . 'authorize/?response_type=code&client_id=' . $developerId . '&redirect_uri=' . urlencode($callbackUrl);
+        } else {
+            return false;
+        }
+    }
+
+    public function getAuthorizationUrl($code)
+    {
+        $activeTokens = $this->tokens->getTokens();
+        if ($activeTokens && $activeTokens->getDeveloperId()) {
+            return self::API_URL . 'grant/?grant_type=authorization_code&client_id=' . $activeTokens->getDeveloperId() . '&redirect_uri=' . urlencode($activeTokens->getRedirectUri()) . '&client_secret=' . $activeTokens->getSecretToken() . '&code=' . $code;
+        }
     }
 
     public function hasValidSession()
     {
-        $activeTokens = $this->tokensFactory->create()->getTokens();
-        if ($activeTokens) {
+        $activeTokens = $this->tokens->getTokens();
+        if ($activeTokens && $activeTokens->getAccessToken()) {
 
             $currentTime = time();
             $accessTokenExpireDate = $this->dateTime->strToTime($activeTokens->getExpireDate());
@@ -56,8 +86,10 @@ class Moloni
 
             if ($currentTime > $accessTokenExpireDate) {
                 if ($currentTime > $refreshTokenExpireDate) {
+                    $activeTokens->delete();
                     return false;
                 } else {
+                    // Handle refresh
                     return true;
                 }
             } else {
@@ -67,4 +99,5 @@ class Moloni
             return false;
         }
     }
+
 }

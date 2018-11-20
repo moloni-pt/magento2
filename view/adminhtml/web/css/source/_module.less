@@ -31,17 +31,116 @@
     /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
 
-.moloni .page-title:before{
     content: 'logo';
     margin-right: 10px;
     color: #aaa6a0;
 }
 
+
 .moloni{
-    .teste(){
-        color: red;
+
+    a{
+        &:hover{
+            color: inherit;
+            text-decoration: none;
+        }
+    }
+
+    .login-form {
+        background-color: #f5f5f5;
+        border: 1px solid #e3e3e3;
+        float: none;
+        margin: auto;
+        max-width: 80rem;
+        min-height: 20rem;
+        min-width: 0;
+        padding: 20px;
+        position: relative;
+        width: 100%;
+        z-index: 1;
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+
+        display: flex;
+        flex-flow: row wrap;
+        flex-grow: 0;
+        flex-shrink: 0;
+        -webkit-flex-grow: 0;
+        -webkit-flex-shrink: 0;
+        justify-content: flex-end;
+
+        .panel{
+            &-left{
+                flex-grow: 1;
+
+                fieldset{
+                    border: 0;
+                    margin: 0;
+                    min-width: 0;
+                    padding: 0;
+                }
+
+                input{
+                    -webkit-appearance: none;
+                    background-color: #ffffff;
+                    border: 1px solid #adadad;
+                    border-radius: 1px;
+                    box-shadow: none;
+                    color: #303030;
+                    font-size: 1.4rem;
+                    font-weight: 400;
+                    width: 100%;
+                    height: auto;
+                    line-height: 1.36;
+                    padding: 0.6rem 1rem 0.6rem;
+                    transition: border-color 0.1s linear;
+                    vertical-align: baseline;
+
+                    &:readonly{
+                        background-color: #f5f5f5;
+                    }
+                }
+
+                legend{
+                    color: #aaa6a0;
+                    font-size: 2.6rem;
+                    font-weight: 300;
+                    line-height: 1.2;
+                    margin-bottom: 20px;
+                }
+
+                .field{
+                    margin-bottom: 20px;
+                }
+
+                .title{
+
+                    span{
+                        margin-left: 14px;
+                        font-weight: 600;
+                    }
+
+                    &:before{
+                        color: #e22626;
+                        content: '*';
+                        display: inline-block;
+                        font-size: 1.6rem;
+                        font-weight: 500;
+                        line-height: 1;
+                        margin-left: 0px;
+                        margin-top: .2rem;
+                        position: absolute;
+                        z-index: 1;
+                    }
+                }
+            }
+
+            &-right{
+                padding-left: 20px;
+            }
+        }
+
     }
 }
 

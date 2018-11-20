@@ -65,6 +65,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'unsigned' => true,
                 ], 'Tokens combination id'
             )->addColumn(
+                'developer_id', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Developer Id'
+            )->addColumn(
+                'redirect_uri', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Redirect Uri'
+            )->addColumn(
+                'secret_token', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Moloni Client Secret'
+            )->addColumn(
                 'access_token', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Access Token'
             )->addColumn(
                 'refresh_token', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Refresh Token'
@@ -156,19 +162,19 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
     private function setIndexMoloniDocuments()
     {
-        /*$this->installer->getConnection()->addIndex(
+        $this->installer->getConnection()->addIndex(
             $this->installer->getTable('moloni_documents'), $this->installer->getIdxName(
                 $this->installer->getTable('moloni_documents'), ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'], \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
             ), ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'], \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
-        );*/
+        );
     }
     
     private function setIndexMoloniSettings()
     {
-        /*$this->installer->getConnection()->addIndex(
+        $this->installer->getConnection()->addIndex(
             $this->installer->getTable('moloni_settings'), $this->installer->getIdxName(
                 $this->installer->getTable('moloni_settings'), ['option_id', 'company_id', 'store_id', 'label', 'value'], \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
             ), ['option_id', 'company_id', 'store_id', 'label', 'value'], \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
-        );*/
+        );
     }
 }

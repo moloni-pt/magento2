@@ -62,6 +62,12 @@ class InstallSchema implements InstallSchemaInterface
                 'unsigned' => true,
                 ], 'Tokens combination id'
             )->addColumn(
+                'developer_id', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Developer Id'
+            )->addColumn(
+                'redirect_uri', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Redirect Uri'
+            )->addColumn(
+                'secret_token', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Moloni Client Secret'
+            )->addColumn(
                 'access_token', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Access Token'
             )->addColumn(
                 'refresh_token', \Magento\Framework\DB\Ddl\Table::TYPE_TEXT, 255, [], 'Refresh Token'
@@ -70,12 +76,12 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'login_date', \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP, null, ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT], 'Login date'
             )->addColumn(
-            'expire_date', \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP, null, ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT], 'Expire date'
-            )
+                'expire_date', \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP, null, ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT], 'Expire date'
+            )->setComment('Used to store moloni session tokens - clean this table for a token reset')
         );
 
         return $table;
-    }
+    }  
 
     private function setIndexMoloniTokens()
     {

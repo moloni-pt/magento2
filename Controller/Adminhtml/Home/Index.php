@@ -45,30 +45,14 @@ class Index extends Action
      */
     public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, RedirectInterface $redirect, Http $response)
     {
-        $this->_moloni = $moloniFactory->create();
+        $this->moloni = $moloniFactory->create();
+        $this->tokensFactory = $tokensFactory->create();
         $this->_page = $resultPageFactory;
-        $this->_tokensFactory = $tokensFactory;
         $this->_coreRegistry = $coreRegistry;
         $this->_redirect = $redirect;
         $this->_response = $response;
-        
-        $this->_init();
-        
-        parent::__construct($context);
-    }
 
-    public function _init()
-    {
-        if (!$this->_moloni->hasValidSession()) {
-            $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
-        }
-        //$this->_redirect->setRedirect('https://api.moloni.pt/v1/authorize/?response_type=code&client_id=devmagento2&redirect_uri=http://retron.warz/magento2/admin/moloni/home/');
-        /* $dbTokens = $this->_tokensFactory->create()->getTokens();
-          if (!$dbTokens && !isset($_GET['code'])) {
-          $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-          $redirect = ;
-          //$redirect->;
-          } */
+        parent::__construct($context);
     }
 
     /**
@@ -78,13 +62,18 @@ class Index extends Action
      */
     public function execute()
     {
-        #$url = 'https://api.moloni.pt/v1/grant/?grant_type=authorization_code&client_id=devmagento2&redirect_uri=http://retron.warz/magento2/admin/moloni/home/&client_secret=b349e4a794515326c808092d63c1af451ac96777&code='.$_GET['code'];
-        #$teste = $this->_moloni->execute($url);
-        #echo $url;
-        #$this->_coreRegistry->register('firstResult', $teste);
+        $this->_init();
+
+        if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {
+            $this->redirectToAuthentication();
+        } else if ($this->getRequest()->getParam('code')) {
+            $this->moloni->execute($this->moloni->getAuthorizationUrl($this->getRequest()->getParam('code')));
+            exit;
+        } else {
+            $this->_init();
+        }
 
         $resultPage = $this->_page->create();
-        $resultPage->getConfig()->getTitle()->set('');
         return $resultPage;
     }
 
@@ -92,4 +81,28 @@ class Index extends Action
     {
         return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
     }
+
+    private function redirectToAuthentication()
+    {
+        if ($this->tokensFactory->getTokens() == null) {
+            $tokensObj = $this->tokensFactory;
+        } else {
+            $tokensObj = $this->tokensFactory->getTokens();
+        }
+
+        $tokensObj->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
+        $tokensObj->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
+        $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
+        $tokensObj->save();
+
+        $this->_redirect($this->moloni->getAuthenticationUrl($tokensObj->getDeveloperId(), $tokensObj->getRedirectUri()));
+    }
+
+    private function _init()
+    {
+        if (!$this->moloni->hasValidSession()) {
+            $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
+        }
+    }
+
 }
