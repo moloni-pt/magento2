@@ -1,11 +1,25 @@
-<table>
-    <tr>
-        <th class="post-id">Id</th>
-        <th class="post-name">Name</th>
-        <th>Content</th>
-    </tr>
+<form id="form-validate" action="<?php echo $block->getUrl('moloni/home/welcome/') ?>" method="post">
 
-</table>
+    <?php echo $block->getBlockHtml('formkey') ?>
 
-</body>
-</html>
+    <div class="field title required">
+        <label class="label" for="title">
+            <span> 
+                <?php echo __('Developer Id') ?>
+            </span>
+        </label>
+        <div class="control">
+            <input id="title" type="text" name="developer_id" data-validate="{required:true}" value=""/>
+        </div>
+    </div>
+
+    <button type="submit" class="action save primary">
+        <span><?php echo __('Submit Ticket') ?></span>
+    </button>
+    <div class='teste'>Okaaay</div>
+</form>
+<script>
+    require(['jquery', 'mage/mage'], function($) {
+        $('#form-validate').mage('validation', {});
+    });
+</script>

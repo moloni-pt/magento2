@@ -47,7 +47,15 @@ class Welcome extends Action
         $this->_page = $resultPageFactory;
         $this->_tokensFactory = $tokensFactory;
         $this->_coreRegistry = $coreRegistry;
+
+        $this->_init();
+
         parent::__construct($context);
+    }
+
+    public function _init()
+    {
+        
     }
 
     /**
@@ -62,7 +70,8 @@ class Welcome extends Action
         #echo $url;
         #$this->_coreRegistry->register('firstResult', $teste);
         $resultPage = $this->_page->create();
-        $resultPage->getConfig()->getTitle()->set('Welcome to Moloni');
+        #$resultPage->getConfig()->getTitle()->set(__('Welcome to Moloni'));
+
         return $resultPage;
     }
 }

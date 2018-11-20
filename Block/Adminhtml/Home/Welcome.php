@@ -30,18 +30,14 @@ class Welcome extends \Magento\Framework\View\Element\Template
     protected $_tokens;
 
     public function __construct(Context $context, Registry $coreRegistry)
-    {   
+    {
         $this->_coreRegistry = $coreRegistry;
         parent::__construct($context);
     }
 
-    public function sayHello()
+    public function _prepareLayout()
     {
-        return __('Hello World');
-    }
-
-    public function getTokensCollection()
-    {
-        return $this->_coreRegistry->registry('firstResult');
+        $this->pageConfig->getTitle()->set(__('Moloni - Login Page'));
+        return parent::_prepareLayout();
     }
 }

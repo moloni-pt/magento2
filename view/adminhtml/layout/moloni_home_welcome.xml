@@ -2,14 +2,15 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
     <body>
+        <attribute name="class" value="moloni"/>
         <referenceBlock name="menu">
             <action method="setActive">
-                <argument name="itemId" xsi:type="string">Invoicing_Moloni::index</argument>
+                <argument name="itemId" xsi:type="string">Invoicing_Moloni::home</argument>
             </action>
         </referenceBlock>
 
         <referenceContainer name="content">
-            <block class="Invoicing\Moloni\Block\Adminhtml\Home\Welcome" name="home.welcome" template="Invoicing_Moloni::home/welcome.phtml"/>        
+            <block class="Invoicing\Moloni\Block\Adminhtml\Home\Welcome" name="home.welcome" template="Invoicing_Moloni::home/welcome.phtml"/>
         </referenceContainer>
     </body>
 </page>
