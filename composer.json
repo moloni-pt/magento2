@@ -1,5 +1,5 @@
 {
-    "name": "invoicing/module-moloni",
+    "name": "moloni/magento2",
     "description": "Module for Magento 2 by Moloni",
     "type": "magento2-module",
     "version": "1.0.0",
