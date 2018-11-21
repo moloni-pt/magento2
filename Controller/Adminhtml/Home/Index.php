@@ -28,6 +28,7 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Registry;
 use Invoicing\Moloni\Model\TokensFactory;
 use Invoicing\Moloni\Model\MoloniFactory;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
 class Index extends Action
 {
@@ -43,7 +44,8 @@ class Index extends Action
      * @param \Magento\Backend\App\Action\Context  $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
-    public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, RedirectInterface $redirect, Http $response)
+    public function __construct(
+    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, RedirectInterface $redirect, Http $response, DataPersistorInterface $dataPersistant)
     {
         $this->moloni = $moloniFactory->create();
         $this->tokensFactory = $tokensFactory->create();
@@ -51,6 +53,7 @@ class Index extends Action
         $this->_coreRegistry = $coreRegistry;
         $this->_redirect = $redirect;
         $this->_response = $response;
+        $this->_session = $dataPersistant;
 
         parent::__construct($context);
     }
@@ -62,13 +65,18 @@ class Index extends Action
      */
     public function execute()
     {
-        $this->_init();
-
         if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {
-            $this->redirectToAuthentication();
+            $this->handleAuthentication();
         } else if ($this->getRequest()->getParam('code')) {
-            $this->moloni->execute($this->moloni->getAuthorizationUrl($this->getRequest()->getParam('code')));
-            exit;
+            if (!$this->moloni->doAuthorization($this->getRequest()->getParam('code'))) {
+                echo "Parei 2";
+                $this->_session->set('moloni_messages', array('Teste' => 'Olá'));
+                $teste = ($this->_session->get('moloni_messages'));
+                print_r(get_class_methods($this->_session));
+                print_r($this->_session->getData());
+                exit;
+                $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
+            }
         } else {
             $this->_init();
         }
@@ -82,7 +90,7 @@ class Index extends Action
         return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
     }
 
-    private function redirectToAuthentication()
+    private function handleAuthentication()
     {
         if ($this->tokensFactory->getTokens() == null) {
             $tokensObj = $this->tokensFactory;
@@ -95,7 +103,8 @@ class Index extends Action
         $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
         $tokensObj->save();
 
-        $this->_redirect($this->moloni->getAuthenticationUrl($tokensObj->getDeveloperId(), $tokensObj->getRedirectUri()));
+        $authenticationUrl = $this->moloni->getAuthenticationUrl();
+        $this->_redirect($authenticationUrl);
     }
 
     private function _init()

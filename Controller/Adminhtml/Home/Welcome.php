@@ -22,6 +22,7 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Response\Http;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Registry;
 use Invoicing\Moloni\Model\TokensFactory;
@@ -34,6 +35,7 @@ class Welcome extends Action
     protected $_moloni;
     protected $_tokensFactory;
     protected $_coreRegistry;
+    protected $_response;
 
     /**
      * Constructor
@@ -41,13 +43,14 @@ class Welcome extends Action
      * @param \Magento\Backend\App\Action\Context  $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
-    public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry)
+    public function __construct(Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Http $response)
     {
         $this->_moloni = $moloniFactory;
         $this->_page = $resultPageFactory;
         $this->_tokensFactory = $tokensFactory;
         $this->_coreRegistry = $coreRegistry;
-        
+        $this->_response = $response;
+
         parent::__construct($context);
     }
 
@@ -58,13 +61,9 @@ class Welcome extends Action
      */
     public function execute()
     {
-        #$url = 'https://api.moloni.pt/v1/grant/?grant_type=authorization_code&client_id=devmagento2&redirect_uri=http://retron.warz/magento2/admin/moloni/home/&client_secret=b349e4a794515326c808092d63c1af451ac96777&code='.$_GET['code'];
-        #$teste = $this->_moloni->execute($url);
-        #echo $url;
-        #$this->_coreRegistry->register('firstResult', $teste);
+ 
         $resultPage = $this->_page->create();
-        #$resultPage->getConfig()->getTitle()->set(__('Welcome to Moloni'));
-
         return $resultPage;
     }
+
 }
