@@ -2,7 +2,7 @@
     "name": "invoicing/module-moloni",
     "description": "Module for Magento 2 by Moloni",
     "type": "magento2-module",
-    "version": "^1.0.2",
+    "version": "v1.0.0",
     "license": "GPL-3.0",
     "authors": [
         {
