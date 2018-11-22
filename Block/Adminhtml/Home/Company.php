@@ -25,7 +25,7 @@ use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
-class Welcome extends Template
+class Company extends Template
 {
 
     protected $messages = false;
@@ -42,7 +42,7 @@ class Welcome extends Template
 
     public function _prepareLayout()
     {
-        $this->pageConfig->getTitle()->set(__('Moloni - Login Page'));
+        $this->pageConfig->getTitle()->set(__('Moloni - Select your company'));
         return parent::_prepareLayout();
     }
 

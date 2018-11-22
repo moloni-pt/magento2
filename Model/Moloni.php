@@ -20,12 +20,11 @@ class Moloni
     const API_URL = 'https://api.moloni.pt/v1/';
     const LIBRARY_PATH = 'MoloniLibrary';
     const MY_NAMESPACE = '\MoloniLibrary\\';
-    
+
     public $errors;
-    
     protected $curl;
     protected $tokens;
-    protected $activeSession;
+    public $activeSession;
     protected $dateTime;
     private $dependencies = array(
         "Errors" => "Errors.php",
@@ -65,10 +64,20 @@ class Moloni
             if (isset($response['error'])) {
                 $this->errors->throwError(__('Erro de autenticação'), __('Ocorreu um erro durante a operação de autenticação'), $authorizationUrl, $response);
                 return false;
+            } else {
+                $activeTokens->setAccessToken($response['access_token']);
+                $activeTokens->setRefreshToken($response['refresh_token']);
+                $activeTokens->setExpireDate($this->dateTime->formatDate((time() + 3000), true));
+                $activeTokens->setLoginDate($this->dateTime->formatDate(true, true));
+
+                $activeTokens->save();
+
+                $this->activeSession = $activeTokens->toArray();
+                return true;
             }
         }
 
-        return $response;
+        return false;
     }
 
     public function hasValidSession()
@@ -90,6 +99,7 @@ class Moloni
                 }
             } else {
                 $this->activeSession = $activeTokens->toArray();
+                return true;
             }
         } else {
             return false;
@@ -128,5 +138,4 @@ class Moloni
             $this->{$name} = new $className();
         }
     }
-
 }

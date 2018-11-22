@@ -30,7 +30,7 @@ use Invoicing\Moloni\Model\TokensFactory;
 use Invoicing\Moloni\Model\MoloniFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
-class Welcome extends Action
+class Company extends Action
 {
 
     protected $_page;
@@ -70,40 +70,8 @@ class Welcome extends Action
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
-    {
-        if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {            
-            $this->handleAuthentication();
-        } else if ($this->getRequest()->getParam('code')) {
-            $accessTokens = $this->moloni->doAuthorization($this->getRequest()->getParam('code'));
-            if (!$accessTokens) {
-                $errorMessage = array(array('type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']));
-                $this->_coreRegistry->register('moloni_messages', $errorMessage);
-            } else {
-               
-                echo "Aqui vamos escolher a empresa";
-                $this->_redirect->redirect($this->_response, 'moloni/home/company/');
-                exit;
-            }
-        } 
-
+    {       
         $resultPage = $this->_page->create();
         return $resultPage;
-    }
-
-    private function handleAuthentication()
-    {
-        if ($this->tokensFactory->getTokens() == null) {
-            $tokensObj = $this->tokensFactory;
-        } else {
-            $tokensObj = $this->tokensFactory->getTokens();
-        }
-
-        $tokensObj->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
-        $tokensObj->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
-        $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
-        $tokensObj->save();
-
-        $authenticationUrl = $this->moloni->getAuthenticationUrl();
-        $this->_redirect($authenticationUrl);
-    }  
+    } 
 }

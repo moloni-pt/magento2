@@ -49,9 +49,6 @@ class Tokens extends AbstractModel implements \Magento\Framework\DataObject\Iden
             if ($collection->getSize()) {
                 $this->tokensRow = $collection->getFirstItem();
             }
-            echo "Olha NÃO estou em cache";
-        }else{
-            echo "Olha estou em cache";
         }
 
         return $this->tokensRow;

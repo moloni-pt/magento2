@@ -1,10 +1,20 @@
-<form id="form-validate" action="<?php echo $block->getUrl('moloni/home/') ?>" method="post"> 
+<form id="form-validate" action="<?php echo $block->getUrl('moloni/home/welcome') ?>" method="post"> 
     <div class='login-form'>
         <?php echo $block->getBlockHtml('formkey') ?>
 
         <div class='panel-left'>
             <fieldset class="fieldset">
-                <legend><?php echo __('Bem vindo ao moloni') ?></legend>
+                <legend>
+                    <?php echo __('Bem vindo ao moloni') ?>
+                    <?php
+                    if ($block->getMessages()) {
+                        foreach ($block->getMessages() as $message) {
+                            echo "<br><div class='message-" . $message['type'] . "'>" . $message['message'] . "</div>";
+                        }
+                    }
+                    ?>
+                </legend>
+
                 <div class="field title required">
                     <label class="label" for="developer_id"><span><?php echo __('Developer Id') ?></span></label>
                     <div class="control">
@@ -22,7 +32,7 @@
                 <div class="field title">
                     <label class="label" for="redirect_uri"><span><?php echo __('Redirect URI') ?></span></label>
                     <div class="control">
-                        <input id="title" type="text" name="redirect_uri" value="<?php echo $block->getUrl('moloni/home/') ?>" readonly/>
+                        <input id="title" type="text" name="redirect_uri" value="<?php echo $block->getUrl('moloni/home/welcome') ?>" readonly/>
                     </div>               
                 </div>
 

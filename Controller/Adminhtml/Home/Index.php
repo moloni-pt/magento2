@@ -22,8 +22,8 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Response\Http;
-use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Registry;
 use Invoicing\Moloni\Model\TokensFactory;
@@ -45,7 +45,7 @@ class Index extends Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, RedirectInterface $redirect, Http $response, DataPersistorInterface $dataPersistant)
+    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Redirect $redirect, Http $response, DataPersistorInterface $dataPersistant)
     {
         $this->moloni = $moloniFactory->create();
         $this->tokensFactory = $tokensFactory->create();
@@ -53,9 +53,14 @@ class Index extends Action
         $this->_coreRegistry = $coreRegistry;
         $this->_redirect = $redirect;
         $this->_response = $response;
-        $this->_session = $dataPersistant;
+        $this->_dataPersistor = $dataPersistant;
 
         parent::__construct($context);
+    }
+
+    public function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
     }
 
     /**
@@ -65,46 +70,11 @@ class Index extends Action
      */
     public function execute()
     {
-        if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {
-            $this->handleAuthentication();
-        } else if ($this->getRequest()->getParam('code')) {
-            if (!$this->moloni->doAuthorization($this->getRequest()->getParam('code'))) {
-                echo "Parei 2";
-                $this->_session->set('moloni_messages', array('Teste' => 'Olá'));
-                $teste = ($this->_session->get('moloni_messages'));
-                print_r(get_class_methods($this->_session));
-                print_r($this->_session->getData());
-                exit;
-                $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
-            }
-        } else {
-            $this->_init();
-        }
+
+        $this->_init();
 
         $resultPage = $this->_page->create();
         return $resultPage;
-    }
-
-    public function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
-    }
-
-    private function handleAuthentication()
-    {
-        if ($this->tokensFactory->getTokens() == null) {
-            $tokensObj = $this->tokensFactory;
-        } else {
-            $tokensObj = $this->tokensFactory->getTokens();
-        }
-
-        $tokensObj->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
-        $tokensObj->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
-        $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
-        $tokensObj->save();
-
-        $authenticationUrl = $this->moloni->getAuthenticationUrl();
-        $this->_redirect($authenticationUrl);
     }
 
     private function _init()
@@ -112,6 +82,9 @@ class Index extends Action
         if (!$this->moloni->hasValidSession()) {
             $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
         }
-    }
 
+        if ($this->moloni->activeSession['company_id'] == null) {
+            $this->_redirect->redirect($this->_response, 'moloni/home/company/');
+        }
+    }
 }
