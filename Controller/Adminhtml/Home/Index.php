@@ -51,7 +51,6 @@ class Index extends Action
         $this->tokensFactory = $tokensFactory->create();
         $this->_page = $resultPageFactory;
         $this->_coreRegistry = $coreRegistry;
-        $this->_redirect = $redirect;
         $this->_response = $response;
         $this->_dataPersistor = $dataPersistant;
 
@@ -71,20 +70,11 @@ class Index extends Action
     public function execute()
     {
 
-        $this->_init();
+        if(!$this->moloni->session->validateSession()){
+            $this->_redirect->redirect($this->_response, $this->moloni->redirectTo);
+        }
 
         $resultPage = $this->_page->create();
         return $resultPage;
-    }
-
-    private function _init()
-    {
-        if (!$this->moloni->hasValidSession()) {
-            $this->_redirect->redirect($this->_response, 'moloni/home/welcome/');
-        }
-
-        if ($this->moloni->activeSession['company_id'] == null) {
-            $this->_redirect->redirect($this->_response, 'moloni/home/company/');
-        }
     }
 }

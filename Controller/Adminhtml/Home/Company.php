@@ -55,7 +55,7 @@ class Company extends Action
         $this->_redirect = $redirect;
         $this->_response = $response;
         $this->_dataPersistor = $dataPersistant;
-        
+
         parent::__construct($context);
     }
 
@@ -70,8 +70,15 @@ class Company extends Action
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
-    {       
+    {
+        $this->moloni->session->validateSession();
+
         $resultPage = $this->_page->create();
         return $resultPage;
-    } 
+    }
+
+    private function _init()
+    {
+        
+    }
 }

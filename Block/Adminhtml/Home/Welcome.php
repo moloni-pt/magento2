@@ -28,9 +28,10 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 class Welcome extends Template
 {
 
-    protected $messages = false;
+    public $messages = false;
     protected $_coreRegistry;
     protected $_tokens;
+    protected $_dataPersistor;
 
     public function __construct(Context $context, Registry $coreRegistry, DataPersistorInterface $dataPersistant)
     {
@@ -48,12 +49,16 @@ class Welcome extends Template
 
     public function getMessages()
     {
-        $persistingMessages = $this->_coreRegistry->registry('moloni_messages');
-        if (!empty($persistingMessages)) {
-            $this->_coreRegistry->registry('moloni_messages');
-            $this->messages = $persistingMessages;
+        $registryMessages = $this->_coreRegistry->registry('moloni_messages');
+        if (!empty($registryMessages)) {
+            $this->messages = $registryMessages;
         }
 
+        $persistingMessages = $this->_dataPersistor->get('moloni_messages');
+        if (!empty($persistingMessages)) {
+            $this->_dataPersistor->clear('moloni_messages');
+            $this->messages = $persistingMessages;
+        }
         return $this->messages;
     }
 }

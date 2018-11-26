@@ -9,7 +9,11 @@ namespace MoloniLibrary;
 class Errors
 {
     private $error_log = array();
-
+    
+    public function hasError(){
+        return !empty($this->error_log);
+    }
+    
     public function throwError($title, $message, $where, $received = false, $sent = false)
     {
         if (is_Array($message)) {
