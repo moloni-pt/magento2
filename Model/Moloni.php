@@ -32,8 +32,7 @@ class Moloni
     public $_dateTime;
     private $__dependencies = array(
         "Errors" => "Errors.php",
-        "Session" => "Session.php",
-        # "debug" => "debug.class.php",
+        "Session" => "Session.php"
     );
 
     /**
@@ -51,55 +50,59 @@ class Moloni
 
         $this->loadDependencies();
     }
-   
+
+    public function __get($name)
+    {
+        $fileName = self::LIBRARY_PATH . "/classes/" . ucfirst($name) . "Class.php";
+        $className = self::MY_NAMESPACE . ucfirst($name);
+        if (!method_exists($this, $name)) {
+            $this->load($fileName, $name, $className);
+        }
+
+        return $this->{$name};
+    }
+
+    public function __call($name, $documentType)
+    {
+        $this->documentType = empty($documentType[0]) ? "documents" : $documentType[0];
+
+        if (!isset($this->{$name}) && !isset($this->dependencies[$name])) {
+            $this->load("moloni/classes/" . $name . ".class.php", $name, $this->namespace . $name);
+        }
+        return $this->{$name};
+    }
 
     public function getCompanyId()
     {
         return isset($this->_tokens->getCompanyId);
     }
 
+    public function isAuthorized($code)
+    {
+        if (!empty($code)) {
+            return $this->session->doAuthorization($code);
+        } else {
+            return $this->errors->throwError(__('Erro de autenticação'), __('Code is not defined'), __FUNCTION__);
+        }
+    }
+
+    public function hasValidSession()
+    {
+        $this->activeSession = $this->session->validateSession();
+        return $this->activeSession ? true : false;
+    }
+
     public function getAuthenticationUrl()
     {
-        $activeTokens = $this->_tokens->getTokens();
-        if (!empty($activeTokens->getDeveloperId()) && !empty($activeTokens->getRedirectUri())) {
-            return self::API_URL . 'authorize/?response_type=code&client_id=' . $activeTokens->getDeveloperId() . '&redirect_uri=' . urlencode($activeTokens->getRedirectUri());
-        } else {
-            return false;
-        }
+        return $this->session->formAuthenticationUrl();
     }
 
-    public function doAuthorization($code)
-    {
-        $activeTokens = $this->_tokens->getTokens();
-        if ($activeTokens && $activeTokens->getDeveloperId()) {
-            $authorizationUrl = self::API_URL . 'grant/?grant_type=authorization_code&client_id=' . $activeTokens->getDeveloperId() . '&redirect_uri=' . urlencode($activeTokens->getRedirectUri()) . '&client_secret=' . $activeTokens->getSecretToken() . '&code=' . $code;
-            $response = $this->execute($authorizationUrl);
-
-            if (isset($response['error'])) {
-                $this->errors->throwError(__('Erro de autenticação'), __('Ocorreu um erro durante a operação de autenticação'), $authorizationUrl, $response);
-                return false;
-            } else {
-                $activeTokens->setAccessToken($response['access_token']);
-                $activeTokens->setRefreshToken($response['refresh_token']);
-                $activeTokens->setExpireDate($this->_dateTime->formatDate((time() + 3000), true));
-                $activeTokens->setLoginDate($this->_dateTime->formatDate(true, true));
-
-                $activeTokens->save();
-
-                $this->activeSession = $activeTokens->toArray();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    
-    private function execute($url, $params = false)
+    public function execute($url, $params = false, $debug = false)
     {
         $response = false;
+        $requestUrl = self::API_URL . $url . '/' . ($this->activeSession ? '?human_errors=true&access_token=' . $this->activeSession['access_token'] : '');
 
-        $this->_curl->post($url, $params);
+        $this->_curl->post($requestUrl, $params);
         $raw = $this->_curl->getBody();
 
         if (!empty($raw)) {

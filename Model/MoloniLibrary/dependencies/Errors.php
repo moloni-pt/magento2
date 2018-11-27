@@ -23,6 +23,8 @@ class Errors
         } else {
             $this->logError($title, $message, $where, $received, $sent);
         }
+        
+        return false;
     }
 
     public function logError($title, $message, $where, $received = false, $sent = false)

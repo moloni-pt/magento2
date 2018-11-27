@@ -71,7 +71,7 @@ class Index extends Action
     {
 
         if(!$this->moloni->session->validateSession()){
-            $this->_redirect->redirect($this->_response, $this->moloni->redirectTo);
+            $this->_redirect->redirect($this->moloni->redirectTo);
         }
 
         $resultPage = $this->_page->create();

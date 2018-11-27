@@ -71,10 +71,8 @@ class Welcome extends Action
         if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
         } else if ($this->getRequest()->getParam('code')) {
-            $accessTokens = $this->moloni->doAuthorization($this->getRequest()->getParam('code'));
-            if (!$accessTokens) {
-                $errorMessage = array(array('type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']));
-                $this->_coreRegistry->register('moloni_messages', $errorMessage);
+            if (!$this->moloni->isAuthorized($this->getRequest()->getParam('code'))) {
+                $this->_coreRegistry->register('moloni_messages', array(array('type' => 'error', 'message' => $this->moloni->errors->getError('last')['message'])));
             } else {
                 $this->_redirect->redirect($this->_response, 'moloni/home/company/');
             }

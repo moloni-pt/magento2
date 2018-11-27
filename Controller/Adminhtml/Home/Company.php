@@ -71,14 +71,19 @@ class Company extends Action
      */
     public function execute()
     {
-        $this->moloni->session->validateSession();
+        if (!$this->moloni->hasValidSession()) {
+            $this->_redirect($this->moloni->redirectTo);
+        } else {
+            $companies1 = $this->moloni->companies->getAll();
+            $companies2 = $this->moloni->companies->getAll();
+            
+            echo "<pre>";
+            print_r($companies1);
+            print_r($companies2);
+            exit;
+        }
 
         $resultPage = $this->_page->create();
         return $resultPage;
-    }
-
-    private function _init()
-    {
-        
     }
 }
