@@ -45,7 +45,7 @@ class Index extends Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Redirect $redirect, Http $response, DataPersistorInterface $dataPersistant)
+    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Http $response, DataPersistorInterface $dataPersistant)
     {
         $this->moloni = $moloniFactory->create();
         $this->tokensFactory = $tokensFactory->create();
@@ -71,7 +71,7 @@ class Index extends Action
     {
 
         if(!$this->moloni->session->validateSession()){
-            $this->_redirect->redirect($this->moloni->redirectTo);
+            $this->_redirect->redirect($this->_response, $this->moloni->redirectTo);
         }
 
         $resultPage = $this->_page->create();

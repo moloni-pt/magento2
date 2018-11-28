@@ -46,13 +46,12 @@ class Company extends Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Redirect $redirect, Http $response, DataPersistorInterface $dataPersistant)
+    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Http $response, DataPersistorInterface $dataPersistant)
     {
         $this->moloni = $moloniFactory->create();
         $this->tokensFactory = $tokensFactory->create();
         $this->_page = $resultPageFactory;
         $this->_coreRegistry = $coreRegistry;
-        $this->_redirect = $redirect;
         $this->_response = $response;
         $this->_dataPersistor = $dataPersistant;
 
@@ -72,15 +71,11 @@ class Company extends Action
     public function execute()
     {
         if (!$this->moloni->hasValidSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+             $this->_redirect->redirect($this->_response, $this->moloni->redirectTo);
         } else {
             $companies1 = $this->moloni->companies->getAll();
             $companies2 = $this->moloni->companies->getAll();
-            
-            echo "<pre>";
-            print_r($companies1);
-            print_r($companies2);
-            exit;
+
         }
 
         $resultPage = $this->_page->create();

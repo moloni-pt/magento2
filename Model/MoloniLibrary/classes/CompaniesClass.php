@@ -30,7 +30,7 @@ class Companies
 
     public function getAll()
     {
-        $result = $this->moloni->execute("companies/getAll", null, true);
+        $result = $this->moloni->execute("companies/getAll", null);
         if (is_array($result) && isset($result[0]['company_id'])) {
             return $result;
         } else {

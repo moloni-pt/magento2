@@ -24,6 +24,8 @@ use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Invoicing\Moloni\Model\MoloniFactory;
+
 
 class Company extends Template
 {
@@ -32,11 +34,13 @@ class Company extends Template
     protected $_coreRegistry;
     protected $_tokens;
 
-    public function __construct(Context $context, Registry $coreRegistry, DataPersistorInterface $dataPersistant)
+    public function __construct(Context $context, Registry $coreRegistry, DataPersistorInterface $dataPersistant, MoloniFactory $moloniFactory)
     {
         $this->_coreRegistry = $coreRegistry;
         $this->_dataPersistor = $dataPersistant;
-
+        $this->moloni = $moloniFactory->create();
+        print_r(get_class_methods($this->moloni));
+        exit;
         parent::__construct($context);
     }
 

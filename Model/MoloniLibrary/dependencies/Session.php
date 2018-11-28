@@ -35,9 +35,9 @@ class Session
         if ($this->tokens && $this->tokens->getDeveloperId()) {
             $authorizationUrl = 'grant/?grant_type=authorization_code&client_id=' . $this->tokens->getDeveloperId() . '&redirect_uri=' . urlencode($this->tokens->getRedirectUri()) . '&client_secret=' . $this->tokens->getSecretToken() . '&code=' . $code;
             $response = $this->moloni->execute($authorizationUrl);
-
+            
             if (isset($response['error'])) {
-                return $this->moloni->errors->throwError(__('Erro de autenticação'), __('Ocorreu um erro durante a operação de autenticação'), $authorizationUrl, $response);
+                return $this->moloni->errors->throwError(__('Erro de autenticação'), __('Ocorreu um erro durante a operação de autenticação<br>'.$response['error']), $authorizationUrl, $response);
             } else {
                 $this->tokens->setAccessToken($response['access_token']);
                 $this->tokens->setRefreshToken($response['refresh_token']);
@@ -67,7 +67,7 @@ class Session
 
         if ($this->moloni->errors->hasError()) {
             $errorMessage = array(array('type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']));
-            $this->_dataPersistor->set('moloni_messages', $errorMessage);
+            $this->moloni->_dataPersistor->set('moloni_messages', $errorMessage);
         }
 
         return false;

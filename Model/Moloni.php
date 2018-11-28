@@ -100,13 +100,19 @@ class Moloni
     public function execute($url, $params = false, $debug = false)
     {
         $response = false;
-        $requestUrl = self::API_URL . $url . '/' . ($this->activeSession ? '?human_errors=true&access_token=' . $this->activeSession['access_token'] : '');
-
+        $requestUrl = self::API_URL . $url . ($this->activeSession ? '/?human_errors=true&access_token=' . $this->activeSession['access_token'] : '');
         $this->_curl->post($requestUrl, $params);
-        $raw = $this->_curl->getBody();
+        $raw = $this->_curl->getBody();        
 
         if (!empty($raw)) {
             $response = json_decode($raw, true);
+        }
+        
+        if ($debug) {
+            echo "Url: " . $requestUrl . "<br>";
+            echo "Dados Enviados: " . "<br><pre>" . print_r($params, true) . "</pre><br>";
+            echo "Dados Recebidos: " . "<br><pre>" . print_r($response, true) . "</pre>";
+            exit;
         }
 
         return $response;
