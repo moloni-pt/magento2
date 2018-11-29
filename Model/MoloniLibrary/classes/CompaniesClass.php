@@ -18,7 +18,7 @@ class Companies
 
     public function getOne($company_id = false)
     {
-        $values = array("company_id" => ($company_id ? $company_id : $this->moloni->company_id));
+        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->company_id)];
         $result = $this->moloni->execute("companies/getOne", $values);
         if (is_array($result) && isset($result['company_id'])) {
             return $result;

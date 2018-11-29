@@ -8,9 +8,10 @@ namespace MoloniLibrary;
 
 class Errors
 {
-    private $error_log = array();
+    private $error_log = [];
     
-    public function hasError(){
+    public function hasError()
+    {
         return !empty($this->error_log);
     }
     
@@ -29,15 +30,15 @@ class Errors
 
     public function logError($title, $message, $where, $received = false, $sent = false)
     {
-        $this->error_log[] = array(
+        $this->error_log[] = [
             "title" => $title,
             "message" => $this->translateMessage($message),
             "where" => $where,
-            "values" => array(
+            "values" => [
                 "received" => $received,
                 "sent" => $sent
-            )
-        );
+            ]
+        ];
     }
 
     // @params $order all|first|last
@@ -45,9 +46,9 @@ class Errors
     {
         if ($this->error_log && is_array($this->error_log)) {
             switch ($order) {
-                case "first" :
+                case "first":
                     return $this->error_log[0];
-                case "last" :
+                case "last":
                     $aux = end($this->error_log);
                     return $aux;
                 case "all":
@@ -62,36 +63,35 @@ class Errors
     private function translateMessage($string)
     {
         switch ($string) {
-            case "1 name" :
+            case "1 name":
                 $string = "Campo nome não pode estar em branco";
                 break;
-            case "1 number" :
+            case "1 number":
                 $string = "Campo number não pode estar em branco";
                 break;
-            case "2 maturity_date_id 1 0" :
+            case "2 maturity_date_id 1 0":
                 $string = "Defina um prazo de vencimento nas configurações do plugin";
                 break;
-            case "2 unit_id 1 0" :
+            case "2 unit_id 1 0":
                 $string = "Unidade de medida errada";
                 break;
-            case "1 exemption_reason" :
+            case "1 exemption_reason":
                 $string = "Um dos artigos requer uma razão de isenção";
                 break;
-            case "5 exemption_reason" :
+            case "5 exemption_reason":
                 $string = "Um dos artigos não tem uma razão de isenção definida";
                 break;
-            case "5 document_set_id" :
+            case "5 document_set_id":
                 $string = "Não está definida a série onde quer emitir o documento";
                 break;
-            case "2 price 0 null null 0" :
+            case "2 price 0 null null 0":
                 $string = "Um dos artigos tem o preço igual a 0";
                 break;
 
-            case "2 category_id 1 0" :
+            case "2 category_id 1 0":
                 $string = "Um dos artigos não tem uma categoria definida.";
                 break;
         }
         return $string;
     }
-
 }

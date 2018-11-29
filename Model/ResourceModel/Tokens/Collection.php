@@ -27,5 +27,4 @@ class Collection extends AbstractCollection
     {
         $this->_init('Invoicing\Moloni\Model\Tokens', 'Invoicing\Moloni\Model\ResourceModel\Tokens');
     }
-
 }

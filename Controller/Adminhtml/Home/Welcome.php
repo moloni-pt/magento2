@@ -2,19 +2,19 @@
 /**
  * Module for Magento 2 by Moloni
  * Copyright (C) 2017  Moloni, lda
- * 
+ *
  * This file is part of Invoicing/Moloni.
- * 
+ *
  * Invoicing/Moloni is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,9 +45,16 @@ class Welcome extends Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Http $response, DataPersistorInterface $dataPersistant)
-    {
-        $this->moloni = $moloniFactory->create();
+        Context $context,
+        PageFactory $resultPageFactory,
+        TokensFactory $tokensFactory,
+        MoloniFactory $moloniFactory,
+        Registry $coreRegistry,
+        Http $response,
+        DataPersistorInterface $dataPersistant
+    ) {
+    
+        $this->moloni = $moloniFactory;
         $this->tokensFactory = $tokensFactory->create();
         $this->_page = $resultPageFactory;
         $this->_coreRegistry = $coreRegistry;
@@ -70,9 +77,9 @@ class Welcome extends Action
     {
         if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
-        } else if ($this->getRequest()->getParam('code')) {
+        } elseif ($this->getRequest()->getParam('code')) {
             if (!$this->moloni->isAuthorized($this->getRequest()->getParam('code'))) {
-                $this->_coreRegistry->register('moloni_messages', array(array('type' => 'error', 'message' => $this->moloni->errors->getError('last')['message'])));
+                $this->_coreRegistry->register('moloni_messages', [['type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']]]);
             } else {
                 $this->_redirect->redirect($this->_response, 'moloni/home/company/');
             }
@@ -84,6 +91,8 @@ class Welcome extends Action
 
     private function handleAuthentication()
     {
+        $this->tokensFactory->create();
+
         if ($this->tokensFactory->getTokens() == null) {
             $tokensObj = $this->tokensFactory;
         } else {

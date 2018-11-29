@@ -30,10 +30,10 @@ class Moloni
     public $_curl;
     public $_tokens;
     public $_dateTime;
-    private $__dependencies = array(
+    private $__dependencies = [
         "Errors" => "Errors.php",
         "Session" => "Session.php"
-    );
+    ];
 
     /**
      * @param Context                             $context
@@ -102,7 +102,7 @@ class Moloni
         $response = false;
         $requestUrl = self::API_URL . $url . ($this->activeSession ? '/?human_errors=true&access_token=' . $this->activeSession['access_token'] : '');
         $this->_curl->post($requestUrl, $params);
-        $raw = $this->_curl->getBody();        
+        $raw = $this->_curl->getBody();
 
         if (!empty($raw)) {
             $response = json_decode($raw, true);

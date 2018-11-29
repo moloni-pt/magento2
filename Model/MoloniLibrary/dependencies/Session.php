@@ -66,7 +66,7 @@ class Session
         }
 
         if ($this->moloni->errors->hasError()) {
-            $errorMessage = array(array('type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']));
+            $errorMessage = [['type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']]];
             $this->moloni->_dataPersistor->set('moloni_messages', $errorMessage);
         }
 

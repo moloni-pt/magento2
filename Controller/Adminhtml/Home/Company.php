@@ -2,19 +2,19 @@
 /**
  * Module for Magento 2 by Moloni
  * Copyright (C) 2017  Moloni, lda
- * 
+ *
  * This file is part of Invoicing/Moloni.
- * 
+ *
  * Invoicing/Moloni is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,8 +46,15 @@ class Company extends Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
-    Context $context, PageFactory $resultPageFactory, TokensFactory $tokensFactory, MoloniFactory $moloniFactory, Registry $coreRegistry, Http $response, DataPersistorInterface $dataPersistant)
-    {
+        Context $context,
+        PageFactory $resultPageFactory,
+        TokensFactory $tokensFactory,
+        MoloniFactory $moloniFactory,
+        Registry $coreRegistry,
+        Http $response,
+        DataPersistorInterface $dataPersistant
+    ) {
+    
         $this->moloni = $moloniFactory->create();
         $this->tokensFactory = $tokensFactory->create();
         $this->_page = $resultPageFactory;
@@ -75,7 +82,6 @@ class Company extends Action
         } else {
             $companies1 = $this->moloni->companies->getAll();
             $companies2 = $this->moloni->companies->getAll();
-
         }
 
         $resultPage = $this->_page->create();
