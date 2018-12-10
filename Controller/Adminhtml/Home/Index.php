@@ -36,6 +36,7 @@ class Index extends Action
 
     private $page;
     private $moloni;
+    private $moloniFactory;
     private $dataPersistor;
     private $coreRegistry;
     private $response;
@@ -59,18 +60,13 @@ class Index extends Action
         DataPersistorInterface $dataPersistant
     ) {
 
-        $this->moloni = $moloniFactory;
+        $this->moloniFactory = $moloniFactory;
         $this->page = $resultPageFactory;
         $this->coreRegistry = $coreRegistry;
         $this->response = $response;
         $this->dataPersistor = $dataPersistant;
 
         parent::__construct($context);
-    }
-
-    protected function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
     }
 
     /**
@@ -80,9 +76,9 @@ class Index extends Action
      */
     public function execute()
     {
-        $this->moloni->create();
+        $this->moloni = $this->moloniFactory->create();
 
-        if (!$this->moloni->session->validateSession()) {
+        if (!$this->moloni->hasValidSession()) {
             $this->_redirect->redirect($this->response, $this->moloni->redirectTo);
         }
 

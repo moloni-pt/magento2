@@ -18,92 +18,102 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
-use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Framework\App\Response\Http;
 use Magento\Framework\View\Result\PageFactory;
-use Invoicing\Moloni\Model\TokensFactory;
+use Psr\Log\LoggerInterface;
+use Invoicing\Moloni\Api\Data\TokensInterface;
 use Invoicing\Moloni\Model\MoloniFactory;
 
 class Welcome extends Action
 {
 
-    protected $_page;
-    protected $_moloni;
-    protected $_tokensFactory;
-    protected $_coreRegistry;
-    protected $_response;
+    private $logger;
+    private $coreRegistry;
+    private $moloni;
+    private $tokens;
+    private $moloniFactory;
+    private $tokensFactory;
+    private $pageFactory;
 
     /**
-     * Constructor
-     *
-     * @param \Magento\Backend\App\Action\Context  $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * Welcome constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param LoggerInterface $logger
+     * @param TokensInterface $tokensFactory
+     * @param MoloniFactory $moloniFactory
+     * @param Registry $coreRegistry
      */
+
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        TokensFactory $tokensFactory,
+        LoggerInterface $logger,
+        TokensInterface $tokensFactory,
         MoloniFactory $moloniFactory,
-        Registry $coreRegistry,
-        Http $response,
-        DataPersistorInterface $dataPersistant
-    ) {
-    
-        $this->moloni = $moloniFactory;
-        $this->tokensFactory = $tokensFactory->create();
-        $this->_page = $resultPageFactory;
-        $this->_coreRegistry = $coreRegistry;
-        $this->_dataPersistor = $dataPersistant;
+        Registry $coreRegistry
+    )
+    {
+        $this->logger = $logger;
+        $this->coreRegistry = $coreRegistry;
+        $this->pageFactory = $resultPageFactory;
+        $this->moloniFactory = $moloniFactory;
+        $this->tokensFactory = $tokensFactory;
 
         parent::__construct($context);
     }
 
-    public function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Invoicing_Moloni::home_welcome');
-    }
-
     /**
-     * Execute view action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
+     * @throws \Exception
      */
     public function execute()
     {
-        if ($this->getRequest()->getPostValue('developer_id') && $this->getRequest()->getPostValue('secret_token')) {
+        if($this->tokensFactory->getId()){
+            echo "Teste";
+            exit;
+        }
+        $tokensObj = $this->tokensFactory->getId();
+        print_r($tokensObj->getFirstItem()->toArray());
+        exit;
+        if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
-        } elseif ($this->getRequest()->getParam('code')) {
+        } elseif ($this->getRequest()->getParam("code")) {
             if (!$this->moloni->isAuthorized($this->getRequest()->getParam('code'))) {
-                $this->_coreRegistry->register('moloni_messages', [['type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']]]);
+                $this->coreRegistry->register(
+                    "moloni_messages",
+                    [['type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']]]
+                );
             } else {
                 $this->_redirect->redirect($this->_response, 'moloni/home/company/');
             }
         }
 
-        $resultPage = $this->_page->create();
+        $resultPage = $this->pageFactory->create();
         return $resultPage;
     }
 
+    /**
+     * @throws \Exception
+     */
     private function handleAuthentication()
     {
-        $this->tokensFactory->create();
+        try {
+            $tokensObj = $this->tokensFactory->getCollection();
 
-        if ($this->tokensFactory->getTokens() == null) {
-            $tokensObj = $this->tokensFactory;
-        } else {
-            $tokensObj = $this->tokensFactory->getTokens();
+            $tokensObj->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
+            $tokensObj->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
+            $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
+            $tokensObj->save();
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
         }
-
-        $tokensObj->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
-        $tokensObj->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
-        $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
-        $tokensObj->save();
-
+        exit;
         $authenticationUrl = $this->moloni->getAuthenticationUrl();
         $this->_redirect($authenticationUrl);
     }

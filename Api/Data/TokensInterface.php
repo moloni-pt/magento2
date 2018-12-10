@@ -18,100 +18,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Api\Data;
 
 interface TokensInterface
 {
 
-    const ID            = 'id';
-    const ACCESS_TOKEN  = 'access_token';
+    const ID = 'id';
+    const DEVELOPER_ID = 'developer_id';
+    const REDIRECT_URI = 'redirect_uri';
+    const ACCESS_TOKEN = 'access_token';
+    const SECRET_TOKEN = 'secret_token';
     const REFRESH_TOKEN = 'refresh_token';
-    const COMPANY_ID    = 'company_id';
-    const EXPIRE_DATE   = 'expire_date';
-    const LOGIN_DATE    = 'login_date';
-    
-    /**
-     * Get ID
-     *
-     * @return int|null
-     */
-    public function getId();
-    
-    /**
-     * Get Access Token
-     *
-     * @return string|null
-     */
-    public function getAccessToken();
-    
-    /**
-     * Get Refresh Token
-     *
-     * @return string|null
-     */
-    public function getRefreshToken();
-    
-    /**
-     * Get Company Id
-     *
-     * @return int|null
-     */
-    public function getCompanyId();
-    
-    /**
-     * Get Expire Date
-     *
-     * @return date|null
-     */
-    public function getExpireDate();
-    
-    /**
-     * Get Login Date
-     *
-     * @return date|null
-     */
-    public function getLoginDate();
-    
-    
-    /**
-     * Set Id
-     *
-     * @return string|null
-     */
-    public function setId($id);
-    
-    /**
-     * Set Access Token
-     *
-     * @return string|null
-     */
-    public function setAccessToken($access_token);
-    
-    /**
-     * Set Refresh Token
-     *
-     * @return string|null
-     */
-    public function setRefreshToken($refresh_token);
-    
-    /**
-     * Get Company Id
-     *
-     * @return int|null
-     */
-    public function setCompanyId($company_id);
-    
-    /**
-     * Get Expire Date
-     *
-     * @return date|null
-     */
-    public function setExpireDate($expire_date);
-    
-    /**
-     * Set Login Date
-     *
-     * @return date|null
-     */
-    public function setLoginDate($login_date);
+    const COMPANY_ID = 'company_id';
+    const EXPIRE_DATE = 'expire_date';
+    const LOGIN_DATE = 'login_date';
+
+    public function getTokens();
 }

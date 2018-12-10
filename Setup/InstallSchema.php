@@ -268,10 +268,10 @@ class InstallSchema implements InstallSchemaInterface
             $this->installer->getIdxName(
                 $this->installer->getTable('moloni_documents'),
                 ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
-                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
             ),
             ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
-            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
         );
     }
     
@@ -282,10 +282,10 @@ class InstallSchema implements InstallSchemaInterface
             $this->installer->getIdxName(
                 $this->installer->getTable('moloni_settings'),
                 ['option_id', 'company_id', 'store_id', 'label', 'value'],
-                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
             ),
             ['option_id', 'company_id', 'store_id', 'label', 'value'],
-            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
         );
     }
 }

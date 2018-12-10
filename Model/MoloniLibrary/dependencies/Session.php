@@ -17,7 +17,7 @@ class Session
     public function __construct(Moloni $moloni)
     {
         $this->moloni = $moloni;
-        $this->tokens = $this->moloni->_tokens->getTokens();
+        $this->tokens = $this->moloni->tokens->getTokens();
     }
 
     public function formAuthenticationUrl()

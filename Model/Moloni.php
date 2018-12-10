@@ -4,6 +4,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 namespace Invoicing\Moloni\Model;
 
 use Magento\Framework\HTTP\Client\Curl;
@@ -20,33 +21,34 @@ use Invoicing\Moloni\Model\TokensFactory;
  */
 class Moloni
 {
-
     const API_URL = 'https://api.moloni.pt/v1/';
     const LIBRARY_PATH = 'MoloniLibrary';
     const MY_NAMESPACE = '\MoloniLibrary\\';
 
     public $errors;
     public $activeSession = false;
-    public $_curl;
-    public $_tokens;
-    public $_dateTime;
-    private $__dependencies = [
+    public $curl;
+    public $tokens;
+    public $dateTime;
+    private $dependencies = [
         "Errors" => "Errors.php",
         "Session" => "Session.php"
     ];
 
-    /**
-     * @param Context                             $context
-     * @param \Magento\Framework\HTTP\Client\Curl $curl
-     */
-    public function __construct(Curl $curl, TokensFactory $tokensFactory, DateTime $dateTime, Redirect $redirect, DataPersistorInterface $dataPersistant, RequestInterface $request)
-    {
-        $this->_curl = $curl;
-        $this->_dateTime = $dateTime;
-        $this->_tokens = $tokensFactory->create();
-        $this->_redirect = $redirect;
-        $this->_request = $request;
-        $this->_dataPersistor = $dataPersistant;
+    public function __construct(
+        Curl $curl,
+        TokensFactory $tokensFactory,
+        DateTime $dateTime,
+        Redirect $redirect,
+        DataPersistorInterface $dataPersistant,
+        RequestInterface $request
+    ) {
+        $this->curl = $curl;
+        $this->dateTime = $dateTime;
+        $this->tokens = $tokensFactory->create();
+        $this->redirect = $redirect;
+        $this->request = $request;
+        $this->dataPersistor = $dataPersistant;
 
         $this->loadDependencies();
     }
@@ -67,14 +69,14 @@ class Moloni
         $this->documentType = empty($documentType[0]) ? "documents" : $documentType[0];
 
         if (!isset($this->{$name}) && !isset($this->dependencies[$name])) {
-            $this->load("moloni/classes/" . $name . ".class.php", $name, $this->namespace . $name);
+            $this->loadClass("moloni/classes/" . $name . ".class.php", $name, $this->namespace . $name);
         }
         return $this->{$name};
     }
 
     public function getCompanyId()
     {
-        return isset($this->_tokens->getCompanyId);
+        return $this->tokens->getCompanyId();
     }
 
     public function isAuthorized($code)
@@ -100,19 +102,27 @@ class Moloni
     public function execute($url, $params = false, $debug = false)
     {
         $response = false;
-        $requestUrl = self::API_URL . $url . ($this->activeSession ? '/?human_errors=true&access_token=' . $this->activeSession['access_token'] : '');
-        $this->_curl->post($requestUrl, $params);
-        $raw = $this->_curl->getBody();
+        $requestUrl = self::API_URL . $url;
+
+        if ($this->activeSession) {
+            $requestUrl .= '/?human_errors=true&access_token=' . $this->activeSession['access_token'];
+        }
+
+        // Do curl request and get the response
+        $this->curl->post($requestUrl, $params);
+        $rawResponse = $this->curl->getBody();
 
         if (!empty($raw)) {
-            $response = json_decode($raw, true);
+            $response = json_decode($rawResponse, true);
         }
-        
+
         if ($debug) {
-            echo "Url: " . $requestUrl . "<br>";
-            echo "Dados Enviados: " . "<br><pre>" . print_r($params, true) . "</pre><br>";
-            echo "Dados Recebidos: " . "<br><pre>" . print_r($response, true) . "</pre>";
-            exit;
+            $debug .= __('Url:') . $requestUrl . "<br>";
+            $debug .= __("Dados Enviados: ") . "<br><pre>" . $rawResponse . "</pre><br>";
+            $debug .= __("Dados Recebidos: ") . "<br><pre>" . $rawResponse. "</pre>";
+
+            \Magento\Framework\App\ObjectManager::getInstance()
+                ->get('Psr\Log\LoggerInterface')->debug($debug);
         }
 
         return $response;
@@ -120,19 +130,19 @@ class Moloni
 
     private function loadDependencies()
     {
-        foreach ($this->__dependencies as $name => $depend) {
-            try {
-                $this->load(self::LIBRARY_PATH . "/dependencies/" . $depend, strtolower($name), self::MY_NAMESPACE . $name);
-            } catch (Exception $e) {
-                echo 'Ups... There was a problem loading a required dependency: ', $e->getMessage(), "\n";
-            }
+        foreach ($this->dependencies as $name => $depend) {
+            $this->loadClass(
+                self::LIBRARY_PATH . "/dependencies/" . $depend,
+                self::MY_NAMESPACE . $name,
+                strtolower($name)
+            );
         }
     }
 
-    private function load($path, $name, $className)
+    private function loadClass($path, $className, $name)
     {
         if (!class_exists($className)) {
-            require_once($path);
+            require_once $path;
             $this->{$name} = new $className($this);
         }
     }
