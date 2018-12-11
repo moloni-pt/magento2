@@ -58,4 +58,19 @@ class Tokens extends AbstractModel implements
 
         return $this->tokensRow;
     }
+
+    public function getById()
+    {
+        return $this->getData(self::ID);
+    }
+
+    public function getCompanyId()
+    {
+        return $this->getData(self::ID);
+    }
+
+    public function setCompanyId($id)
+    {
+        return '';
+    }
 }

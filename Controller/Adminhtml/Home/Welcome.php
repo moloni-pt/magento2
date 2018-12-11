@@ -21,12 +21,12 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
+use Invoicing\Moloni\Model\TokensRepository;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use Psr\Log\LoggerInterface;
-use Invoicing\Moloni\Api\Data\TokensInterface;
 use Invoicing\Moloni\Model\MoloniFactory;
 
 class Welcome extends Action
@@ -37,7 +37,7 @@ class Welcome extends Action
     private $moloni;
     private $tokens;
     private $moloniFactory;
-    private $tokensFactory;
+    private $tokensRepository;
     private $pageFactory;
 
     /**
@@ -45,7 +45,7 @@ class Welcome extends Action
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param LoggerInterface $logger
-     * @param TokensInterface $tokensFactory
+     * @param TokensRepository $tokensRepository
      * @param MoloniFactory $moloniFactory
      * @param Registry $coreRegistry
      */
@@ -54,7 +54,7 @@ class Welcome extends Action
         Context $context,
         PageFactory $resultPageFactory,
         LoggerInterface $logger,
-        TokensInterface $tokensFactory,
+        TokensRepository $tokensRepository,
         MoloniFactory $moloniFactory,
         Registry $coreRegistry
     )
@@ -63,7 +63,7 @@ class Welcome extends Action
         $this->coreRegistry = $coreRegistry;
         $this->pageFactory = $resultPageFactory;
         $this->moloniFactory = $moloniFactory;
-        $this->tokensFactory = $tokensFactory;
+        $this->tokensRepository = $tokensRepository;
 
         parent::__construct($context);
     }
@@ -74,12 +74,12 @@ class Welcome extends Action
      */
     public function execute()
     {
-        if($this->tokensFactory->getId()){
-            echo "Teste";
-            exit;
-        }
+        echo '<pre>';
+        echo "Teste";
+        exit;
+
         $tokensObj = $this->tokensFactory->getId();
-        print_r($tokensObj->getFirstItem()->toArray());
+       // print_r($tokensObj->getFirstItem()->toArray());
         exit;
         if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
