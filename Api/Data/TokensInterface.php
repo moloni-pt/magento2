@@ -34,31 +34,4 @@ interface TokensInterface
     const EXPIRE_DATE = 'expire_date';
     const LOGIN_DATE = 'login_date';
 
-    /**
-     * @return mixed
-     */
-    public function getId();
-
-    /**
-     * @param $id
-     * @return $this
-     */
-    public function setId($id);
-
-    /**
-     * @return mixed
-     */
-    public function getCompanyId();
-
-    /**
-     * @param $id string
-     * @return mixed
-     */
-    public function setCompanyId($id);
-
-    /**
-     * @return string[]
-     */
-    public function getTokens();
-
 }

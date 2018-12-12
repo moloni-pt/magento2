@@ -22,37 +22,37 @@
 namespace Invoicing\Moloni\Model;
 
 use Invoicing\Moloni\Api\Data\TokensInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use \Magento\Framework\Exception\NoSuchEntityException;
 use \Magento\Framework\Api\SearchCriteriaInterface;
-use Invoicing\Moloni\Api\Data\TokensSearchResultsInterface;
 use Invoicing\Moloni\Api\TokensRepositoryInterface;
 use Invoicing\Moloni\Model\ResourceModel\Tokens as ObjectResourceModel;
-use Invoicing\Moloni\Model\ResourceModel\Tokens\Collection;
+use Invoicing\Moloni\Model\ResourceModel\Tokens\CollectionFactory;
 use Magento\Framework\Api\SearchResultsInterfaceFactory;
 
-class TokensRepository
+class TokensRepository implements TokensRepositoryInterface
 {
     public $objectFactory;
-
     public $objectResourceModel;
-
     public $collectionFactory;
-
     public $searchResultsFactory;
+    public $searchCriteriaBuilder;
 
     public function __construct(
         ObjectResourceModel $objectResourceModel,
         TokensFactory $objectFactory,
-        Collection $collectionFactory,
-        SearchResultsInterfaceFactory $searchResultsFactory
+        CollectionFactory $collectionFactory,
+        SearchResultsInterfaceFactory $searchResultsFactory,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     )
     {
         $this->objectFactory = $objectFactory;
         $this->objectResourceModel = $objectResourceModel;
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -81,6 +81,52 @@ class TokensRepository
         }
 
         return $tokens;
+    }
+
+    /**
+     * @param TokensInterface $tokens
+     * @return bool
+     * @throws CouldNotDeleteException
+     */
+    public function delete(TokensInterface $tokens)
+    {
+        try {
+            $this->objectResourceModel->delete($tokens);
+        } catch (\Exception $exception) {
+            throw new CouldNotDeleteException(__($exception->getMessage()));
+        }
+        return true;
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
+    public function deleteById($id)
+    {
+        try {
+            return $this->delete($this->getById($id));
+        } catch (NoSuchEntityException $exception) {
+            throw new CouldNotDeleteException(__($exception->getMessage()));
+        }
+    }
+
+    /**
+     * @return TokensInterface
+     */
+    public function getTokens()
+    {
+        $_filter = $this->searchCriteriaBuilder->setPageSize("1")->create();
+        $list = $this->getList($_filter);
+
+        if ($list->getTotalCount() > 0) {
+            $tokensRow = $list->getItems()[0];
+        } else {
+            $tokensRow = $this->objectFactory->create();
+        }
+
+        return $tokensRow;
     }
 
     /**
@@ -122,34 +168,5 @@ class TokensRepository
         }
         $searchResults->setItems($objects);
         return $searchResults;
-    }
-
-    /**
-     * @param int $tokenId
-     * @return bool
-     * @throws \Exception
-     */
-    public function delete(TokensInterface $tokens)
-    {
-        try {
-            $this->objectFactory->delete($tokens);
-        } catch (\Exception $exception) {
-            throw new CouldNotDeleteException(__($exception->getMessage()));
-        }
-        return true;
-    }
-
-    /**
-     * @param $id
-     * @return bool
-     * @throws \Exception
-     */
-    public function deleteById($id)
-    {
-        try {
-            return $this->delete($this->getById($id));
-        } catch (NoSuchEntityException $exception) {
-            throw new CouldNotDeleteException(__($exception->getMessage()));
-        }
     }
 }

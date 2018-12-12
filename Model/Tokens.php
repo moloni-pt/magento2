@@ -45,32 +45,4 @@ class Tokens extends AbstractModel implements
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }
-
-    public function getTokens()
-    {
-        if ($this->tokensRow == null) {
-            $collection = $this->getCollection();
-
-            if ($collection->getSize()) {
-                $this->tokensRow = $collection->getFirstItem();
-            }
-        }
-
-        return $this->tokensRow;
-    }
-
-    public function getById()
-    {
-        return $this->getData(self::ID);
-    }
-
-    public function getCompanyId()
-    {
-        return $this->getData(self::ID);
-    }
-
-    public function setCompanyId($id)
-    {
-        return '';
-    }
 }

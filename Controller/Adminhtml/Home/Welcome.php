@@ -26,25 +26,21 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
-use Psr\Log\LoggerInterface;
 use Invoicing\Moloni\Model\MoloniFactory;
 
 class Welcome extends Action
 {
 
-    private $logger;
-    private $coreRegistry;
     private $moloni;
-    private $tokens;
+    private $pageFactory;
     private $moloniFactory;
     private $tokensRepository;
-    private $pageFactory;
+    private $coreRegistry;
 
     /**
      * Welcome constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param LoggerInterface $logger
      * @param TokensRepository $tokensRepository
      * @param MoloniFactory $moloniFactory
      * @param Registry $coreRegistry
@@ -53,17 +49,15 @@ class Welcome extends Action
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        LoggerInterface $logger,
-        TokensRepository $tokensRepository,
         MoloniFactory $moloniFactory,
+        TokensRepository $tokensRepository,
         Registry $coreRegistry
     )
     {
-        $this->logger = $logger;
-        $this->coreRegistry = $coreRegistry;
         $this->pageFactory = $resultPageFactory;
         $this->moloniFactory = $moloniFactory;
         $this->tokensRepository = $tokensRepository;
+        $this->coreRegistry = $coreRegistry;
 
         parent::__construct($context);
     }
@@ -74,13 +68,6 @@ class Welcome extends Action
      */
     public function execute()
     {
-        echo '<pre>';
-        echo "Teste";
-        exit;
-
-        $tokensObj = $this->tokensFactory->getId();
-       // print_r($tokensObj->getFirstItem()->toArray());
-        exit;
         if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
         } elseif ($this->getRequest()->getParam("code")) {
@@ -103,17 +90,13 @@ class Welcome extends Action
      */
     private function handleAuthentication()
     {
-        try {
-            $tokensObj = $this->tokensFactory->getCollection();
+        $tokens = $this->tokensRepository->getTokens();
 
-            $tokensObj->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
-            $tokensObj->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
-            $tokensObj->setSecretToken($this->getRequest()->getPostValue('secret_token'));
-            $tokensObj->save();
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
-        }
-        exit;
+        $tokens->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
+        $tokens->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
+        $tokens->setSecretToken($this->getRequest()->getPostValue('secret_token'));
+        $tokens->save();
+
         $authenticationUrl = $this->moloni->getAuthenticationUrl();
         $this->_redirect($authenticationUrl);
     }
