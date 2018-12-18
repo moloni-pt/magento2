@@ -40,14 +40,15 @@ class TokensRepository implements TokensRepositoryInterface
     public $searchResultsFactory;
     public $searchCriteriaBuilder;
 
+    private $tokensRow;
+
     public function __construct(
         ObjectResourceModel $objectResourceModel,
         TokensFactory $objectFactory,
         CollectionFactory $collectionFactory,
         SearchResultsInterfaceFactory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder
-    )
-    {
+    ) {
         $this->objectFactory = $objectFactory;
         $this->objectResourceModel = $objectResourceModel;
         $this->collectionFactory = $collectionFactory;
@@ -117,16 +118,19 @@ class TokensRepository implements TokensRepositoryInterface
      */
     public function getTokens()
     {
-        $_filter = $this->searchCriteriaBuilder->setPageSize("1")->create();
-        $list = $this->getList($_filter);
 
-        if ($list->getTotalCount() > 0) {
-            $tokensRow = $list->getItems()[0];
-        } else {
-            $tokensRow = $this->objectFactory->create();
+        if (empty($this->tokensRow)) {
+            $_filter = $this->searchCriteriaBuilder->setPageSize("1")->create();
+            $list = $this->getList($_filter);
+
+            if ($list->getTotalCount() > 0) {
+                $this->tokensRow = $list->getItems()[0];
+            } else {
+                $this->tokensRow = $this->objectFactory->create();
+            }
         }
 
-        return $tokensRow;
+        return $this->tokensRow;
     }
 
     /**

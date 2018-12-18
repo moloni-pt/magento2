@@ -1,8 +1,7 @@
-<?php /** @noinspection PhpCSValidationInspection */
-
+<?php
 /**
  * Module for Magento 2 by Moloni
- * Copyright (C) 2017  Moloni, lda
+ * Copyright (C) 2017  Moloni, lda.
  *
  * This file is part of Invoicing/Moloni.
  *
@@ -19,34 +18,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Registry;
-use Invoicing\Moloni\Model\TokensFactory;
-use Invoicing\Moloni\Model\MoloniFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 class Index extends Action
 {
-
     private $page;
     private $moloni;
-    private $moloniFactory;
     private $dataPersistor;
     private $coreRegistry;
     private $response;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param MoloniFactory $moloniFactory
+     * @param Moloni $moloni
      * @param Registry $coreRegistry
      * @param Http $response
      * @param DataPersistorInterface $dataPersistant
@@ -54,13 +50,12 @@ class Index extends Action
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        MoloniFactory $moloniFactory,
+        Moloni $moloni,
         Registry $coreRegistry,
         Http $response,
         DataPersistorInterface $dataPersistant
     ) {
-
-        $this->moloniFactory = $moloniFactory;
+        $this->moloni = $moloni;
         $this->page = $resultPageFactory;
         $this->coreRegistry = $coreRegistry;
         $this->response = $response;
@@ -70,16 +65,13 @@ class Index extends Action
     }
 
     /**
-     * Execute view action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return bool|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
      */
     public function execute()
     {
-        $this->moloni = $this->moloniFactory->create();
-
-        if (!$this->moloni->hasValidSession()) {
-            $this->_redirect->redirect($this->response, $this->moloni->redirectTo);
+        if (!$this->moloni->checkActiveSession()) {
+            $this->_redirect($this->moloni->redirectTo);
+            return false;
         }
 
         $resultPage = $this->page->create();

@@ -21,19 +21,18 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
-use Invoicing\Moloni\Model\TokensRepository;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
-use Invoicing\Moloni\Model\MoloniFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Model\TokensRepository;
 
 class Welcome extends Action
 {
 
     private $moloni;
     private $pageFactory;
-    private $moloniFactory;
     private $tokensRepository;
     private $coreRegistry;
 
@@ -42,20 +41,19 @@ class Welcome extends Action
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param TokensRepository $tokensRepository
-     * @param MoloniFactory $moloniFactory
+     * @param Moloni $Moloni
      * @param Registry $coreRegistry
      */
 
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        MoloniFactory $moloniFactory,
+        Moloni $Moloni,
         TokensRepository $tokensRepository,
         Registry $coreRegistry
-    )
-    {
+    ) {
         $this->pageFactory = $resultPageFactory;
-        $this->moloniFactory = $moloniFactory;
+        $this->moloni = $Moloni;
         $this->tokensRepository = $tokensRepository;
         $this->coreRegistry = $coreRegistry;
 
@@ -71,10 +69,10 @@ class Welcome extends Action
         if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
         } elseif ($this->getRequest()->getParam("code")) {
-            if (!$this->moloni->isAuthorized($this->getRequest()->getParam('code'))) {
+            if (!$this->moloni->checkAuthorizationCode($this->getRequest()->getParam('code'))) {
                 $this->coreRegistry->register(
                     "moloni_messages",
-                    [['type' => 'error', 'message' => $this->moloni->errors->getError('last')['message']]]
+                    [['type' => 'error', 'message' => $this->moloni->errors->getErrors('last')['message']]]
                 );
             } else {
                 $this->_redirect->redirect($this->_response, 'moloni/home/company/');
@@ -98,6 +96,13 @@ class Welcome extends Action
         $tokens->save();
 
         $authenticationUrl = $this->moloni->getAuthenticationUrl();
-        $this->_redirect($authenticationUrl);
+        if ($authenticationUrl) {
+            $this->_redirect($authenticationUrl);
+        } else {
+            $this->coreRegistry->register(
+                "moloni_messages",
+                [['type' => 'error', 'message' => __('Error while saving data...')]]
+            );
+        }
     }
 }

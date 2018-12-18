@@ -6,8 +6,6 @@
  */
 namespace MoloniLibrary;
 
-use Invoicing\Moloni\Model\Moloni;
-
 class Companies
 {
 
@@ -17,9 +15,8 @@ class Companies
      * Companies constructor.
      * @param Moloni $moloni
      */
-    public function __construct(Moloni $moloni)
+    public function __construct()
     {
-        $this->moloni = $moloni;
     }
 
     /**

@@ -18,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
 use Magento\Framework\View\Element\Template;
@@ -29,14 +30,13 @@ class Welcome extends Template
 {
 
     public $messages = false;
-    protected $_coreRegistry;
-    protected $_tokens;
-    protected $_dataPersistor;
+    public $coreRegistry;
+    public $dataPersistor;
 
     public function __construct(Context $context, Registry $coreRegistry, DataPersistorInterface $dataPersistant)
     {
-        $this->_coreRegistry = $coreRegistry;
-        $this->_dataPersistor = $dataPersistant;
+        $this->coreRegistry = $coreRegistry;
+        $this->dataPersistor = $dataPersistant;
 
         parent::__construct($context);
     }
@@ -49,14 +49,14 @@ class Welcome extends Template
 
     public function getMessages()
     {
-        $registryMessages = $this->_coreRegistry->registry('moloni_messages');
+        $registryMessages = $this->coreRegistry->registry('moloni_messages');
         if (!empty($registryMessages)) {
             $this->messages = $registryMessages;
         }
 
-        $persistingMessages = $this->_dataPersistor->get('moloni_messages');
+        $persistingMessages = $this->dataPersistor->get('moloni_messages');
         if (!empty($persistingMessages)) {
-            $this->_dataPersistor->clear('moloni_messages');
+            $this->dataPersistor->clear('moloni_messages');
             $this->messages = $persistingMessages;
         }
         return $this->messages;

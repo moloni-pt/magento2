@@ -1,7 +1,7 @@
 <?php
 /**
  * Module for Magento 2 by Moloni
- * Copyright (C) 2017  Moloni, lda
+ * Copyright (C) 2017  Moloni, lda.
  *
  * This file is part of Invoicing/Moloni.
  *
@@ -18,73 +18,64 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Registry;
-use Invoicing\Moloni\Model\TokensFactory;
-use Invoicing\Moloni\Model\MoloniFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 class Company extends Action
 {
-
-    protected $_page;
-    protected $_moloni;
-    protected $_tokensFactory;
-    protected $_coreRegistry;
-    protected $_response;
+    private $page;
+    private $moloni;
+    private $dataPersistor;
+    private $coreRegistry;
+    private $response;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param \Magento\Backend\App\Action\Context  $context
+     * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Moloni $moloni
+     * @param Registry $coreRegistry
+     * @param Http $response
+     * @param DataPersistorInterface $dataPersistant
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        TokensFactory $tokensFactory,
-        MoloniFactory $moloniFactory,
+        Moloni $moloni,
         Registry $coreRegistry,
         Http $response,
         DataPersistorInterface $dataPersistant
     ) {
-    
-        $this->moloni = $moloniFactory->create();
-        $this->tokensFactory = $tokensFactory->create();
-        $this->_page = $resultPageFactory;
-        $this->_coreRegistry = $coreRegistry;
-        $this->_response = $response;
-        $this->_dataPersistor = $dataPersistant;
+        $this->moloni = $moloni;
+        $this->page = $resultPageFactory;
+        $this->coreRegistry = $coreRegistry;
+        $this->response = $response;
+        $this->dataPersistor = $dataPersistant;
 
         parent::__construct($context);
     }
 
-    public function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Invoicing_Moloni::home_index');
-    }
-
     /**
-     * Execute view action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return bool|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
      */
     public function execute()
     {
-        if (!$this->moloni->hasValidSession()) {
-             $this->_redirect->redirect($this->_response, $this->moloni->redirectTo);
-        } else {
-            $companies1 = $this->moloni->companies->getAll();
-            $companies2 = $this->moloni->companies->getAll();
+        if (!$this->moloni->checkActiveSession()) {
+            $this->_redirect($this->moloni->redirectTo);
+            return false;
         }
 
-        $resultPage = $this->_page->create();
+        $resultPage = $this->page->create();
+
         return $resultPage;
     }
 }

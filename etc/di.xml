@@ -1,6 +1,12 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-        
+    
+    <preference for="Invoicing\Moloni\Api\MoloniApiRepositoryInterface"
+                type="Magento\Framework\Libraries\MoloniLibrary\Moloni"/>
+    <preference for="Invoicing\Moloni\Api\MoloniApiErrorsRepositoryInterface"
+                type="Magento\Framework\Libraries\MoloniLibrary\Dependencies\ApiErrors"/>
+    <preference for="Invoicing\Moloni\Api\MoloniApiSessionRepositoryInterface"
+                type="Magento\Framework\Libraries\MoloniLibrary\Dependencies\ApiSession"/>
     <preference for="Invoicing\Moloni\Api\TokensRepositoryInterface"
                 type="Invoicing\Moloni\Model\TokensRepository"/>
     <preference for="Invoicing\Moloni\Api\Data\TokensInterface"

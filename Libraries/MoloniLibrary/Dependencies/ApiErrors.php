@@ -4,45 +4,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace MoloniLibrary;
 
-class Errors
+namespace Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies;
+
+class ApiErrors
 {
     private $error_log = [];
-    
+
     public function hasError()
     {
         return !empty($this->error_log);
     }
-    
+
     public function throwError($title, $message, $where, $received = false, $sent = false)
     {
-        if (is_Array($message)) {
+        if (is_array($message)) {
             foreach ($message as $msg) {
                 $this->logError($title, $msg, $where, $received, $sent);
             }
         } else {
             $this->logError($title, $message, $where, $received, $sent);
         }
-        
+
         return false;
     }
 
-    public function logError($title, $message, $where, $received = false, $sent = false)
-    {
-        $this->error_log[] = [
-            "title" => $title,
-            "message" => $this->translateMessage($message),
-            "where" => $where,
-            "values" => [
-                "received" => $received,
-                "sent" => $sent
-            ]
-        ];
-    }
-
-    // @params $order all|first|last
-    public function getError($order = "all")
+    public function getErrors($order = "all")
     {
         if ($this->error_log && is_array($this->error_log)) {
             switch ($order) {
@@ -58,6 +45,19 @@ class Errors
         } else {
             return false;
         }
+    }
+
+    private function logError($title, $message, $where, $received = false, $sent = false)
+    {
+        $this->error_log[] = [
+            "title" => $title,
+            "message" => $this->translateMessage($message),
+            "where" => $where,
+            "values" => [
+                "received" => $received,
+                "sent" => $sent
+            ]
+        ];
     }
 
     private function translateMessage($string)
