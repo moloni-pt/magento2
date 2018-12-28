@@ -18,25 +18,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Registry;
-use Magento\Framework\App\Request\DataPersistorInterface;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
 class Company extends Template
 {
 
-    protected $messages = false;
-    protected $_coreRegistry;
-    protected $_tokens;
+    private $coreRegistry;
 
-    public function __construct(Context $context, Registry $coreRegistry, DataPersistorInterface $dataPersistant, Moloni $Moloni)
-    {
-        $this->_coreRegistry = $coreRegistry;
-        $this->_dataPersistor = $dataPersistant;
+    public function __construct(
+        Context $context,
+        Registry $coreRegistry
+    ) {
+        $this->coreRegistry = $coreRegistry;
 
         parent::__construct($context);
     }
@@ -47,14 +45,11 @@ class Company extends Template
         return parent::_prepareLayout();
     }
 
-    public function getMessages()
+    public function getCompanies()
     {
-        $persistingMessages = $this->_coreRegistry->registry('moloni_messages');
-        if (!empty($persistingMessages)) {
-            $this->_coreRegistry->registry('moloni_messages');
-            $this->messages = $persistingMessages;
-        }
-
-        return $this->messages;
+        $companies = $this->coreRegistry->registry('moloni_companies');
+        echo "te";
+        print_r($companies);
+        return $companies;
     }
 }

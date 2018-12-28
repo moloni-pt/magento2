@@ -9,50 +9,62 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary;
 
 use Invoicing\Moloni\Api\MoloniApiRepositoryInterface;
 use Magento\Framework\HTTP\Client\Curl;
-use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\RequestInterface;
 use Invoicing\Moloni\Model\TokensRepository;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiSession;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
+
+use /** @noinspection PhpUndefinedClassInspection */
+    Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
 
 class Moloni implements MoloniApiRepositoryInterface
 {
     const API_URL = 'https://api.moloni.pt/v1/';
 
     public $errors;
-    public $activeSession = false;
-    private $curl;
+    public $curl;
     public $tokensRepository;
 
-    private $redirect;
     public $request;
     public $dataPersistor;
     public $session;
+
+    private $factories = [];
 
     public $redirectTo = null;
 
     public function __construct(
         Curl $curl,
         TokensRepository $tokensRepository,
-        Redirect $redirect,
         RequestInterface $request,
         ApiSession $session,
-        ApiErrors $errors
+        ApiErrors $errors,
+        /** @noinspection PhpUndefinedClassInspection */
+        CompaniesFactory $companiesFactory
     ) {
         $this->curl = $curl;
         $this->tokensRepository = $tokensRepository;
-        $this->redirect = $redirect;
         $this->request = $request;
         $this->session = $session;
         $this->errors = $errors;
+        $this->factories = [
+            'companies' => $companiesFactory
+        ];
     }
 
-    public function __invoke($method, $action, $params = false)
+    public function __get($name)
     {
-        echo "Hello";
-        exit;
-        return $this->execute($method . '/' . $action, $params);
+        if (!isset($this->{$name}) && isset($this->factories[$name])) {
+            $this->{$name} = $this->factories[$name]->create();
+        }
+
+        return $this->{$name};
     }
+
+    /*public function __invoke($method, $action, $params = false)
+    {
+
+    }*/
 
     public function checkActiveSession()
     {
@@ -69,6 +81,14 @@ class Moloni implements MoloniApiRepositoryInterface
         }
 
         $this->redirectTo = 'moloni/home/welcome/';
+        return false;
+    }
+
+    public function dropActiveSession()
+    {
+        $this->redirectTo = 'moloni/home/welcome/';
+        $activeTokens = $this->tokensRepository->getTokens();
+        $activeTokens->delete();
         return false;
     }
 
@@ -106,8 +126,8 @@ class Moloni implements MoloniApiRepositoryInterface
         $response = false;
         $requestUrl = self::API_URL . $url;
 
-        if ($this->activeSession) {
-            $requestUrl .= '/?human_errors=true&access_token=' . $this->activeSession['access_token'];
+        if ($this->session->accessToken) {
+            $requestUrl .= '/?human_errors=true&access_token=' . $this->session->accessToken;
         }
 
         $this->curl->post($requestUrl, $body);

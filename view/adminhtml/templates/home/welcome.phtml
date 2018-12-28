@@ -18,21 +18,22 @@
                 <div class="field title required">
                     <label class="label" for="developer_id"><span><?php echo __('Developer Id') ?></span></label>
                     <div class="control">
-                        <input id="title" type="text" name="developer_id" data-validate="{required:true}" value=""/>
+                        <input data-validate="{required:true}" id="developer_id" name="developer_id" type="text"/>
                     </div>
                 </div>
 
                 <div class="field title required">
                     <label class="label" for="secret_token"><span><?php echo __('Secret Key') ?></span></label>
                     <div class="control">
-                        <input id="title" type="text" name="secret_token" data-validate="{required:true}" value=""/>
+                        <input id="secret_token" type="text" name="secret_token" data-validate="{required:true}"/>
                     </div>               
                 </div>
 
                 <div class="field title">
                     <label class="label" for="redirect_uri"><span><?php echo __('Redirect URI') ?></span></label>
                     <div class="control">
-                        <input id="title" type="text" name="redirect_uri" value="<?php echo $block->getUrl('moloni/home/welcome') ?>" readonly/>
+                        <input id="redirect_uri" name="redirect_uri" readonly
+                               type="text" value="<?php echo $block->getUrl('moloni/home/welcome') ?>"/>
                     </div>               
                 </div>
 
@@ -52,7 +53,8 @@
 
         </div>
         <div class='panel-right'>
-            <img src='<?php echo $this->getViewFileUrl('Invoicing_Moloni::images/banner_login_1.jpg'); ?>' alt='<?php echo __('Moloni Sign Up'); ?>'/>
+            <img src='<?php echo $this->getViewFileUrl('Invoicing_Moloni::images/banner_login_1.jpg'); ?>'
+                 alt='<?php echo __('Moloni Sign Up'); ?>'/>
         </div>
     </div>
 </form>

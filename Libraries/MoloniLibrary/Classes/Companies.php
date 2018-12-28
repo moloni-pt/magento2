@@ -4,7 +4,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace MoloniLibrary;
+namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
+
+use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
 class Companies
 {
@@ -15,8 +17,9 @@ class Companies
      * Companies constructor.
      * @param Moloni $moloni
      */
-    public function __construct()
+    public function __construct(Moloni $moloni)
     {
+        $this->moloni = $moloni;
     }
 
     /**
@@ -25,7 +28,7 @@ class Companies
      */
     public function getOne($company_id = false)
     {
-        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->company_id)];
+        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
         $result = $this->moloni->execute("companies/getOne", $values);
         if (is_array($result) && isset($result['company_id'])) {
             return $result;

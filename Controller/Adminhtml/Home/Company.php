@@ -74,8 +74,18 @@ class Company extends Action
             return false;
         }
 
-        $resultPage = $this->page->create();
+        $companies = $this->moloni->companies->getAll();
+        if (!$companies) {
+            $this->moloni->dropActiveSession();
+            $errorMessage = [['type' => 'error', 'message' => $this->moloni->errors->getErrors('last')['message']]];
+            $this->dataPersistor->set('moloni_messages', $errorMessage);
+            $this->_redirect($this->moloni->redirectTo);
+            return false;
+        }
 
+        $this->coreRegistry->register('moloni_companies', $companies);
+
+        $resultPage = $this->page->create();
         return $resultPage;
     }
 }

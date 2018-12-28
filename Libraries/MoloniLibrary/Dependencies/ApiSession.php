@@ -7,13 +7,13 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies;
 
+use Invoicing\Moloni\Api\MoloniApiSessionRepositoryInterface;
 use Invoicing\Moloni\Model\TokensRepository;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\HTTP\Client\Curl;
-use Magento\Framework\App\RequestInterface;
 
-class ApiSession
+class ApiSession implements MoloniApiSessionRepositoryInterface
 {
     const API_URL = 'https://api.moloni.pt/v1/';
 
@@ -22,7 +22,6 @@ class ApiSession
     private $errors;
     private $tokens;
     private $dataPersistor;
-    private $request;
     public $accessToken = null;
     public $companyId = null;
 
@@ -31,7 +30,6 @@ class ApiSession
      * @param ApiErrors $errors
      * @param TokensRepository $tokens
      * @param DataPersistorInterface $dataPersistant
-     * @param RequestInterface $request
      * @param DateTime $dateTime
      * @param Curl $curl
      */
@@ -39,14 +37,12 @@ class ApiSession
         ApiErrors $errors,
         TokensRepository $tokens,
         DataPersistorInterface $dataPersistant,
-        RequestInterface $request,
         DateTime $dateTime,
         Curl $curl
     ) {
         $this->errors = $errors;
         $this->tokens = $tokens;
         $this->dataPersistor = $dataPersistant;
-        $this->request = $request;
         $this->dateTime = $dateTime;
         $this->curl = $curl;
     }
@@ -112,7 +108,6 @@ class ApiSession
 
     /**
      * @return bool
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
     private function handleSessionRefresh()
     {
@@ -127,7 +122,10 @@ class ApiSession
                     $tokens->delete();
                     return $this->errors->throwError(
                         __('Erro de sessão'),
-                        __('A sessão expirou no dia ') . $this->dateTime->formatDate($refreshTokenExpireDate, true),
+                        __('A sessão expirou no dia ') . $this->dateTime->formatDate(
+                            $refreshTokenExpireDate + 432000,
+                            true
+                        ),
                         'Refresh'
                     );
                 } else {
