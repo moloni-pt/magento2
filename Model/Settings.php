@@ -19,35 +19,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Model;
 
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\Registry;
+use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\DataObject\IdentityInterface;
+use Invoicing\Moloni\Api\Data\SettingsInterface;
 
-class Company extends Template
+class Settings extends AbstractModel implements
+    IdentityInterface,
+    SettingsInterface
 {
 
-    private $coreRegistry;
+    const CACHE_TAG = 'moloni_settings';
 
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry
-    ) {
-        $this->coreRegistry = $coreRegistry;
+    public $cacheTag = 'moloni_settings';
+    public $eventPrefix = 'moloni_settings';
 
-        parent::__construct($context);
+    public function _construct()
+    {
+        $this->_init(ResourceModel\Settings::class);
     }
 
-    public function _prepareLayout()
+    public function getIdentities()
     {
-        $this->pageConfig->getTitle()->set(__('Moloni - Select your company'));
-        return parent::_prepareLayout();
-    }
-
-    public function getCompanies()
-    {
-        $companies = $this->coreRegistry->registry('moloni_companies');
-        return $companies;
+        return [self::CACHE_TAG . '_' . $this->getId()];
     }
 }

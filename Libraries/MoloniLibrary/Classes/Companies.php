@@ -4,6 +4,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
@@ -49,6 +50,12 @@ class Companies
     {
         $result = $this->moloni->execute("companies/getAll", null);
         if (is_array($result) && isset($result[0]['company_id'])) {
+            foreach ($result as $key => &$company) {
+                // Unset company_id 5 (Empresa de Demonstração) due to lack of privleges
+                if ($company['company_id'] == 5) {
+                    unset($result[$key]);
+                }
+            }
             return $result;
         } else {
             return $this->moloni->errors->throwError(

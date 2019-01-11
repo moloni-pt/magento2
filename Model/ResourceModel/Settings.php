@@ -19,35 +19,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Model\ResourceModel;
 
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\Registry;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use Magento\Framework\Model\ResourceModel\Db\Context;
 
-class Company extends Template
+class Settings extends AbstractDb
 {
 
-    private $coreRegistry;
-
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry
-    ) {
-        $this->coreRegistry = $coreRegistry;
-
+    public function __construct(Context $context)
+    {
         parent::__construct($context);
     }
 
-    public function _prepareLayout()
+    public function _construct()
     {
-        $this->pageConfig->getTitle()->set(__('Moloni - Select your company'));
-        return parent::_prepareLayout();
-    }
-
-    public function getCompanies()
-    {
-        $companies = $this->coreRegistry->registry('moloni_companies');
-        return $companies;
+        $this->_init('moloni_settings', 'option_id');
     }
 }

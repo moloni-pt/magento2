@@ -19,35 +19,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Api\Data;
 
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\Registry;
-
-class Company extends Template
+interface SettingsInterface
 {
 
-    private $coreRegistry;
+    const ID = 'option_id';
+    const COMPANY_ID = 'company_id';
+    const STORE_ID = 'store_id';
+    const LABEL = 'label';
+    const VALUE = 'value';
 
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry
-    ) {
-        $this->coreRegistry = $coreRegistry;
-
-        parent::__construct($context);
-    }
-
-    public function _prepareLayout()
-    {
-        $this->pageConfig->getTitle()->set(__('Moloni - Select your company'));
-        return parent::_prepareLayout();
-    }
-
-    public function getCompanies()
-    {
-        $companies = $this->coreRegistry->registry('moloni_companies');
-        return $companies;
-    }
 }

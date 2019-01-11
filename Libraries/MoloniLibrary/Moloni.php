@@ -11,6 +11,7 @@ use Invoicing\Moloni\Api\MoloniApiRepositoryInterface;
 use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\App\RequestInterface;
 use Invoicing\Moloni\Model\TokensRepository;
+use Invoicing\Moloni\Model\SettingsRepository;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiSession;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
 
@@ -24,6 +25,7 @@ class Moloni implements MoloniApiRepositoryInterface
     public $errors;
     public $curl;
     public $tokensRepository;
+    public $settingsRepository;
 
     public $request;
     public $dataPersistor;
@@ -33,9 +35,41 @@ class Moloni implements MoloniApiRepositoryInterface
 
     public $redirectTo = null;
 
+    /*
+     * 'Required' means its not set and must be sent to the settings page
+     */
+    public $settings = [
+        'cae' => '',
+        'debug_console' => '0',
+
+        'document_set_id' => 'required',
+        'document_type' => 'invoices',
+        'document_status' => 0,
+
+        'customer_prefix' => '',
+        'customer_vat' => '0',
+
+        'default_maturity_date_id' => 'required',
+        'default_measurement_unit_id' => 'required',
+
+        'products_reference_prefix' => '',
+        'products_at_category' => 'M',
+        'products_auto_create' => '0',
+        'products_sync_stock' => '0',
+        'products_tax' => '0',
+        'products_tax_exemption' => '',
+
+        'shipping_tax' => '0',
+        'shipping_tax_exemption' => '',
+
+        'orders_since' => '2019-01-01 00:00:00',
+        'orders_statuses' => '{}',
+    ];
+
     public function __construct(
         Curl $curl,
         TokensRepository $tokensRepository,
+        SettingsRepository $settingsRepository,
         RequestInterface $request,
         ApiSession $session,
         ApiErrors $errors,
@@ -44,9 +78,11 @@ class Moloni implements MoloniApiRepositoryInterface
     ) {
         $this->curl = $curl;
         $this->tokensRepository = $tokensRepository;
+        $this->settingsRepository = $settingsRepository;
         $this->request = $request;
         $this->session = $session;
         $this->errors = $errors;
+
         $this->factories = [
             'companies' => $companiesFactory
         ];
@@ -61,11 +97,6 @@ class Moloni implements MoloniApiRepositoryInterface
         return $this->{$name};
     }
 
-    /*public function __invoke($method, $action, $params = false)
-    {
-
-    }*/
-
     public function checkActiveSession()
     {
         $activeTokens = $this->tokensRepository->getTokens();
@@ -75,6 +106,7 @@ class Moloni implements MoloniApiRepositoryInterface
                     $this->redirectTo = 'moloni/home/company/';
                     return false;
                 } else {
+                    $this->setSettings($this->session->companyId);
                     return true;
                 }
             }
@@ -147,5 +179,33 @@ class Moloni implements MoloniApiRepositoryInterface
         }
 
         return $response;
+    }
+
+    /**
+     * @param $companyId
+     * @return array
+     */
+    private function setSettings($companyId)
+    {
+        if ($companyId) {
+            $savedSattings = $this->settingsRepository->getSettingsByCompany($companyId);
+            if (!$savedSattings) {
+                foreach ($this->settings as $label => $option) {
+                    $savedSattings[$label] = $option;
+                    $this->settingsRepository->saveSetting($companyId, $label, $option);
+                }
+            } else {
+                foreach ($this->settings as $label => $option) {
+                    if (!array_key_exists($label, $savedSattings)) {
+                        $savedSattings[$label] = $option;
+                        $this->settingsRepository->saveSetting($companyId, $label, $option);
+                    }
+                }
+            }
+
+            $this->settings = $savedSattings;
+        }
+
+        return $this->settings;
     }
 }

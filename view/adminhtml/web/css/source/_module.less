@@ -1,159 +1,195 @@
 @moloni-icons-admin__font-name-path: '@{baseDir}Invoicing_Moloni/fonts/moloni-icons';
-@moloni-icons-admin__font-name : 'moloni-icons';
+@moloni-icons-admin__font-name: 'moloni-icons';
 
 .lib-font-face(
-@family-name:@moloni-icons-admin__font-name,
-@font-path: @moloni-icons-admin__font-name-path,
-@font-weight: normal,
-@font-style: normal
+  @family-name:@moloni-icons-admin__font-name,
+  @font-path: @moloni-icons-admin__font-name-path,
+  @font-weight: normal,
+  @font-style: normal
 );
 
 .moloni .page-title:before {
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'moloni-icons' !important;
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'moloni-icons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
 
-    /* Enable Ligatures ================ */
-    letter-spacing: 0;
-    -webkit-font-feature-settings: "liga";
-    -moz-font-feature-settings: "liga=1";
-    -moz-font-feature-settings: "liga";
-    -ms-font-feature-settings: "liga" 1;
-    font-feature-settings: "liga";
-    -webkit-font-variant-ligatures: discretionary-ligatures;
-    font-variant-ligatures: discretionary-ligatures;
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
 
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
-    content: 'logo';
-    margin-right: 10px;
-    color: #aaa6a0;
+  content: 'logo';
+  margin-right: 10px;
+  color: #aaa6a0;
 }
 
 
-.moloni{
+.moloni {
 
-    a{
-        &:hover{
-            color: inherit;
-            text-decoration: none;
+  a {
+    &:hover {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+  .login-form {
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    float: none;
+    max-width: 80rem;
+    min-height: 20rem;
+    min-width: 0;
+    padding: 20px;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    margin: 5rem auto;
+
+    display: flex;
+    flex-flow: row wrap;
+    flex-grow: 0;
+    flex-shrink: 0;
+    -webkit-flex-grow: 0;
+    -webkit-flex-shrink: 0;
+    justify-content: flex-end;
+
+    .panel {
+      &-left {
+        flex-grow: 1;
+
+        fieldset {
+          border: 0;
+          margin: 0;
+          min-width: 0;
+          padding: 0;
         }
+
+        input {
+          -webkit-appearance: none;
+          background-color: #ffffff;
+          border: 1px solid #adadad;
+          border-radius: 1px;
+          box-shadow: none;
+          color: #303030;
+          font-size: 1.4rem;
+          font-weight: 400;
+          width: 100%;
+          height: auto;
+          line-height: 1.36;
+          padding: 0.6rem 1rem 0.6rem;
+          transition: border-color 0.1s linear;
+          vertical-align: baseline;
+
+          //noinspection CssInvalidPseudoSelector
+          &:readonly {
+            background-color: #f5f5f5;
+          }
+        }
+
+        legend {
+          color: #aaa6a0;
+          font-size: 2.6rem;
+          font-weight: 300;
+          line-height: 1.2;
+          margin-bottom: 20px;
+          width: 100%;
+        }
+
+        .message-error {
+          color: #41362f;
+          padding: 5px;
+          font-size: 1.4rem;
+          font-weight: 300;
+
+          &:before {
+            font-family: 'Admin Icons';
+            margin-right: 10px;
+          }
+        }
+
+        .field {
+          margin-bottom: 20px;
+        }
+
+        .title {
+
+          span {
+            margin-left: 14px;
+            font-weight: 600;
+          }
+
+          &:before {
+            color: #e22626;
+            content: '*';
+            display: inline-block;
+            font-size: 1.6rem;
+            font-weight: 500;
+            line-height: 1;
+            margin-left: 0;
+            margin-top: .2rem;
+            position: absolute;
+            z-index: 1;
+          }
+        }
+      }
+
+      &-right {
+        padding-left: 20px;
+      }
     }
 
-    .login-form {
+  }
+
+  .companies {
+
+    border-top: 1px solid #e3e3e3;
+    padding-top: 2.5rem;
+
+    &-holder {
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+      flex-direction: row;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+
+      .company {
         background-color: #f5f5f5;
         border: 1px solid #e3e3e3;
-        float: none;
-        margin: auto;
-        max-width: 80rem;
-        min-height: 20rem;
-        min-width: 0;
-        padding: 20px;
-        position: relative;
-        width: 100%;
-        z-index: 1;
-        margin-top: 5rem;
-        margin-bottom: 5rem;
 
-        display: flex;
-        flex-flow: row wrap;
-        flex-grow: 0;
-        flex-shrink: 0;
-        -webkit-flex-grow: 0;
-        -webkit-flex-shrink: 0;
-        justify-content: flex-end;
+        margin: 0 2rem 4rem 2rem;
+        padding: 2rem;
+        width: 25%;
 
-        .panel{
-            &-left{
-                flex-grow: 1;
-
-                fieldset{
-                    border: 0;
-                    margin: 0;
-                    min-width: 0;
-                    padding: 0;
-                }
-
-                input{
-                    -webkit-appearance: none;
-                    background-color: #ffffff;
-                    border: 1px solid #adadad;
-                    border-radius: 1px;
-                    box-shadow: none;
-                    color: #303030;
-                    font-size: 1.4rem;
-                    font-weight: 400;
-                    width: 100%;
-                    height: auto;
-                    line-height: 1.36;
-                    padding: 0.6rem 1rem 0.6rem;
-                    transition: border-color 0.1s linear;
-                    vertical-align: baseline;
-
-                    &:readonly{
-                        background-color: #f5f5f5;
-                    }
-                }
-
-                legend{
-                    color: #aaa6a0;
-                    font-size: 2.6rem;
-                    font-weight: 300;
-                    line-height: 1.2;
-                    margin-bottom: 20px;         
-                    width: 100%;
-                }
-
-                .message-error{
-                    color: #41362f;
-                    padding: 5px;
-                    font-size: 1.4rem;
-                    font-weight: 300;
-                    &:before{
-                        font-family: 'Admin Icons'; 
-                        margin-right: 10px;
-                    }
-                }
-
-                .field{
-                    margin-bottom: 20px;
-                }
-
-                .title{
-
-                    span{
-                        margin-left: 14px;
-                        font-weight: 600;
-                    }
-
-                    &:before{
-                        color: #e22626;
-                        content: '*';
-                        display: inline-block;
-                        font-size: 1.6rem;
-                        font-weight: 500;
-                        line-height: 1;
-                        margin-left: 0px;
-                        margin-top: .2rem;
-                        position: absolute;
-                        z-index: 1;
-                    }
-                }
-            }
-
-            &-right{
-                padding-left: 20px;
-            }
+        &-image {
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
+        &-title {
+          font-weight: 600;
+        }
+      }
     }
+  }
 }
 
 

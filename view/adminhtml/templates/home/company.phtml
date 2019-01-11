@@ -1,7 +1,23 @@
-
-<?php
-
-$block->getCompanies();
-
-?>
-
+<section class="companies">
+    <h2 class="page-sub-title"><?php echo __('Select the company you want to connect to Moloni.') ?></h2>
+    <div class="companies-holder">
+        <?php
+        foreach ($block->getCompanies() as $company) {
+            ?>
+            <div class="company">
+                <?php
+                if (!empty($company['image'])) {
+                    echo '<div class="company-image">' .
+                        '<img src="https://www.moloni.pt/_imagens/?macro=imgAC_iconeEmpresa_s1&img=' .
+                        $company['image'] . '">' .
+                        $company['name'].
+                        '</div>';
+                } else {
+                    echo $company['name'];
+                } ?>
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+</section>

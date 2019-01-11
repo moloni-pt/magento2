@@ -28,12 +28,12 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterfaceFactory;
 
-use Invoicing\Moloni\Api\TokensRepositoryInterface;
-use Invoicing\Moloni\Model\ResourceModel\Tokens as ObjectResourceModel;
-use Invoicing\Moloni\Model\ResourceModel\Tokens\CollectionFactory;
-use Invoicing\Moloni\Api\Data\TokensInterface;
+use Invoicing\Moloni\Api\SettingsRepositoryInterface;
+use Invoicing\Moloni\Model\ResourceModel\Settings as ObjectResourceModel;
+use Invoicing\Moloni\Model\ResourceModel\Settings\CollectionFactory;
+use Invoicing\Moloni\Api\Data\SettingsInterface;
 
-class TokensRepository implements TokensRepositoryInterface
+class SettingsRepository implements SettingsRepositoryInterface
 {
     public $objectFactory;
     public $objectResourceModel;
@@ -41,11 +41,11 @@ class TokensRepository implements TokensRepositoryInterface
     public $searchResultsFactory;
     public $searchCriteriaBuilder;
 
-    private $tokensRow;
+    private $settingsResults = false;
 
     public function __construct(
         ObjectResourceModel $objectResourceModel,
-        TokensFactory $objectFactory,
+        SettingsFactory $objectFactory,
         CollectionFactory $collectionFactory,
         SearchResultsInterfaceFactory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder
@@ -58,42 +58,57 @@ class TokensRepository implements TokensRepositoryInterface
     }
 
     /**
-     * @param \Invoicing\Moloni\Api\Data\TokensInterface $tokens
+     * @param SettingsInterface $setting
      * @return int
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
-    public function save(TokensInterface $tokens)
+    public function save(SettingsInterface $setting)
     {
-        $this->objectResourceModel->save($tokens);
-        return $tokens->getId();
+        $this->settingsResults = false;
+        $this->objectResourceModel->save($setting);
+        return $setting->getId();
+    }
+
+    public function saveSetting($companyId, $label, $value)
+    {
+        $obj = $this->getByCompanyLabel($companyId, $label);
+
+        $obj->setCompanyId($companyId);
+        $obj->setStoreId(0);
+        $obj->setLabel($label);
+        $obj->setValue(($value == 'required') ? '' : $value);
+
+        $this->save($obj);
+
+        return $obj;
     }
 
     /**
-     * @param $tokenId
-     * @return \Invoicing\Moloni\Api\Data\TokensInterface int
+     * @param $optionId
+     * @return \Invoicing\Moloni\Api\Data\SettingsInterface int
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getById($tokenId)
+    public function getById($optionId)
     {
-        $tokens = $this->objectFactory->create();
-        $this->objectResourceModel->load($tokens, $tokenId);
+        $object = $this->objectFactory->create();
+        $this->objectResourceModel->load($object, $optionId);
 
-        if (!$tokens->getId()) {
-            throw new NoSuchEntityException(__('Tokens do not exist'));
+        if (!$object->getId()) {
+            throw new NoSuchEntityException(__('Setting not found'));
         }
 
-        return $tokens;
+        return $object;
     }
 
     /**
-     * @param TokensInterface $tokens
+     * @param SettingsInterface $option
      * @return bool
      * @throws CouldNotDeleteException
      */
-    public function delete(TokensInterface $tokens)
+    public function delete(SettingsInterface $option)
     {
         try {
-            $this->objectResourceModel->delete($tokens);
+            $this->objectResourceModel->delete($option);
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__($exception->getMessage()));
         }
@@ -114,24 +129,53 @@ class TokensRepository implements TokensRepositoryInterface
         }
     }
 
-    /**
-     * @return TokensInterface
-     */
-    public function getTokens()
+    public function newOption()
     {
+        return $this->objectFactory->create();
+    }
 
-        if (empty($this->tokensRow)) {
-            $_filter = $this->searchCriteriaBuilder->setPageSize("1")->create();
+    /**
+     * @param $companyId
+     * @return bool|array
+     */
+    public function getSettingsByCompany($companyId)
+    {
+        if (!$this->settingsResults[$companyId]) {
+            $_filter = $this->searchCriteriaBuilder->addFilter("company_id", $companyId)->create();
             $list = $this->getList($_filter);
 
             if ($list->getTotalCount() > 0) {
-                $this->tokensRow = $list->getItems()[0];
+                foreach ($list->getItems() as $option) {
+                    $this->settingsResults[$companyId][$option['label']] = $option['value'];
+                }
             } else {
-                $this->tokensRow = $this->objectFactory->create();
+                return false;
             }
         }
 
-        return $this->tokensRow;
+        return $this->settingsResults[$companyId];
+    }
+
+    /**
+     * @param $companyId
+     * @param $label
+     * @return \Invoicing\Moloni\Api\Data\SettingsInterface
+     */
+    public function getByCompanyLabel($companyId, $label)
+    {
+        $_filter = $this->searchCriteriaBuilder
+            ->addFilter("company_id", $companyId)
+            ->addFilter("label", $label)
+            ->setPageSize("1")
+            ->create();
+
+        $list = $this->getList($_filter);
+
+        if ($list->getTotalCount() > 0) {
+            return $list->getItems()[0];
+        } else {
+            return $this->objectFactory->create();
+        }
     }
 
     /**

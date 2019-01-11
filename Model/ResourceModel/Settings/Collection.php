@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-namespace Invoicing\Moloni\Model\ResourceModel\Tokens;
+namespace Invoicing\Moloni\Model\ResourceModel\Settings;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
@@ -15,9 +15,9 @@ class Collection extends AbstractCollection
     /**
      * @var string
      */
-    protected $_idFieldName = 'id';
-    protected $_eventPrefix = 'invoicing_moloni_tokens_collection';
-    protected $_eventObject = 'tokens_collection';
+    protected $_idFieldName = 'option_id';
+    protected $_eventPrefix = 'moloni_settings_collection';
+    protected $_eventObject = 'settings_collection';
 
     /**
      * Define resource model
@@ -26,6 +26,6 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init('Invoicing\Moloni\Model\Tokens', 'Invoicing\Moloni\Model\ResourceModel\Tokens');
+        $this->_init('Invoicing\Moloni\Model\Settings', 'Invoicing\Moloni\Model\ResourceModel\Settings');
     }
 }
