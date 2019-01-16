@@ -1,11 +1,14 @@
 <?xml version="1.0" ?>
 <page layout="admin-1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-        <title>
-            Moloni - Settings
-        </title>
-    </head>
+    <update handle="styles"/>
     <body>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
+                <action method="setUseConfirm">
+                    <argument name="params" xsi:type="string">1</argument>
+                </action>
+            </block>
+        </referenceContainer>
         <referenceContainer name="content">
             <block class="Invoicing\Moloni\Block\Adminhtml\Settings\Index" name="settings.index" template="Invoicing_Moloni::settings/index.phtml"/>
         </referenceContainer>

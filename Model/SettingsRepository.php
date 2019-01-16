@@ -23,6 +23,7 @@ namespace Invoicing\Moloni\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\SearchCriteriaInterface;
@@ -40,32 +41,49 @@ class SettingsRepository implements SettingsRepositoryInterface
     public $collectionFactory;
     public $searchResultsFactory;
     public $searchCriteriaBuilder;
+    public $logger;
 
     private $settingsResults = false;
 
+    /**
+     * SettingsRepository constructor.
+     * @param ObjectResourceModel $objectResourceModel
+     * @param SettingsFactory $objectFactory
+     * @param CollectionFactory $collectionFactory
+     * @param SearchResultsInterfaceFactory $searchResultsFactory
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Psr\Log\LoggerInterface $logger
+     */
     public function __construct(
         ObjectResourceModel $objectResourceModel,
         SettingsFactory $objectFactory,
         CollectionFactory $collectionFactory,
         SearchResultsInterfaceFactory $searchResultsFactory,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->objectFactory = $objectFactory;
         $this->objectResourceModel = $objectResourceModel;
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->logger = $logger;
     }
 
     /**
      * @param SettingsInterface $setting
      * @return int
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
     public function save(SettingsInterface $setting)
     {
         $this->settingsResults = false;
-        $this->objectResourceModel->save($setting);
+        try {
+            $this->objectResourceModel->save($setting);
+        } catch (AlreadyExistsException $e) {
+            $this->logger->critical($e->getMessage());
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
+        }
         return $setting->getId();
     }
 
@@ -129,6 +147,9 @@ class SettingsRepository implements SettingsRepositoryInterface
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function newOption()
     {
         return $this->objectFactory->create();
@@ -141,8 +162,8 @@ class SettingsRepository implements SettingsRepositoryInterface
     public function getSettingsByCompany($companyId)
     {
         if (!$this->settingsResults[$companyId]) {
-            $_filter = $this->searchCriteriaBuilder->addFilter("company_id", $companyId)->create();
-            $list = $this->getList($_filter);
+            $filter = $this->searchCriteriaBuilder->addFilter("company_id", $companyId)->create();
+            $list = $this->getList($filter);
 
             if ($list->getTotalCount() > 0) {
                 foreach ($list->getItems() as $option) {
@@ -159,7 +180,7 @@ class SettingsRepository implements SettingsRepositoryInterface
     /**
      * @param $companyId
      * @param $label
-     * @return \Invoicing\Moloni\Api\Data\SettingsInterface
+     * @return \Invoicing\Moloni\Api\Data\SettingsInterface|\Magento\Framework\Model\AbstractModel
      */
     public function getByCompanyLabel($companyId, $label)
     {

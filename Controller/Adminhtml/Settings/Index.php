@@ -18,25 +18,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Controller\Adminhtml\Settings;
 
-class Index extends \Magento\Backend\App\Action
+use Magento\Backend\App\Action;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Store\Model\StoreResolver;
+
+class Index extends Action
 {
 
-    protected $resultPageFactory;
+    private $resultPageFactory;
+    private $moloni;
+    private $store;
 
     /**
      * Constructor
      *
-     * @param \Magento\Backend\App\Action\Context  $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Context $context
+     * @param StoreResolver $store
+     * @param PageFactory $resultPageFactory
+     * @param Moloni $Moloni
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        StoreResolver $store,
+        PageFactory $resultPageFactory,
+        Moloni $Moloni
     ) {
-    
+        $this->store = $store;
         $this->resultPageFactory = $resultPageFactory;
+        $this->moloni = $Moloni;
         parent::__construct($context);
     }
 
@@ -44,9 +58,18 @@ class Index extends \Magento\Backend\App\Action
      * Execute view action
      *
      * @return \Magento\Framework\Controller\ResultInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute()
     {
+        if (!$this->moloni->checkActiveSession()) {
+            $this->_redirect($this->moloni->redirectTo);
+            return false;
+        }
+
+        print_r($this->store->getCurrentStoreId());
+        exit;
+
         return $this->resultPageFactory->create();
     }
 }

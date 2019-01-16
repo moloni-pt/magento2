@@ -9,6 +9,7 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary;
 
 use Invoicing\Moloni\Api\MoloniApiRepositoryInterface;
 use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Invoicing\Moloni\Model\TokensRepository;
 use Invoicing\Moloni\Model\SettingsRepository;
@@ -101,6 +102,11 @@ class Moloni implements MoloniApiRepositoryInterface
     {
         $activeTokens = $this->tokensRepository->getTokens();
         if (!empty($activeTokens->getAccessToken())) {
+            $setCompanyId = $this->request->getParam('company_id', false);
+            if ($setCompanyId && $setCompanyId > 0) {
+                $activeTokens->setCompanyId($setCompanyId)->save();
+            }
+
             if ($this->session->isValidSession()) {
                 if (empty($this->session->companyId) && $this->request->getActionName() !== 'company') {
                     $this->redirectTo = 'moloni/home/company/';
