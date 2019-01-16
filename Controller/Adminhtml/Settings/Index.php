@@ -25,7 +25,6 @@ use Magento\Backend\App\Action;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Store\Model\StoreResolver;
 
 class Index extends Action
 {
@@ -38,17 +37,14 @@ class Index extends Action
      * Constructor
      *
      * @param Context $context
-     * @param StoreResolver $store
      * @param PageFactory $resultPageFactory
      * @param Moloni $Moloni
      */
     public function __construct(
         Context $context,
-        StoreResolver $store,
         PageFactory $resultPageFactory,
         Moloni $Moloni
     ) {
-        $this->store = $store;
         $this->resultPageFactory = $resultPageFactory;
         $this->moloni = $Moloni;
         parent::__construct($context);
@@ -66,9 +62,6 @@ class Index extends Action
             $this->_redirect($this->moloni->redirectTo);
             return false;
         }
-
-        print_r($this->store->getCurrentStoreId());
-        exit;
 
         return $this->resultPageFactory->create();
     }

@@ -87,12 +87,19 @@ class SettingsRepository implements SettingsRepositoryInterface
         return $setting->getId();
     }
 
-    public function saveSetting($companyId, $label, $value)
+    /**
+     * @param $storeId
+     * @param $companyId
+     * @param $label
+     * @param $value
+     * @return SettingsInterface|\Magento\Framework\Model\AbstractModel
+     */
+    public function saveSetting($storeId, $companyId, $label, $value)
     {
-        $obj = $this->getByCompanyLabel($companyId, $label);
+        $obj = $this->getByCompanyLabel($storeId, $companyId, $label);
 
         $obj->setCompanyId($companyId);
-        $obj->setStoreId(0);
+        $obj->setStoreId($storeId);
         $obj->setLabel($label);
         $obj->setValue(($value == 'required') ? '' : $value);
 
@@ -156,13 +163,17 @@ class SettingsRepository implements SettingsRepositoryInterface
     }
 
     /**
+     * @param $storeId
      * @param $companyId
      * @return bool|array
      */
-    public function getSettingsByCompany($companyId)
+    public function getSettingsByCompany($storeId, $companyId)
     {
         if (!$this->settingsResults[$companyId]) {
-            $filter = $this->searchCriteriaBuilder->addFilter("company_id", $companyId)->create();
+            $filter = $this->searchCriteriaBuilder
+                ->addFilter("company_id", $companyId)
+                ->addFilter('store_id', $storeId)
+                ->create();
             $list = $this->getList($filter);
 
             if ($list->getTotalCount() > 0) {
@@ -178,13 +189,15 @@ class SettingsRepository implements SettingsRepositoryInterface
     }
 
     /**
+     * @param $storeId
      * @param $companyId
      * @param $label
      * @return \Invoicing\Moloni\Api\Data\SettingsInterface|\Magento\Framework\Model\AbstractModel
      */
-    public function getByCompanyLabel($companyId, $label)
+    public function getByCompanyLabel($storeId, $companyId, $label)
     {
         $_filter = $this->searchCriteriaBuilder
+            ->addFilter('store_id', $storeId)
             ->addFilter("company_id", $companyId)
             ->addFilter("label", $label)
             ->setPageSize("1")
