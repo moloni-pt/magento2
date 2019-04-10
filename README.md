@@ -1,1 +1,1 @@
-magento2
+Module for Magento 2 - Work in progress
