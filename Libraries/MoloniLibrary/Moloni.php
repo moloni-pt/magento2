@@ -18,7 +18,6 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
 
 use /** @noinspection PhpUndefinedClassInspection */
     Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
-use Magento\Store\Model\StoreManagerInterface;
 
 class Moloni implements MoloniApiRepositoryInterface
 {
@@ -26,7 +25,6 @@ class Moloni implements MoloniApiRepositoryInterface
 
     public $errors;
     public $curl;
-
     public $tokensRepository;
     public $settingsRepository;
 
@@ -35,9 +33,7 @@ class Moloni implements MoloniApiRepositoryInterface
     public $session;
 
     private $factories = [];
-    private $storeInterface;
 
-    public $activeStore = null;
     public $redirectTo = null;
 
     /*
@@ -79,11 +75,9 @@ class Moloni implements MoloniApiRepositoryInterface
         ApiSession $session,
         ApiErrors $errors,
         /** @noinspection PhpUndefinedClassInspection */
-        CompaniesFactory $companiesFactory,
-        StoreManagerInterface $store
+        CompaniesFactory $companiesFactory
     ) {
         $this->curl = $curl;
-        $this->storeInterface = $store;
         $this->tokensRepository = $tokensRepository;
         $this->settingsRepository = $settingsRepository;
         $this->request = $request;
@@ -108,12 +102,9 @@ class Moloni implements MoloniApiRepositoryInterface
     {
         $activeTokens = $this->tokensRepository->getTokens();
         if (!empty($activeTokens->getAccessToken())) {
-            $this->setActiveStore();
-
             $setCompanyId = $this->request->getParam('company_id', false);
             if ($setCompanyId && $setCompanyId > 0) {
-                $activeTokens->setCompanyId($setCompanyId);
-                $this->tokensRepository->save($activeTokens);
+                $activeTokens->setCompanyId($setCompanyId)->save();
             }
 
             if ($this->session->isValidSession()) {
@@ -121,7 +112,7 @@ class Moloni implements MoloniApiRepositoryInterface
                     $this->redirectTo = 'moloni/home/company/';
                     return false;
                 } else {
-                    $this->setSettings($this->activeStore, $this->session->companyId);
+                    $this->setSettings($this->session->companyId);
                     return true;
                 }
             }
@@ -197,24 +188,23 @@ class Moloni implements MoloniApiRepositoryInterface
     }
 
     /**
-     * @param $storeId
      * @param $companyId
      * @return array
      */
-    private function setSettings($storeId, $companyId)
+    private function setSettings($companyId)
     {
         if ($companyId) {
-            $savedSattings = $this->settingsRepository->getSettingsByCompany($storeId, $companyId);
+            $savedSattings = $this->settingsRepository->getSettingsByCompany($companyId);
             if (!$savedSattings) {
                 foreach ($this->settings as $label => $option) {
                     $savedSattings[$label] = $option;
-                    $this->settingsRepository->saveSetting($storeId, $companyId, $label, $option);
+                    $this->settingsRepository->saveSetting($companyId, $label, $option);
                 }
             } else {
                 foreach ($this->settings as $label => $option) {
                     if (!array_key_exists($label, $savedSattings)) {
                         $savedSattings[$label] = $option;
-                        $this->settingsRepository->saveSetting($storeId, $companyId, $label, $option);
+                        $this->settingsRepository->saveSetting($companyId, $label, $option);
                     }
                 }
             }
@@ -223,18 +213,5 @@ class Moloni implements MoloniApiRepositoryInterface
         }
 
         return $this->settings;
-    }
-
-    /**
-     * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    private function setActiveStore()
-    {
-        $customActiveStoreId = $this->request->getParam('store', false);
-        $storeId = $customActiveStoreId ? $customActiveStoreId : null;
-        $this->activeStore = $this->storeInterface->getStore($storeId)->getId();
-
-        return true;
     }
 }
