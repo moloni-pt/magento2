@@ -20,7 +20,12 @@
  */
 namespace Invoicing\Moloni\Block\Adminhtml\Settings;
 
-class Index extends \Magento\Framework\View\Element\Template
-{
+use Magento\Framework\View\Element\Template;
 
+class Index extends Template
+{
+    public function __construct(Template\Context $context, array $data = [])
+    {
+        parent::__construct($context, $data);
+    }
 }

@@ -25,7 +25,7 @@ use Magento\Backend\App\Action;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Store\Model\StoreResolver;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Index extends Action
 {
@@ -38,13 +38,13 @@ class Index extends Action
      * Constructor
      *
      * @param Context $context
-     * @param StoreResolver $store
+     * @param StoreManagerInterface $store
      * @param PageFactory $resultPageFactory
      * @param Moloni $Moloni
      */
     public function __construct(
         Context $context,
-        StoreResolver $store,
+        StoreManagerInterface $store,
         PageFactory $resultPageFactory,
         Moloni $Moloni
     ) {
@@ -57,7 +57,7 @@ class Index extends Action
     /**
      * Execute view action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return bool|\Magento\Framework\Controller\ResultInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute()
@@ -67,8 +67,7 @@ class Index extends Action
             return false;
         }
 
-        print_r($this->store->getCurrentStoreId());
-        exit;
+        print_r($this->store->getStore()->getId());
 
         return $this->resultPageFactory->create();
     }
