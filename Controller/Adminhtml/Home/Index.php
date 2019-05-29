@@ -25,7 +25,6 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Framework\Registry;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
@@ -34,7 +33,6 @@ class Index extends Action
     private $page;
     private $moloni;
     private $dataPersistor;
-    private $coreRegistry;
     private $response;
 
     /**
@@ -43,23 +41,21 @@ class Index extends Action
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param Moloni $moloni
-     * @param Registry $coreRegistry
      * @param Http $response
-     * @param DataPersistorInterface $dataPersistant
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
         Moloni $moloni,
-        Registry $coreRegistry,
         Http $response,
-        DataPersistorInterface $dataPersistant
-    ) {
+        DataPersistorInterface $dataPersistor
+    )
+    {
         $this->moloni = $moloni;
         $this->page = $resultPageFactory;
-        $this->coreRegistry = $coreRegistry;
         $this->response = $response;
-        $this->dataPersistor = $dataPersistant;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($context);
     }

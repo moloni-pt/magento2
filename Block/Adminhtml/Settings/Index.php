@@ -18,14 +18,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Block\Adminhtml\Settings;
 
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 
 class Index extends Template
 {
-    public function __construct(Template\Context $context, array $data = [])
+    private $moloniSettings = [];
+    private $dataPersistor;
+
+    public function __construct(
+        Context $context,
+        DataPersistorInterface $dataPersistor
+    )
     {
-        parent::__construct($context, $data);
+        $this->dataPersistor = $dataPersistor;
+
+        parent::__construct($context);
     }
+
+    public function _prepareLayout()
+    {
+        $this->pageConfig->getTitle()->set(__('Moloni - Settings'));
+        $this->moloniSettings = $this->dataPersistor->get('moloni_settings');
+        return parent::_prepareLayout();
+    }
+
+    public function getSetting($label)
+    {
+        if (isset($this->moloniSettings[$label])) {
+            return $this->moloniSettings[$label];
+        }
+
+        return false;
+    }
+
 }

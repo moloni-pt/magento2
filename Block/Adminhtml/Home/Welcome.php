@@ -23,20 +23,17 @@ namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\Registry;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 class Welcome extends Template
 {
 
     public $messages = false;
-    public $coreRegistry;
     public $dataPersistor;
 
-    public function __construct(Context $context, Registry $coreRegistry, DataPersistorInterface $dataPersistant)
+    public function __construct(Context $context, DataPersistorInterface $dataPersistor)
     {
-        $this->coreRegistry = $coreRegistry;
-        $this->dataPersistor = $dataPersistant;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($context);
     }
@@ -49,11 +46,6 @@ class Welcome extends Template
 
     public function getMessages()
     {
-        $registryMessages = $this->coreRegistry->registry('moloni_messages');
-        if (!empty($registryMessages)) {
-            $this->messages = $registryMessages;
-        }
-
         $persistingMessages = $this->dataPersistor->get('moloni_messages');
         if (!empty($persistingMessages)) {
             $this->dataPersistor->clear('moloni_messages');

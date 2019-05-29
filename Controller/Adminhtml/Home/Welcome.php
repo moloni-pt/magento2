@@ -23,7 +23,7 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
+use Magento\Framework\App\Request\DataPersistor;
 use Magento\Framework\View\Result\PageFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Model\TokensRepository;
@@ -34,15 +34,15 @@ class Welcome extends Action
     private $moloni;
     private $pageFactory;
     private $tokensRepository;
-    private $coreRegistry;
+    private $dataPersistor;
 
     /**
      * Welcome constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param TokensRepository $tokensRepository
      * @param Moloni $Moloni
-     * @param Registry $coreRegistry
+     * @param TokensRepository $tokensRepository
+     * @param DataPersistor $dataPersistor
      */
 
     public function __construct(
@@ -50,12 +50,13 @@ class Welcome extends Action
         PageFactory $resultPageFactory,
         Moloni $Moloni,
         TokensRepository $tokensRepository,
-        Registry $coreRegistry
-    ) {
+        DataPersistor $dataPersistor
+    )
+    {
         $this->pageFactory = $resultPageFactory;
         $this->moloni = $Moloni;
         $this->tokensRepository = $tokensRepository;
-        $this->coreRegistry = $coreRegistry;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($context);
     }
@@ -70,7 +71,7 @@ class Welcome extends Action
             $this->handleAuthentication();
         } elseif ($this->getRequest()->getParam("code")) {
             if (!$this->moloni->checkAuthorizationCode($this->getRequest()->getParam('code'))) {
-                $this->coreRegistry->register(
+                $this->dataPersistor->set(
                     "moloni_messages",
                     [['type' => 'error', 'message' => $this->moloni->errors->getErrors('last')['message']]]
                 );
@@ -99,7 +100,7 @@ class Welcome extends Action
         if ($authenticationUrl) {
             $this->_redirect($authenticationUrl);
         } else {
-            $this->coreRegistry->register(
+            $this->dataPersistor->set(
                 "moloni_messages",
                 [['type' => 'error', 'message' => __('Error while saving data...')]]
             );

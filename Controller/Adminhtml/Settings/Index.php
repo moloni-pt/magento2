@@ -24,31 +24,32 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Settings;
 use Magento\Backend\App\Action;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Store\Model\StoreManagerInterface;
 
 class Index extends Action
 {
 
     private $resultPageFactory;
     private $moloni;
-    private $store;
+    private $request;
 
     /**
      * Constructor
      *
      * @param Context $context
-     * @param StoreManagerInterface $store
+     * @param Http $request
      * @param PageFactory $resultPageFactory
      * @param Moloni $Moloni
      */
     public function __construct(
         Context $context,
-        StoreManagerInterface $store,
+        Http $request,
         PageFactory $resultPageFactory,
         Moloni $Moloni
-    ) {
-        $this->store = $store;
+    )
+    {
+        $this->request = $request;
         $this->resultPageFactory = $resultPageFactory;
         $this->moloni = $Moloni;
         parent::__construct($context);
@@ -58,7 +59,6 @@ class Index extends Action
      * Execute view action
      *
      * @return bool|\Magento\Framework\Controller\ResultInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute()
     {
@@ -66,8 +66,6 @@ class Index extends Action
             $this->_redirect($this->moloni->redirectTo);
             return false;
         }
-
-        print_r($this->store->getStore()->getId());
 
         return $this->resultPageFactory->create();
     }

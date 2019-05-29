@@ -34,7 +34,6 @@ class Company extends Action
     private $page;
     private $moloni;
     private $dataPersistor;
-    private $coreRegistry;
     private $response;
 
     /**
@@ -43,23 +42,21 @@ class Company extends Action
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param Moloni $moloni
-     * @param Registry $coreRegistry
      * @param Http $response
-     * @param DataPersistorInterface $dataPersistant
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
         Moloni $moloni,
-        Registry $coreRegistry,
         Http $response,
-        DataPersistorInterface $dataPersistant
-    ) {
+        DataPersistorInterface $dataPersistor
+    )
+    {
         $this->moloni = $moloni;
         $this->page = $resultPageFactory;
-        $this->coreRegistry = $coreRegistry;
         $this->response = $response;
-        $this->dataPersistor = $dataPersistant;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($context);
     }
@@ -83,7 +80,7 @@ class Company extends Action
             return false;
         }
 
-        $this->coreRegistry->register('moloni_companies', $companies);
+        $this->dataPersistor->set('moloni_companies', $companies);
 
         $resultPage = $this->page->create();
         return $resultPage;

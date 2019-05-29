@@ -21,20 +21,21 @@
 
 namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\Registry;
 
 class Company extends Template
 {
 
-    private $coreRegistry;
+    private $dataPersistor;
 
     public function __construct(
         Context $context,
-        Registry $coreRegistry
-    ) {
-        $this->coreRegistry = $coreRegistry;
+        DataPersistorInterface $dataPersistor
+    )
+    {
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($context);
     }
@@ -47,7 +48,7 @@ class Company extends Template
 
     public function getCompanies()
     {
-        $companies = $this->coreRegistry->registry('moloni_companies');
+        $companies = $this->dataPersistor->get('moloni_companies');
         return $companies;
     }
 }

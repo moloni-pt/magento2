@@ -15,6 +15,7 @@ use Invoicing\Moloni\Model\TokensRepository;
 use Invoicing\Moloni\Model\SettingsRepository;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiSession;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
 use /** @noinspection PhpUndefinedClassInspection */
     Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
@@ -74,15 +75,18 @@ class Moloni implements MoloniApiRepositoryInterface
         RequestInterface $request,
         ApiSession $session,
         ApiErrors $errors,
+        DataPersistorInterface $dataPersistor,
         /** @noinspection PhpUndefinedClassInspection */
         CompaniesFactory $companiesFactory
-    ) {
+    )
+    {
         $this->curl = $curl;
         $this->tokensRepository = $tokensRepository;
         $this->settingsRepository = $settingsRepository;
         $this->request = $request;
         $this->session = $session;
         $this->errors = $errors;
+        $this->dataPersistor = $dataPersistor;
 
         $this->factories = [
             'companies' => $companiesFactory
@@ -112,7 +116,8 @@ class Moloni implements MoloniApiRepositoryInterface
                     $this->redirectTo = 'moloni/home/company/';
                     return false;
                 } else {
-                    $this->setSettings($this->session->companyId);
+                    $settings = $this->setSettings($this->session->companyId);
+                    $this->dataPersistor->set('moloni_settings', $settings);
                     return true;
                 }
             }
@@ -189,27 +194,28 @@ class Moloni implements MoloniApiRepositoryInterface
 
     /**
      * @param $companyId
+     * @param int $storeId
      * @return array
      */
-    private function setSettings($companyId)
+    private function setSettings($companyId, $storeId = 0)
     {
         if ($companyId) {
-            $savedSattings = $this->settingsRepository->getSettingsByCompany($companyId);
-            if (!$savedSattings) {
+            $savedSettings = $this->settingsRepository->getSettingsByCompany($companyId);
+            if (!$savedSettings) {
                 foreach ($this->settings as $label => $option) {
-                    $savedSattings[$label] = $option;
+                    $savedSettings[$label] = $option;
                     $this->settingsRepository->saveSetting($companyId, $label, $option);
                 }
             } else {
                 foreach ($this->settings as $label => $option) {
-                    if (!array_key_exists($label, $savedSattings)) {
-                        $savedSattings[$label] = $option;
+                    if (!array_key_exists($label, $savedSettings)) {
+                        $savedSettings[$label] = $option;
                         $this->settingsRepository->saveSetting($companyId, $label, $option);
                     }
                 }
             }
 
-            $this->settings = $savedSattings;
+            $this->settings = $savedSettings;
         }
 
         return $this->settings;
