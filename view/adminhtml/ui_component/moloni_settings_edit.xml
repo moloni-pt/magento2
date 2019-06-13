@@ -1,0 +1,120 @@
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">moloni_settings_edit.settings_data_source</item>
+            <item name="deps" xsi:type="string">moloni_settings_edit.settings_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Settings</item>
+        <item name="layout" xsi:type="array">
+            <item name="type" xsi:type="string">tabs</item>
+        </item>
+
+        <item name="buttons" xsi:type="array">
+            <item name="save" xsi:type="array">
+                <item name="name" xsi:type="string">save</item>
+                <item name="label" xsi:type="string" translate="true">save</item>
+                <item name="class" xsi:type="string">primary</item>
+            </item>
+        </item>
+
+    </argument>
+
+    <dataSource name="settings_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Invoicing\Moloni\Model\Settings\DataProvider</argument>
+            <argument name="name" xsi:type="string">settings_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+                <item name="submit_url" path="*/*/*/id/1" xsi:type="url" />
+            </item>
+        </argument>
+    </dataSource>
+
+    <fieldset name="general">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">General settings</item>
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="opened" xsi:type="boolean">true</item>
+                <item name="additionalClasses" xsi:type="array">
+                    <item name="admin__field-my-custom-class" xsi:type="boolean">true</item>
+                </item>
+            </item>
+        </argument>
+
+        <!-- <field name="document_set_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Document set</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">document_set_id</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field> -->
+
+        <field name="document_set_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Model\Settings\Options\DocumentSets</item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Document Set</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">document_set_id</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="document_type">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="array">
+                    <item name="0" xsi:type="array">
+                        <item name="value" xsi:type="string">invoices</item>
+                        <item name="label" xsi:type="string" translate="true">Invoices</item>
+                    </item>
+                    <item name="1" xsi:type="array">
+                        <item name="value" xsi:type="string">invoiceReceipts</item>
+                        <item name="label" xsi:type="string" translate="true">Invoice/Receipts</item>
+                    </item>
+                    <item name="2" xsi:type="array">
+                        <item name="value" xsi:type="string">simplifiedInvoices</item>
+                        <item name="label" xsi:type="string" translate="true">Simplified Invoices</item>
+                    </item>
+                    <item name="3" xsi:type="array">
+                        <item name="value" xsi:type="string">billsOfLading</item>
+                        <item name="label" xsi:type="string" translate="true">Bill of Lading</item>
+                    </item>
+                    <item name="4" xsi:type="array">
+                        <item name="value" xsi:type="string">deliveryNotes</item>
+                        <item name="label" xsi:type="string" translate="true">Delivery Notes</item>
+                    </item>
+                    <item name="5" xsi:type="array">
+                        <item name="value" xsi:type="string">estimates</item>
+                        <item name="label" xsi:type="string" translate="true">Estimates</item>
+                    </item>
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Document Type</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">document_type</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+    </fieldset>
+</form>

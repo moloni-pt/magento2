@@ -17,8 +17,8 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiSession;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
-use /** @noinspection PhpUndefinedClassInspection */
-    Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
 
 class Moloni implements MoloniApiRepositoryInterface
 {
@@ -77,7 +77,8 @@ class Moloni implements MoloniApiRepositoryInterface
         ApiErrors $errors,
         DataPersistorInterface $dataPersistor,
         /** @noinspection PhpUndefinedClassInspection */
-        CompaniesFactory $companiesFactory
+        CompaniesFactory $companiesFactory,
+        DocumentSetsFactory $documentSetsFactory
     )
     {
         $this->curl = $curl;
@@ -89,7 +90,8 @@ class Moloni implements MoloniApiRepositoryInterface
         $this->dataPersistor = $dataPersistor;
 
         $this->factories = [
-            'companies' => $companiesFactory
+            'companies' => $companiesFactory,
+            'documentSets' => $documentSetsFactory
         ];
     }
 
@@ -202,11 +204,13 @@ class Moloni implements MoloniApiRepositoryInterface
         if ($companyId) {
             $savedSettings = $this->settingsRepository->getSettingsByCompany($companyId);
             if (!$savedSettings) {
+                // If there are no saved settings in the table
                 foreach ($this->settings as $label => $option) {
                     $savedSettings[$label] = $option;
                     $this->settingsRepository->saveSetting($companyId, $label, $option);
                 }
             } else {
+                // If any setting doesn't exist add it to the database
                 foreach ($this->settings as $label => $option) {
                     if (!array_key_exists($label, $savedSettings)) {
                         $savedSettings[$label] = $option;
@@ -220,4 +224,6 @@ class Moloni implements MoloniApiRepositoryInterface
 
         return $this->settings;
     }
+
+
 }

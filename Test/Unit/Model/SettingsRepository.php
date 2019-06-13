@@ -9,13 +9,14 @@
 namespace Invoicing\Moloni\Test\Unit\Model;
 
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use function PHPSTORM_META\type;
 use PHPUnit\Framework\TestCase;
 
 class Calculator extends TestCase
 {
     private $objectManager;
     private $desiredResult;
-    private $actualResult;
+    private $actulResult;
     private $settings;
 
     /**
@@ -47,7 +48,7 @@ class Calculator extends TestCase
      */
     public function testGetSettingsByCompany()
     {
-        $this->actualResult = $this->settings->newOption();
+        $this->actulResult = $this->settings->newOption();
 
         $this->desiredResult = false;
         $this->assertEquals($this->desiredResult, $this->actulResult);

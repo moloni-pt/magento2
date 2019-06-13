@@ -1,27 +1,23 @@
 {
-  "name": "moloni/magento2",
-  "description": "Module for Magento 2 by Moloni - Nuno",
-  "type": "magento2-module",
-  "version": "1.0.0",
-  "license": "GPL-3.0",
-  "authors": [
-    {
-      "email": "apoio@moloni.com",
-      "name": "Moloni, lda"
-    }
-  ],
-  "minimum-stability": "dev",
-  "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.15@dev"
-  },
-  "autoload": {
-    "files": [
-      "registration.php"
+    "name": "moloni/magento2",
+    "description": "Module for Magento 2 by Moloni",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "email": "apoio@moloni.com",
+            "name": "Moloni, lda"
+        }
     ],
-    "psr-4": {
-      "Invoicing\\Moloni\\": ""
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Invoicing\\Moloni\\": ""
+        }
     }
-  },
-  "require": {
-  }
 }

@@ -25,6 +25,7 @@ use Magento\Backend\App\Action;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\Http;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action
@@ -33,6 +34,7 @@ class Index extends Action
     private $resultPageFactory;
     private $moloni;
     private $request;
+    protected $messageManager;
 
     /**
      * Constructor
@@ -40,17 +42,20 @@ class Index extends Action
      * @param Context $context
      * @param Http $request
      * @param PageFactory $resultPageFactory
+     * @param ManagerInterface $messageManager
      * @param Moloni $Moloni
      */
     public function __construct(
         Context $context,
         Http $request,
         PageFactory $resultPageFactory,
+        ManagerInterface $messageManager,
         Moloni $Moloni
     )
     {
         $this->request = $request;
         $this->resultPageFactory = $resultPageFactory;
+        $this->messageManager = $messageManager;
         $this->moloni = $Moloni;
         parent::__construct($context);
     }
@@ -64,6 +69,19 @@ class Index extends Action
     {
         if (!$this->moloni->checkActiveSession()) {
             $this->_redirect($this->moloni->redirectTo);
+            return false;
+        }
+
+        if (is_array($this->getRequest()->getParam('general'))) {
+            $settings = [];
+            $settings = array_merge($settings, $this->getRequest()->getParam('general'));
+
+            foreach ($settings as $label => $value) {
+                $this->moloni->settingsRepository->saveSetting($this->moloni->session->companyId, $label, $value);
+            }
+
+            $this->messageManager->addSuccessMessage(__('Alterações guardadas com sucesso'));
+            $this->_redirect('*/*/*/id/1');
             return false;
         }
 

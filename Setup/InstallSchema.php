@@ -19,34 +19,41 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Invoicing\Moloni\Setup;
+
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+
 class InstallSchema implements InstallSchemaInterface
 {
+
     private $tables = [
         "moloni_tokens",
         "moloni_settings",
         "moloni_documents",
     ];
     private $installer;
+
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $this->installer = $setup;
         $this->installer->startSetup();
+
         foreach ($this->tables as $table) {
             if (!$this->installer->tableExists($table)) {
                 $this->{"setTable".str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))}();
                 $this->{"setIndex".str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))}();
             }
         }
+        
         $this->installer->endSetup();
     }
+
     private function setTableMoloniTokens()
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
-                'moloni_tokens'
+                $this->installer->getTable('moloni_tokens')
             )->addColumn(
                 'id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -108,13 +115,15 @@ class InstallSchema implements InstallSchemaInterface
                 'Expire date'
             )->setComment('Used to store moloni session tokens - clean this table for a token reset')
         );
+
         return $table;
     }
+    
     private function setTableMoloniSettings()
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
-                'moloni_settings'
+                $this->installer->getTable('moloni_settings')
             )->addColumn(
                 'option_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -152,13 +161,15 @@ class InstallSchema implements InstallSchemaInterface
                 'Value'
             )->setComment('Used to store all moloni required settings')
         );
+
         return $table;
     }
+    
     private function setTableMoloniDocuments()
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
-                'moloni_documents'
+                $this->installer->getTable('moloni_documents')
             )->addColumn(
                 'document_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -227,13 +238,15 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'metadata',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                \Magento\Framework\DB\Ddl\Table::MAX_TEXT_SIZE,
+                '2M',
                 [],
                 'All json sent to moloni'
             )->setComment('Used to store moloni all the data from inserted documents')
         );
+
         return $table;
     }
+
     private function setIndexMoloniTokens()
     {
         $this->installer->getConnection()->addIndex(
@@ -247,42 +260,32 @@ class InstallSchema implements InstallSchemaInterface
             \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
         );
     }
+
     private function setIndexMoloniDocuments()
     {
-        $documentsIndexes = [
-            'document_id',
-            'company_id',
-            'store_id',
-            'order_id',
-            'invoice_id',
-        ];
-        foreach($documentsIndexes as $columnName) {
-            $this->installer->getConnection()->addIndex(
+        $this->installer->getConnection()->addIndex(
+            $this->installer->getTable('moloni_documents'),
+            $this->installer->getIdxName(
                 $this->installer->getTable('moloni_documents'),
-                $this->installer->getIdxName(
-                    $this->installer->getTable('moloni_documents'),
-                    $columnName
-                ),
-                $columnName
-            );
-        }
+                ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
+            ),
+            ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
+            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
+        );
     }
+    
     private function setIndexMoloniSettings()
     {
-        $settingsIndexes = [
-            'option_id',
-            'company_id',
-            'store_id',
-        ];
-        foreach($settingsIndexes as $columnName) {
-            $this->installer->getConnection()->addIndex(
+        $this->installer->getConnection()->addIndex(
+            $this->installer->getTable('moloni_settings'),
+            $this->installer->getIdxName(
                 $this->installer->getTable('moloni_settings'),
-                $this->installer->getIdxName(
-                    $this->installer->getTable('moloni_settings'),
-                    $columnName
-                ),
-                $columnName
-            );
-        }
+                ['option_id', 'company_id', 'store_id', 'label', 'value'],
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
+            ),
+            ['option_id', 'company_id', 'store_id', 'label', 'value'],
+            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INTEGER
+        );
     }
 }

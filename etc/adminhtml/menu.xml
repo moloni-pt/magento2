@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-      <add id="Invoicing_Moloni::title" title="Moloni Invoicing" translate="title" module="Invoicing_Moloni" parent="Magento_Sales::sales" sortOrder="50" dependsOnModule="Invoicing_Moloni" resource="Invoicing_Moloni::home"/>
+      <add id="Invoicing_Moloni::title" title="Moloni" translate="title" module="Invoicing_Moloni" parent="Magento_Sales::sales" sortOrder="50" dependsOnModule="Invoicing_Moloni" resource="Invoicing_Moloni::home"/>
       <add id="Invoicing_Moloni::home" title="Home" translate="title" module="Invoicing_Moloni" parent="Invoicing_Moloni::title" sortOrder="10" dependsOnModule="Invoicing_Moloni" action="moloni/home" resource="Invoicing_Moloni::title"/>
       <add id="Invoicing_Moloni::documents" title="Documents" translate="title" module="Invoicing_Moloni" parent="Invoicing_Moloni::title" sortOrder="10" dependsOnModule="Invoicing_Moloni" action="moloni/documents" resource="Invoicing_Moloni::documents"/>
-      <add id="Invoicing_Moloni::settings" title="Settings" translate="title" module="Invoicing_Moloni" parent="Invoicing_Moloni::title" sortOrder="10" dependsOnModule="Invoicing_Moloni" action="moloni/settings" resource="Invoicing_Moloni::settings"/>
+      <add id="Invoicing_Moloni::settings" title="Settings" translate="title" module="Invoicing_Moloni" parent="Invoicing_Moloni::title" sortOrder="10" dependsOnModule="Invoicing_Moloni" action="moloni/settings/index/id/1" resource="Invoicing_Moloni::settings"/>
     </menu>
 </config>
