@@ -25,13 +25,13 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 
-class Index extends \Magento\Config\Block\System\Config\Edit
+class Index extends Template
 {
     private $moloniSettings = [];
     private $dataPersistor;
 
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
+        Context $context,
         DataPersistorInterface $dataPersistor
     )
     {
@@ -42,28 +42,7 @@ class Index extends \Magento\Config\Block\System\Config\Edit
 
     public function _prepareLayout()
     {
-        $this->getToolbar()->addChild(
-            "save_button",
-            'Magento\Backend\Block\Widget\Button',
-            [
-                'id' => 'save',
-                'label' => __('Guardar Alterações'),
-                'class' => 'save primary',
-                'data_attribute' => [
-                    'mage-init' => [
-                        'button' => [
-                            'event' => 'save',
-                            'target' => '#config-edit-form'
-                        ]
-                    ],
-                ]
-            ]
-        );
-
-        $block = $this->getLayout()
-            ->createBlock('Invoicing\Moloni\Block\Adminhtml\Settings\Form');
-
-        $this->setChild('form', $block);
+        return parent::_prepareLayout();
     }
 
     public function getSetting($label)

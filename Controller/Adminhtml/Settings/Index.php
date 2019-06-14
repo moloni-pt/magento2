@@ -28,6 +28,8 @@ use Magento\Framework\App\Request\Http;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\PageFactory;
 
+use Invoicing\Moloni\Model\SettingsRepository;
+
 class Index extends Action
 {
 
@@ -35,6 +37,7 @@ class Index extends Action
     private $moloni;
     private $request;
     protected $messageManager;
+    private $settingsRepository;
 
     /**
      * Constructor
@@ -43,6 +46,7 @@ class Index extends Action
      * @param Http $request
      * @param PageFactory $resultPageFactory
      * @param ManagerInterface $messageManager
+     * @param SettingsRepository $settingsRepository
      * @param Moloni $Moloni
      */
     public function __construct(
@@ -50,12 +54,14 @@ class Index extends Action
         Http $request,
         PageFactory $resultPageFactory,
         ManagerInterface $messageManager,
+        SettingsRepository $settingsRepository,
         Moloni $Moloni
     )
     {
         $this->request = $request;
         $this->resultPageFactory = $resultPageFactory;
         $this->messageManager = $messageManager;
+        $this->settingsRepository = $settingsRepository;
         $this->moloni = $Moloni;
         parent::__construct($context);
     }
@@ -72,17 +78,18 @@ class Index extends Action
             return false;
         }
 
-        if (is_array($this->getRequest()->getParam('general'))) {
+        $contactDatas = $this->getRequest()->getParam('general');
+        if (is_array($contactDatas)) {
             $settings = [];
+            $companyId = $this->moloni->session->companyId;
+
             $settings = array_merge($settings, $this->getRequest()->getParam('general'));
 
             foreach ($settings as $label => $value) {
-                $this->moloni->settingsRepository->saveSetting($this->moloni->session->companyId, $label, $value);
+                $this->moloni->settingsRepository->saveSetting($companyId, $label, $value);
             }
 
             $this->messageManager->addSuccessMessage(__('Alterações guardadas com sucesso'));
-            $this->_redirect('*/*/*/id/1');
-            return false;
         }
 
         return $this->resultPageFactory->create();

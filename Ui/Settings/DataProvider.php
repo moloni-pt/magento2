@@ -1,6 +1,6 @@
 <?php
 
-namespace Invoicing\Moloni\Model\Settings;
+namespace Invoicing\Moloni\Ui\Settings;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\Api\FilterBuilder;
@@ -50,7 +50,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
             return [];
         }*/
 
-        $this->loadedData['1']['general'] = [
+        $this->loadedData['0']['general'] = [
             "document_set_id" => $this->moloni->settings['document_set_id'],
             "document_type" => $this->moloni->settings['document_type'],
             "document_status" => $this->moloni->settings['document_status'],

@@ -1,6 +1,6 @@
 <?php
 
-namespace Invoicing\Moloni\Model\Settings\Options;
+namespace Invoicing\Moloni\Ui\Settings\Options;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\Data\OptionSourceInterface;
