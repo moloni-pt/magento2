@@ -42,8 +42,6 @@ class Index extends Template
 
     public function _prepareLayout()
     {
-        $this->pageConfig->getTitle()->set(__('Moloni - Settings'));
-        $this->moloniSettings = $this->dataPersistor->get('moloni_settings');
         return parent::_prepareLayout();
     }
 

@@ -1,8 +1,5 @@
-<form id="form-validate" action="<?php echo $block->getUrl('moloni/settings/index') ?>" method="post">
-    <?php echo $block->getBlockHtml('formkey') ?>
-
-    <?php echo $block->getSetting('orders_since'); ?>
     <fieldset class="admin__fieldset">
+
         <div class="admin__field _required">
             <div class="admin__field-label">
                 <label for="GK7UVGQ">
@@ -10,7 +7,7 @@
                 </label>
             </div>
             <div class="admin__field-control">
-                <input class="admin__control-text" type="text" name="product[name]" aria-describedby="notice-GK7UVGQ"
+                <input class="admin__control-text" type="text" name="product[name]" data-form-part="moloni_settings_edit" aria-describedby="notice-GK7UVGQ"
                        id="GK7UVGQ" maxlength="255">
             </div>
         </div>
@@ -36,12 +33,13 @@
                 </select>
             </div>
         </div>
+
     </fieldset>
 
     <button type="submit" class="action save primary">
         <span><?php echo __('Guardar Alterações') ?></span>
     </button>
-</form>
+
 <script>
     require(['jquery', 'mage/mage', 'Invoicing_Moloni/js/datatables.min'], function ($) {
         $('#form-validate').mage('validation', {});

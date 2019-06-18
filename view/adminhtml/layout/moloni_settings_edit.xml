@@ -1,14 +1,9 @@
 <?xml version="1.0" ?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
     <update handle="editor"/>
     <body>
-        <referenceBlock name="menu">
-            <action method="setActive">
-                <argument name="itemId" xsi:type="string">Invoicing_Moloni::settings</argument>
-            </action>
-        </referenceBlock>
         <referenceContainer name="page.main.actions">
             <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
                 <action method="setUseConfirm">
@@ -16,10 +11,14 @@
                 </action>
             </block>
         </referenceContainer>
-
         <referenceContainer name="content">
-            <!-- <uiComponent name="moloni_settings_edit"/> -->
-            <block class="Invoicing\Moloni\Block\Adminhtml\Settings\Index" name="settings.index"/>
+             <uiComponent name="moloni_settings_edit"/>
         </referenceContainer>
+        <!--<referenceContainer name="content">
+            <block class="Magento\User\Block\User\Edit" name="adminhtml.user.edit"/>
+        </referenceContainer>
+        <referenceContainer name="js">
+            <block class="Magento\Backend\Block\Template" name="adminhtml.user.roles.grid.js" template="Magento_User::user/roles_grid_js.phtml"/>
+        </referenceContainer> -->
     </body>
 </page>
