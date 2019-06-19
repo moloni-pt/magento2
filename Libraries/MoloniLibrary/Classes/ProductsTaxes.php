@@ -9,13 +9,13 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
-class MeasurementUnits
+class ProductsTaxes
 {
 
     private $moloni;
 
     /**
-     * Companies constructor.
+     * ProductsTaxes constructor.
      * @param Moloni $moloni
      */
     public function __construct(Moloni $moloni)
@@ -30,12 +30,12 @@ class MeasurementUnits
     public function getAll($company_id = false)
     {
         $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
-        $result = $this->moloni->execute("measurementUnits/getAll", $values);
-        if (is_array($result) && isset($result[0]['unit_id'])) {
+        $result = $this->moloni->execute("taxes/getAll", $values);
+        if (is_array($result) && isset($result[0]['tax_id'])) {
             return $result;
         } else {
             $this->moloni->errors->throwError(
-                __("Não tem acesso à informação das unidades de medida"),
+                __("Não tem acesso à informação das taxas de artigos"),
                 __(print_r($result, true)),
                 __CLASS__ . "/" . __FUNCTION__
             );

@@ -5,7 +5,7 @@ namespace Invoicing\Moloni\Ui\Settings\Options;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\Data\OptionSourceInterface;
 
-class DocumentSets implements OptionSourceInterface
+class ProductsTaxes implements OptionSourceInterface
 {
     private $moloni;
 
@@ -26,18 +26,18 @@ class DocumentSets implements OptionSourceInterface
     {
         $result = [];
 
-        $documentSets = $this->moloni->documentSets->getAll();
+        $taxes = $this->moloni->taxes->getAll();
 
         $result[] = [
             'value' => '',
-            'label' => __('Escolher uma opção')
+            'label' => __('Os meus artigos têm taxas configuradas')
         ];
 
-        if ($documentSets && is_array($documentSets)) {
-            foreach ($documentSets as $documentSet) {
+        if ($taxes && is_array($taxes)) {
+            foreach ($taxes as $tax) {
                 $result[] = [
-                    "value" => $documentSet['document_set_id'],
-                    "label" => $documentSet['name']
+                    "value" => $tax['tax_id'],
+                    "label" => $tax['name'] . " (" . $tax['value'] . "%)"
                 ];
             }
         }
