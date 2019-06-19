@@ -34,7 +34,6 @@ class Welcome extends Template
     public function __construct(Context $context, DataPersistorInterface $dataPersistor)
     {
         $this->dataPersistor = $dataPersistor;
-
         parent::__construct($context);
     }
 

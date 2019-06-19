@@ -4,6 +4,12 @@
     <update handle="styles"/>
     <update handle="editor"/>
     <body>
+        <attribute name="class" value="moloni"/>
+        <referenceContainer name="page.messages">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Console\Log"
+                   template="Invoicing_Moloni::console/log.phtml"
+                   name="console.log"/>
+        </referenceContainer>
         <referenceContainer name="page.main.actions">
             <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
                 <action method="setUseConfirm">
@@ -12,13 +18,7 @@
             </block>
         </referenceContainer>
         <referenceContainer name="content">
-             <uiComponent name="moloni_settings_edit"/>
+            <uiComponent name="moloni_settings_edit"/>
         </referenceContainer>
-        <!--<referenceContainer name="content">
-            <block class="Magento\User\Block\User\Edit" name="adminhtml.user.edit"/>
-        </referenceContainer>
-        <referenceContainer name="js">
-            <block class="Magento\Backend\Block\Template" name="adminhtml.user.roles.grid.js" template="Magento_User::user/roles_grid_js.phtml"/>
-        </referenceContainer> -->
     </body>
 </page>

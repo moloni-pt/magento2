@@ -29,7 +29,7 @@
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
-                <item name="submit_url" path="*/*/*/invoicing/0" xsi:type="url"/>
+                <item name="submit_url" path="*/*/save/invoicing/0" xsi:type="url"/>
             </item>
         </argument>
     </dataSource>
@@ -37,10 +37,7 @@
     <fieldset name="general">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="label" xsi:type="string" translate="true">Configurações Gerais</item>
-                <item name="additionalClasses" xsi:type="array">
-                    <item name="admin__field-my-custom-class" xsi:type="boolean">true</item>
-                </item>
+                <item name="label" xsi:type="string" translate="true">Documentos</item>
             </item>
         </argument>
 
@@ -52,49 +49,110 @@
                     <item name="label" translate="true" xsi:type="string">Série de documentos</item>
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="source" xsi:type="string">document_set_id</item>
-                </item>
-            </argument>
-        </field>
-
-        <field name="document_type">
-            <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="array">
-                    <item name="0" xsi:type="array">
-                        <item name="value" xsi:type="string">invoices</item>
-                        <item name="label" xsi:type="string" translate="true">Fatura</item>
-                    </item>
-                    <item name="1" xsi:type="array">
-                        <item name="value" xsi:type="string">invoiceReceipts</item>
-                        <item name="label" xsi:type="string" translate="true">Fatura/Recibo</item>
-                    </item>
-                    <item name="2" xsi:type="array">
-                        <item name="value" xsi:type="string">simplifiedInvoices</item>
-                        <item name="label" xsi:type="string" translate="true">Fatura simplificada</item>
-                    </item>
-                    <item name="3" xsi:type="array">
-                        <item name="value" xsi:type="string">billsOfLading</item>
-                        <item name="label" xsi:type="string" translate="true">Guia de transporte</item>
-                    </item>
-                    <item name="4" xsi:type="array">
-                        <item name="value" xsi:type="string">deliveryNotes</item>
-                        <item name="label" xsi:type="string" translate="true">Nota de encomenda</item>
-                    </item>
-                    <item name="5" xsi:type="array">
-                        <item name="value" xsi:type="string">estimates</item>
-                        <item name="label" xsi:type="string" translate="true">Orçamento</item>
-                    </item>
-                </item>
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Tipo de documento</item>
-                    <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">document_type</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
                 </item>
             </argument>
         </field>
+
+        <field name="document_type">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\DocumentTypes</item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Tipo de documento</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">document_type</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="document_status">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Enviar email</item>
+                    <item name="source" xsi:type="string">document_status</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Um documento fechado não pode ser editado. Em caso de erro ao gerar o documento ou se os
+                            valores não baterem certo, será notificado
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="document_email">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Fechar documento</item>
+                    <item name="source" xsi:type="string">document_email</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            O email só enviado se o documento for correctamente inserido como fechado.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="shipping_details">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Dados de transporte</item>
+                    <item name="source" xsi:type="string">shipping_details</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Incluir dados de transporte no documento gerado.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="shipping_document">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Documento de transporte</item>
+                    <item name="source" xsi:type="string">shipping_document</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Emitir automaticamente um documento de transporte.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
     </fieldset>
 
 
@@ -102,9 +160,78 @@
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="label" xsi:type="string" translate="true">Artigos</item>
-                <item name="collapsible" xsi:type="boolean">true</item>
             </item>
         </argument>
+
+        <field name="products_at_category">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\ProductsAtCategory</item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Categoria AT</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">products_at_category</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="default_measurement_unit_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\ProductsMeasurementUnits
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Unidade de medida</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">default_measurement_unit_id</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Unidade de medida por defeito a ser aplicada aos artigos. Pode a qualquer altura trocar a
+                            unidade de medida nos artigos no Moloni
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="products_tax">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\ProductsTaxes
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Taxa aplicada</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">products_tax</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Se os artigos da sua loja online estiverem criados já com IVA incluído, pode seleccionar a
+                            taxa de IVA que o plugin vai usar.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="products_tax_exemption">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\ProductsTaxExemptions
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Razão de isenção</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">products_tax_exemption</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Se os artigos da sua loja online estiverem criados já com IVA incluído, pode seleccionar a
+                            taxa de IVA que o plugin vai usar.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
     </fieldset>
 
 </form>

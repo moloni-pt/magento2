@@ -42,19 +42,24 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
 
     public function getData()
     {
-        /* if (isset($this->loadedData)) {
-             return $this->loadedData;
-         }*/
+        if (isset($this->loadedData)) {
+            return $this->loadedData;
+        }
 
-        /*if (!$this->moloni->checkActiveSession()) {
-            return [];
-        }*/
+        /* $this->loadedData['0']['general'] = [
+             "document_set_id" => $this->moloni->settings['document_set_id'],
+             "document_type" => $this->moloni->settings['document_type'],
+             "document_status" => $this->moloni->settings['document_status'],
+             "shipping_details" => $this->moloni->settings['shipping_details'],
+         ];*/
 
-        $this->loadedData['0']['general'] = [
-            "document_set_id" => $this->moloni->settings['document_set_id'],
-            "document_type" => $this->moloni->settings['document_type'],
-            "document_status" => $this->moloni->settings['document_status'],
-        ];
+        if (is_array($this->moloni->settings) && !empty($this->moloni->settings)) {
+            foreach ($this->moloni->settings as $option => $value) {
+                // Lazy way for not setting each one individually
+                $this->loadedData['0']['general'][$option] = $value;
+                $this->loadedData['0']['products'][$option] = $value;
+            }
+        }
 
         return $this->loadedData;
     }

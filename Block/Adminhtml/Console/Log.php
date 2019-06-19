@@ -19,39 +19,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Settings;
+namespace Invoicing\Moloni\Block\Adminhtml\Console;
 
-use Magento\Framework\App\Request\DataPersistorInterface;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
-class Index extends Template
+class Log extends Template
 {
-    private $moloniSettings = [];
     private $dataPersistor;
+    private $moloni;
 
     public function __construct(
         Context $context,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        Moloni $moloni
     )
     {
         $this->dataPersistor = $dataPersistor;
-
+        $this->moloni = $moloni;
         parent::__construct($context);
     }
 
-    public function _prepareLayout()
+    public function getLogs()
     {
-        return parent::_prepareLayout();
+        return $this->moloni->logs;
     }
-
-    public function getSetting($label)
-    {
-        if (isset($this->moloniSettings[$label])) {
-            return $this->moloniSettings[$label];
-        }
-
-        return false;
-    }
-
 }

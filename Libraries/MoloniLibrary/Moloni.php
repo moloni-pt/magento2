@@ -8,8 +8,9 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary;
 
 use Invoicing\Moloni\Api\MoloniApiRepositoryInterface;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnits;
+use Invoicing\Moloni\Ui\Settings\Options\ProductsTaxes;
 use Magento\Framework\HTTP\Client\Curl;
-use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Invoicing\Moloni\Model\TokensRepository;
 use Invoicing\Moloni\Model\SettingsRepository;
@@ -19,11 +20,15 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnitsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxExemptionsFactory;
 
 class Moloni implements MoloniApiRepositoryInterface
 {
     const API_URL = 'https://api.moloni.pt/v1/';
 
+    public $logs = [];
     public $errors;
     public $curl;
     public $tokensRepository;
@@ -47,14 +52,16 @@ class Moloni implements MoloniApiRepositoryInterface
         'document_set_id' => 'required',
         'document_type' => 'invoices',
         'document_status' => 0,
+        'document_email' => 0,
 
-        'customer_prefix' => '',
+        'shipping_details' => 0,
+        'shipping_document' => 0,
+
         'customer_vat' => '0',
 
         'default_maturity_date_id' => 'required',
         'default_measurement_unit_id' => 'required',
 
-        'products_reference_prefix' => '',
         'products_at_category' => 'M',
         'products_auto_create' => '0',
         'products_sync_stock' => '0',
@@ -78,7 +85,10 @@ class Moloni implements MoloniApiRepositoryInterface
         DataPersistorInterface $dataPersistor,
         /** @noinspection PhpUndefinedClassInspection */
         CompaniesFactory $companiesFactory,
-        DocumentSetsFactory $documentSetsFactory
+        DocumentSetsFactory $documentSetsFactory,
+        MeasurementUnitsFactory $measurementUnitsFactory,
+        ProductsTaxesFactory $productsTaxesFactory,
+        ProductsTaxExemptionsFactory $productsTaxExemptionsFactory
     )
     {
         $this->curl = $curl;
@@ -91,7 +101,10 @@ class Moloni implements MoloniApiRepositoryInterface
 
         $this->factories = [
             'companies' => $companiesFactory,
-            'documentSets' => $documentSetsFactory
+            'documentSets' => $documentSetsFactory,
+            'measurementUnits' => $measurementUnitsFactory,
+            'taxes' => $productsTaxesFactory,
+            'taxExemptions' => $productsTaxExemptionsFactory
         ];
     }
 
@@ -166,7 +179,7 @@ class Moloni implements MoloniApiRepositoryInterface
         return false;
     }
 
-    public function execute($url, $body = false, $debug = false)
+    public function execute($url, $body = false)
     {
         $response = false;
         $requestUrl = self::API_URL . $url;
@@ -182,14 +195,13 @@ class Moloni implements MoloniApiRepositoryInterface
             $response = json_decode($rawResponse, true);
         }
 
-        if ($debug) {
-            $debug .= __('Url:') . $requestUrl . '<br>';
-            $debug .= __('Dados Enviados: ') . '<br><pre>' . $rawResponse . '</pre><br>';
-            $debug .= __('Dados Recebidos: ') . '<br><pre>' . $rawResponse . '</pre>';
+        $this->logs[] = [
+            'url' => $requestUrl,
+            'sent' => $body,
+            'received' => $response
+        ];
 
-            \Magento\Framework\App\ObjectManager::getInstance()
-                ->get('Psr\Log\LoggerInterface')->debug($debug);
-        }
+        $this->dataPersistor->set("moloni_logs", $this->logs);
 
         return $response;
     }

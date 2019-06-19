@@ -1,0 +1,49 @@
+<?php
+
+$logs = $block->getLogs();
+if (is_array($logs) && !empty($logs)) {
+
+    ?>
+
+    <section class="console-log">
+        <div id="console-log-message" class="message console-log-message">
+            <?php echo __('Console de log Moloni.') ?>
+        </div>
+
+        <div id="console-log-container" class="console-log-container">
+            <?php
+
+            foreach ($logs as $key => $log) {
+                echo "<div class='console-log-container-item' log='" . $key . "'>";
+                echo $log['url'];
+                echo "</div>";
+
+                echo "<div id='log-" . $key . "' class='console-log-container-item-inner'>";
+                echo "<pre>" . (!is_array($log['sent']) ?: print_r($log['sent'], true)) . "</pre>";
+                echo "<pre>" . (!is_array($log['received']) ?: print_r($log['received'], true)) . "</pre>";
+                echo "</div>";
+
+            }
+
+            ?>
+        </div>
+    </section>
+
+    <script>
+        require(['jquery'], function ($) {
+            $("#console-log-message").on('click', function () {
+                $("#console-log-container").slideToggle('fast');
+            })
+
+            $("#console-log-container .console-log-container-item").on('click', function () {
+                var child = $("#log-" + this.readAttribute('log'));
+                if (child) {
+                    child.slideToggle('fast');
+                }
+            });
+        });
+    </script>
+
+    <?php
+}
+?>

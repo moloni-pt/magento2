@@ -2,7 +2,9 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Settings;
 
-class Edit extends \Invoicing\Moloni\Controller\Adminhtml\Settings
+use Invoicing\Moloni\Controller\Adminhtml\Settings;
+
+class Edit extends Settings
 {
 
     public function execute()
@@ -12,8 +14,7 @@ class Edit extends \Invoicing\Moloni\Controller\Adminhtml\Settings
             return false;
         }
 
-        $this->initAction();
-        $this->_view->getPage()->getConfig()->getTitle()->prepend(__("Moloni - Configurações"));
-        $this->_view->renderLayout();
+        $page = $this->initAction();
+        return $page;
     }
 }

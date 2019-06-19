@@ -190,6 +190,36 @@
       }
     }
   }
+
+  .console-log {
+    &-message {
+      background-color: #d9edf7;
+      margin-bottom: 20px;
+    }
+
+    &-container {
+      display: none;
+      margin-bottom: 20px;
+      background: rgb(248, 248, 248);
+      border-bottom: 1px solid rgb(227, 227, 227);
+      border-top: 1px solid rgb(227, 227, 227);
+      padding: 5px;
+
+
+      &-item {
+        margin-top: 5px;
+
+        &-inner {
+          display: none;
+
+          pre {
+            width: 50%;
+            float: left;
+          }
+        }
+      }
+    }
+  }
 }
 
 
