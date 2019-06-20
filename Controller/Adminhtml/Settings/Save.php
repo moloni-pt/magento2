@@ -33,12 +33,12 @@ class Save extends Settings
         }
 
         $page = $this->initAction();
-
         $settingsFormData = $this->getRequest()->getParam('general');
         if (is_array($settingsFormData)) {
             $settings = [];
             $settings = array_merge($settings, $this->getRequest()->getParam('general'));
             $settings = array_merge($settings, $this->getRequest()->getParam('products'));
+            $settings = array_merge($settings, $this->getRequest()->getParam('orders'));
             $companyId = $this->moloni->session->companyId;
 
             foreach ($settings as $label => $value) {

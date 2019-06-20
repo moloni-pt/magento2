@@ -46,20 +46,37 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
             return $this->loadedData;
         }
 
-        /* $this->loadedData['0']['general'] = [
-             "document_set_id" => $this->moloni->settings['document_set_id'],
-             "document_type" => $this->moloni->settings['document_type'],
-             "document_status" => $this->moloni->settings['document_status'],
-             "shipping_details" => $this->moloni->settings['shipping_details'],
-         ];*/
+        $this->loadedData['0']['general'] = [
+            "document_set_id" => $this->moloni->settings['document_set_id'],
+            "document_type" => $this->moloni->settings['document_type'],
+            "document_status" => $this->moloni->settings['document_status'],
+            "document_email" => $this->moloni->settings['document_email'],
+            "shipping_details" => $this->moloni->settings['shipping_details'],
+            "shipping_document" => $this->moloni->settings['shipping_document'],
+        ];
 
-        if (is_array($this->moloni->settings) && !empty($this->moloni->settings)) {
+        $this->loadedData['0']['products'] = [
+            "products_at_category" => $this->moloni->settings['products_at_category'],
+            "default_measurement_unit_id" => $this->moloni->settings['default_measurement_unit_id'],
+            "products_tax" => $this->moloni->settings['products_tax'],
+            "products_tax_exemption" => $this->moloni->settings['products_tax_exemption'],
+            "shipping_tax" => $this->moloni->settings['shipping_tax'],
+            "shipping_tax_exemption" => $this->moloni->settings['shipping_tax_exemption'],
+            "products_auto_create" => $this->moloni->settings['products_auto_create'],
+        ];
+
+        $this->loadedData['0']['orders'] = [
+            "orders_since" => $this->moloni->settings['orders_since'],
+            "orders_statuses" => $this->moloni->settings['orders_statuses'],
+        ];
+
+        /*if (is_array($this->moloni->settings) && !empty($this->moloni->settings)) {
             foreach ($this->moloni->settings as $option => $value) {
                 // Lazy way for not setting each one individually
                 $this->loadedData['0']['general'][$option] = $value;
                 $this->loadedData['0']['products'][$option] = $value;
             }
-        }
+        }*/
 
         return $this->loadedData;
     }

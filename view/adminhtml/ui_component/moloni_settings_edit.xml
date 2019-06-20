@@ -1,5 +1,6 @@
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">moloni_settings_edit.settings_data_source</item>
@@ -31,6 +32,7 @@
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
                 <item name="submit_url" path="*/*/save/invoicing/0" xsi:type="url"/>
             </item>
+
         </argument>
     </dataSource>
 
@@ -48,7 +50,6 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Série de documentos</item>
                     <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">document_set_id</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
@@ -63,7 +64,6 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Tipo de documento</item>
                     <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">document_type</item>
                 </item>
             </argument>
         </field>
@@ -74,8 +74,7 @@
                     <item name="dataType" xsi:type="string">boolean</item>
                     <item name="formElement" xsi:type="string">checkbox</item>
                     <item name="prefer" xsi:type="string">toggle</item>
-                    <item name="label" xsi:type="string" translate="true">Enviar email</item>
-                    <item name="source" xsi:type="string">document_status</item>
+                    <item name="label" xsi:type="string" translate="true">Fechar documento</item>
                     <item name="valueMap" xsi:type="array">
                         <item name="true" xsi:type="string">1</item>
                         <item name="false" xsi:type="string">0</item>
@@ -96,8 +95,7 @@
                     <item name="dataType" xsi:type="string">boolean</item>
                     <item name="formElement" xsi:type="string">checkbox</item>
                     <item name="prefer" xsi:type="string">toggle</item>
-                    <item name="label" xsi:type="string" translate="true">Fechar documento</item>
-                    <item name="source" xsi:type="string">document_email</item>
+                    <item name="label" xsi:type="string" translate="true">Enviar email</item>
                     <item name="valueMap" xsi:type="array">
                         <item name="true" xsi:type="string">1</item>
                         <item name="false" xsi:type="string">0</item>
@@ -118,7 +116,6 @@
                     <item name="formElement" xsi:type="string">checkbox</item>
                     <item name="prefer" xsi:type="string">toggle</item>
                     <item name="label" xsi:type="string" translate="true">Dados de transporte</item>
-                    <item name="source" xsi:type="string">shipping_details</item>
                     <item name="valueMap" xsi:type="array">
                         <item name="true" xsi:type="string">1</item>
                         <item name="false" xsi:type="string">0</item>
@@ -139,7 +136,6 @@
                     <item name="formElement" xsi:type="string">checkbox</item>
                     <item name="prefer" xsi:type="string">toggle</item>
                     <item name="label" xsi:type="string" translate="true">Documento de transporte</item>
-                    <item name="source" xsi:type="string">shipping_document</item>
                     <item name="valueMap" xsi:type="array">
                         <item name="true" xsi:type="string">1</item>
                         <item name="false" xsi:type="string">0</item>
@@ -152,7 +148,6 @@
                 </item>
             </argument>
         </field>
-
     </fieldset>
 
 
@@ -170,7 +165,6 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Categoria AT</item>
                     <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">products_at_category</item>
                 </item>
             </argument>
         </field>
@@ -183,7 +177,6 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Unidade de medida</item>
                     <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">default_measurement_unit_id</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
                             Unidade de medida por defeito a ser aplicada aos artigos. Pode a qualquer altura trocar a
@@ -200,9 +193,8 @@
                 </item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Taxa aplicada</item>
+                    <item name="label" translate="true" xsi:type="string">Taxa dos artigos</item>
                     <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">products_tax</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
                             Se os artigos da sua loja online estiverem criados já com IVA incluído, pode seleccionar a
@@ -219,14 +211,115 @@
                 </item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Razão de isenção</item>
+                    <item name="label" translate="true" xsi:type="string">Razão de isenção dos artigos</item>
                     <item name="formElement" xsi:type="string">select</item>
-                    <item name="source" xsi:type="string">products_tax_exemption</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
                             Se os artigos da sua loja online estiverem criados já com IVA incluído, pode seleccionar a
                             taxa de IVA que o plugin vai usar.
                         </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="shipping_tax">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\ProductsTaxes
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Taxa dos portes</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Se os portes da sua loja online estiverem criados já com IVA incluído, pode seleccionar a
+                            taxa de IVA que o plugin vai usar para os portes.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="shipping_tax_exemption">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\ProductsTaxExemptions
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Razão de isenção dos portes</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Se os portes da encomenda não tiverem uma taxa de IVA, terá que seleccionar uma razão de
+                            isenção.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="products_auto_create">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Criar artigos automaticamente</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Criar artigos automaticamente no Moloni assim que um artigo é criado ou alteado no Magento.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+
+
+    <fieldset name="orders">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Encomendas</item>
+            </item>
+        </argument>
+
+        <field name="orders_statuses">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\OrdersStatuses</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Estado das encomendas</item>
+                    <item name="componentType" xsi:type="string">field</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Catalog/js/components/new-category</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="showCheckbox" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="multiple" xsi:type="boolean">true</item>
+                    <item name="levelsVisibility" xsi:type="number">1</item>
+                    <item name="listens" xsi:type="array">
+                        <item name="${ $.namespace }.${ $.namespace }:responseData" xsi:type="string">setParsed</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="orders_since">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="additionalClasses" xsi:type="string">admin__field-date</item>
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="label" translate="true" xsi:type="string">Encomendas desde</item>
+                    <item name="formElement" xsi:type="string">date</item>
+                    <item name="options" xsi:type="array">
+                        <item name="dateFormat" xsi:type="string">yyyy-MM-dd</item>
+                        <item name="timeFormat" xsi:type="string">HH:mm:ss</item>
+                        <item name="showsTime" xsi:type="boolean">true</item>
                     </item>
                 </item>
             </argument>

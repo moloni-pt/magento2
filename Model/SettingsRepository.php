@@ -91,6 +91,10 @@ class SettingsRepository implements SettingsRepositoryInterface
     {
         $obj = $this->getByCompanyLabel($companyId, $label);
 
+        if (is_array($value)) {
+            $value = json_encode($value);
+        }
+
         $obj->setCompanyId($companyId);
         $obj->setStoreId(0);
         $obj->setLabel($label);

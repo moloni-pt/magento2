@@ -72,7 +72,7 @@ class Moloni implements MoloniApiRepositoryInterface
         'shipping_tax_exemption' => '',
 
         'orders_since' => '2019-01-01 00:00:00',
-        'orders_statuses' => '{}',
+        'orders_statuses' => [],
     ];
 
     public function __construct(
@@ -230,6 +230,8 @@ class Moloni implements MoloniApiRepositoryInterface
                     }
                 }
             }
+
+            $savedSettings['orders_statuses'] = json_decode($savedSettings['orders_statuses'], true);
 
             $this->settings = $savedSettings;
         }

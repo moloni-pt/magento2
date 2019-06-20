@@ -5,6 +5,7 @@
     <update handle="editor"/>
     <body>
         <attribute name="class" value="moloni"/>
+        <attribute name="class" value="moloni-settings"/>
         <referenceContainer name="page.messages">
             <block class="Invoicing\Moloni\Block\Adminhtml\Console\Log"
                    template="Invoicing_Moloni::console/log.phtml"
