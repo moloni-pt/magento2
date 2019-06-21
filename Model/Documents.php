@@ -19,32 +19,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Model;
 
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\DataObject\IdentityInterface;
+use Invoicing\Moloni\Api\Data\SettingsInterface;
 
-use Invoicing\Moloni\Model\DocumentsRepository;
-
-class Index extends Template
+class Documents extends AbstractModel implements
+    IdentityInterface,
+    SettingsInterface
 {
-    private $moloni;
 
-    public function __construct(
-        Context $context,
-        DocumentsRepository $documents,
-        Moloni $moloni
-    )
+    const CACHE_TAG = 'moloni_documents';
+
+    public $cacheTag = 'moloni_documents';
+    public $eventPrefix = 'moloni_documents';
+
+    public function _construct()
     {
-        $this->moloni = $moloni;
-        $this->documents = $documents;
-        parent::__construct($context);
+        $this->_init(ResourceModel\Settings::class);
     }
 
-    public function getAvailableDocuments()
+    public function getIdentities()
     {
-
+        return [self::CACHE_TAG . '_' . $this->getId()];
     }
-
 }

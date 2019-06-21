@@ -19,32 +19,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Model\ResourceModel;
 
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use Magento\Framework\Model\ResourceModel\Db\Context;
 
-use Invoicing\Moloni\Model\DocumentsRepository;
-
-class Index extends Template
+class Documents extends AbstractDb
 {
-    private $moloni;
 
-    public function __construct(
-        Context $context,
-        DocumentsRepository $documents,
-        Moloni $moloni
-    )
+    public function __construct(Context $context)
     {
-        $this->moloni = $moloni;
-        $this->documents = $documents;
         parent::__construct($context);
     }
 
-    public function getAvailableDocuments()
+    public function _construct()
     {
-
+        $this->_init('moloni_documents', 'document_id');
     }
-
 }

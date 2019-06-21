@@ -1,23 +1,50 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
         
-    <preference for="Invoicing\Moloni\Api\MoloniApiRepositoryInterface"
-                type="Magento\Framework\Libraries\MoloniLibrary\Moloni"/>
-    <preference for="Invoicing\Moloni\Api\MoloniApiErrorsRepositoryInterface"
-                type="Magento\Framework\Libraries\MoloniLibrary\Dependencies\ApiErrors"/>
-    <preference for="Invoicing\Moloni\Api\MoloniApiSessionRepositoryInterface"
-                type="Magento\Framework\Libraries\MoloniLibrary\Dependencies\ApiSession"/>
-    <preference for="Invoicing\Moloni\Api\TokensRepositoryInterface"
-                type="Invoicing\Moloni\Model\TokensRepository"/>
+    <preference for="Invoicing\Moloni\Api\MoloniApiRepositoryInterface" type="Magento\Framework\Libraries\MoloniLibrary\Moloni"/>
+    <preference for="Invoicing\Moloni\Api\MoloniApiErrorsRepositoryInterface" type="Magento\Framework\Libraries\MoloniLibrary\Dependencies\ApiErrors"/>
+    <preference for="Invoicing\Moloni\Api\MoloniApiSessionRepositoryInterface" type="Magento\Framework\Libraries\MoloniLibrary\Dependencies\ApiSession"/>
+    <preference for="Invoicing\Moloni\Api\TokensRepositoryInterface" type="Invoicing\Moloni\Model\TokensRepository"/>
 
-    <preference for="Invoicing\Moloni\Api\Data\TokensInterface"
-                type="Invoicing\Moloni\Model\Tokens"/>
-    <preference for="Invoicing\Moloni\Api\Data\TokensSearchResultsInterface"
-                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Invoicing\Moloni\Api\Data\TokensInterface" type="Invoicing\Moloni\Model\Tokens"/>
+    <preference for="Invoicing\Moloni\Api\Data\TokensSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
-    <preference for="Invoicing\Moloni\Api\Data\SettingsInterface"
-                type="Invoicing\Moloni\Model\Settings"/>
-    <preference for="Invoicing\Moloni\Api\Data\SettingsSearchResultsInterface"
-                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Invoicing\Moloni\Api\Data\SettingsInterface" type="Invoicing\Moloni\Model\Settings"/>
+    <preference for="Invoicing\Moloni\Api\Data\SettingsSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Invoicing\Moloni\Api\Data\DocumentsInterface" type="Invoicing\Moloni\Model\Documents"/>
+    <preference for="Invoicing\Moloni\Api\Data\DocumentsSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <virtualType name="moloni_orders_grid_data_provider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="collection" xsi:type="object" shared="false">Magento\Sales\Model\ResourceModel\Order\Collection</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MoloniOrdersGridFilterPool" type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Invoicing\Moloni\Model\ResourceModel\Orders\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sales_order</argument>
+            <argument name="eventPrefix" xsi:type="string">invoicing_moloni_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">invoicing_moloni_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Magento\Sales\Model\ResourceModel\Order
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="moloni_orders_grid_data_source" xsi:type="string">Invoicing\Moloni\Model\ResourceModel\Orders\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

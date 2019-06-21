@@ -1,18 +1,21 @@
 <?xml version="1.0" ?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="menu">
-            <action method="setActive">
-                <argument name="itemId" xsi:type="string">Invoicing_Moloni::home</argument>
-            </action>
-        </referenceBlock>
-        <referenceBlock name="page.title">
-            <action method="setTitleClass">
-                <argument name="class" xsi:type="string">Moloni</argument>
-            </action>
-        </referenceBlock>
-        <referenceContainer name="content">
-            <block class="Invoicing\Moloni\Block\Adminhtml\Home\Index" name="home.index" template="Invoicing_Moloni::home/index.phtml"/>
+        <referenceContainer name="page.messages">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Console\Log"
+                   template="Invoicing_Moloni::console/log.phtml"
+                   name="console.log"/>
         </referenceContainer>
+
+        <referenceContainer name="content">
+            <uiComponent name="moloni_orders_grid"/>
+        </referenceContainer>
+
+        <!-- <referenceContainer name="content">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Home\Index"
+                   name="home.index"
+                   template="Invoicing_Moloni::home/index.phtml"/>
+        </referenceContainer> -->
     </body>
 </page>

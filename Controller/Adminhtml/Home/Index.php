@@ -21,56 +21,21 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Response\Http;
-use Magento\Framework\View\Result\PageFactory;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Framework\App\Request\DataPersistorInterface;
+use Invoicing\Moloni\Controller\Adminhtml\Home;
 
-class Index extends Action
+class Index extends Home
 {
-    private $page;
-    private $moloni;
-    private $dataPersistor;
-    private $response;
 
-    /**
-     * Constructor.
-     *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param Moloni $moloni
-     * @param Http $response
-     * @param DataPersistorInterface $dataPersistor
-     */
-    public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory,
-        Moloni $moloni,
-        Http $response,
-        DataPersistorInterface $dataPersistor
-    )
-    {
-        $this->moloni = $moloni;
-        $this->page = $resultPageFactory;
-        $this->response = $response;
-        $this->dataPersistor = $dataPersistor;
-
-        parent::__construct($context);
-    }
-
-    /**
-     * @return bool|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
-     */
     public function execute()
     {
+        $page = $this->initAction();
         if (!$this->moloni->checkActiveSession()) {
             $this->_redirect($this->moloni->redirectTo);
             return false;
         }
 
-        $resultPage = $this->page->create();
-        return $resultPage;
+        // $this->_redirect("*/ajax/documents");
+
+        return $page;
     }
 }

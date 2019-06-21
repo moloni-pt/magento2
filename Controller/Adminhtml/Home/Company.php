@@ -21,51 +21,14 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Response\Http;
-use Magento\Framework\View\Result\PageFactory;
-use Magento\Framework\Registry;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Framework\App\Request\DataPersistorInterface;
+use Invoicing\Moloni\Controller\Adminhtml\Home;
 
-class Company extends Action
+class Company extends Home
 {
-    private $page;
-    private $moloni;
-    private $dataPersistor;
-    private $response;
 
-    /**
-     * Constructor.
-     *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param Moloni $moloni
-     * @param Http $response
-     * @param DataPersistorInterface $dataPersistor
-     */
-    public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory,
-        Moloni $moloni,
-        Http $response,
-        DataPersistorInterface $dataPersistor
-    )
-    {
-        $this->moloni = $moloni;
-        $this->page = $resultPageFactory;
-        $this->response = $response;
-        $this->dataPersistor = $dataPersistor;
-
-        parent::__construct($context);
-    }
-
-    /**
-     * @return bool|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
-     */
     public function execute()
     {
+        $page = $this->initAction();
         if (!$this->moloni->checkActiveSession()) {
             $this->_redirect($this->moloni->redirectTo);
             return false;
@@ -74,15 +37,12 @@ class Company extends Action
         $companies = $this->moloni->companies->getAll();
         if (!$companies) {
             $this->moloni->dropActiveSession();
-            $errorMessage = [['type' => 'error', 'message' => $this->moloni->errors->getErrors('last')['message']]];
-            $this->dataPersistor->set('moloni_messages', $errorMessage);
+            $this->messageManager->addErrorMessage($this->moloni->errors->getErrors('last')['message']);
             $this->_redirect($this->moloni->redirectTo);
             return false;
         }
 
         $this->dataPersistor->set('moloni_companies', $companies);
-
-        $resultPage = $this->page->create();
-        return $resultPage;
+        return $page;
     }
 }

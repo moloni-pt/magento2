@@ -21,72 +21,26 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Request\DataPersistor;
-use Magento\Framework\View\Result\PageFactory;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Invoicing\Moloni\Model\TokensRepository;
+use Invoicing\Moloni\Controller\Adminhtml\Home;
 
-class Welcome extends Action
+class Welcome extends Home
 {
 
-    private $moloni;
-    private $pageFactory;
-    private $tokensRepository;
-    private $dataPersistor;
-
-    /**
-     * Welcome constructor.
-     * @param Context $context
-     * @param PageFactory $resultPageFactory
-     * @param Moloni $Moloni
-     * @param TokensRepository $tokensRepository
-     * @param DataPersistor $dataPersistor
-     */
-
-    public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory,
-        Moloni $Moloni,
-        TokensRepository $tokensRepository,
-        DataPersistor $dataPersistor
-    )
-    {
-        $this->pageFactory = $resultPageFactory;
-        $this->moloni = $Moloni;
-        $this->tokensRepository = $tokensRepository;
-        $this->dataPersistor = $dataPersistor;
-
-        parent::__construct($context);
-    }
-
-    /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
-     * @throws \Exception
-     */
     public function execute()
     {
+        $page = $this->initAction();
         if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
         } elseif ($this->getRequest()->getParam("code")) {
             if (!$this->moloni->checkAuthorizationCode($this->getRequest()->getParam('code'))) {
-                $this->dataPersistor->set(
-                    "moloni_messages",
-                    [['type' => 'error', 'message' => $this->moloni->errors->getErrors('last')['message']]]
-                );
+                $this->messageManager->addErrorMessage($this->moloni->errors->getErrors('last')['message']);
             } else {
                 $this->_redirect->redirect($this->_response, 'moloni/home/company/');
             }
         }
-
-        $resultPage = $this->pageFactory->create();
-        return $resultPage;
+        return $page;
     }
 
-    /**
-     * @throws \Exception
-     */
     private function handleAuthentication()
     {
         $tokens = $this->tokensRepository->getTokens();
@@ -100,10 +54,8 @@ class Welcome extends Action
         if ($authenticationUrl) {
             $this->_redirect($authenticationUrl);
         } else {
-            $this->dataPersistor->set(
-                "moloni_messages",
-                [['type' => 'error', 'message' => __('Error while saving data...')]]
-            );
+            $this->messageManager->addErrorMessage(__("Houve um erro ao guardar alterações"));
+
         }
     }
 }

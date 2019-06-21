@@ -3,12 +3,6 @@
     <update handle="styles"/>
     <body>
         <attribute name="class" value="moloni"/>
-        <referenceBlock name="menu">
-            <action method="setActive">
-                <argument name="itemId" xsi:type="string">Invoicing_Moloni::home</argument>
-            </action>
-        </referenceBlock>
-
         <referenceContainer name="content">
             <block class="Invoicing\Moloni\Block\Adminhtml\Home\Company" name="home.company" template="Invoicing_Moloni::home/company.phtml"/>
         </referenceContainer>

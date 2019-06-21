@@ -8,8 +8,6 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary;
 
 use Invoicing\Moloni\Api\MoloniApiRepositoryInterface;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnits;
-use Invoicing\Moloni\Ui\Settings\Options\ProductsTaxes;
 use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\App\RequestInterface;
 use Invoicing\Moloni\Model\TokensRepository;

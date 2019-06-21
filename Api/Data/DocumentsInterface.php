@@ -19,32 +19,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Invoicing\Moloni\Block\Adminhtml\Home;
+namespace Invoicing\Moloni\Api\Data;
 
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
-
-use Invoicing\Moloni\Model\DocumentsRepository;
-
-class Index extends Template
+interface DocumentsInterface
 {
-    private $moloni;
 
-    public function __construct(
-        Context $context,
-        DocumentsRepository $documents,
-        Moloni $moloni
-    )
-    {
-        $this->moloni = $moloni;
-        $this->documents = $documents;
-        parent::__construct($context);
-    }
-
-    public function getAvailableDocuments()
-    {
-
-    }
+    const ID = 'document_id';
+    const COMPANY_ID = 'company_id';
+    const STORE_ID = 'store_id';
+    const ORDER_ID = 'order_id';
+    const ORDER_TOTAL = 'order_total';
+    const INVOICE_ID = 'invoice_id';
+    const INVOICE_TOTAL = 'invoice_total';
+    const INVOICE_STATUS = 'invoice_status';
+    const INVOICE_TYPE = 'invoice_type';
+    const METADATA = 'metadata';
 
 }
