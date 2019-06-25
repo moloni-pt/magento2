@@ -27,12 +27,28 @@ class Collection extends SearchResult
     {
         parent::_initSelect();
 
-        $this->getSelect()
-            ->columns('moloni_documents.*')
-            ->joinLeft(
-                ['moloni_documents' => $this->getTable('moloni_documents')],
-                'moloni_documents.order_id = ' . 'main_table.entity_id',
-                []
-            )->where('moloni_documents.order_id IS NULL');
+        $query = $this->getSelect();
+
+        $query->joinLeft(
+            ['moloni' => $this->getTable('moloni_documents')],
+            'moloni.order_id = main_table.entity_id',
+            []
+        );
+
+        $query->joinLeft(
+            ['grid' => $this->getTable('sales_order_grid')],
+            'grid.entity_id = main_table.entity_id',
+            ['billing_name']
+        );
+
+        $query->where('moloni.order_id IS NULL');
+
+
+        $tableDescription = $this->getConnection()->describeTable($this->getMainTable());
+        foreach ($tableDescription as $columnInfo) {
+            $this->addFilterToMap($columnInfo['COLUMN_NAME'], 'main_table.' . $columnInfo['COLUMN_NAME']);
+        }
+
+        return $this;
     }
 }

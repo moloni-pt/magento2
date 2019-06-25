@@ -69,13 +69,9 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="provider" xsi:type="string">moloni_orders_grid.moloni_orders_grid_data_source</item>
-                    <item name="chipsProvider" xsi:type="string">
-                        moloni_orders_grid.moloni_orders_grid.listing_top.listing_filters_chips
-                    </item>
+                    <item name="chipsProvider" xsi:type="string">moloni_orders_grid.moloni_orders_grid.listing_top.listing_filters_chips</item>
                     <item name="storageConfig" xsi:type="array">
-                        <item name="provider" xsi:type="string">
-                            moloni_orders_grid.moloni_orders_grid.listing_top.bookmarks
-                        </item>
+                        <item name="provider" xsi:type="string">moloni_orders_grid.moloni_orders_grid.listing_top.bookmarks</item>
                         <item name="namespace" xsi:type="string">current.search</item>
                     </item>
                 </item>
@@ -173,13 +169,17 @@
                 </item>
             </argument>
         </selectionsColumn>
-        <column name="entity_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="sorting" xsi:type="string">asc</item>
-                    <item name="label" xsi:type="string" translate="true">Entity ID</item>
-                </item>
-            </argument>
+        <column name="increment_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="billing_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Cliente</label>
+            </settings>
         </column>
     </columns>
 </listing>
