@@ -13,6 +13,7 @@ class Companies
 {
 
     private $moloni;
+    private $store;
 
     /**
      * Companies constructor.
@@ -29,6 +30,10 @@ class Companies
      */
     public function getOne($company_id = false)
     {
+        if (isset($this->store[__FUNCTION__])) {
+            return $this->store[__FUNCTION__];
+        }
+        
         $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
         $result = $this->moloni->execute("companies/getOne", $values);
         if (is_array($result) && isset($result['company_id'])) {

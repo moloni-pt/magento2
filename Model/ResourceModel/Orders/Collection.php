@@ -38,11 +38,16 @@ class Collection extends SearchResult
         $query->joinLeft(
             ['grid' => $this->getTable('sales_order_grid')],
             'grid.entity_id = main_table.entity_id',
-            ['billing_name']
+            ['billing_name', 'billing_address']
+        );
+
+        $query->joinLeft(
+            ['address' => $this->getTable('sales_order_address')],
+            'address.parent_id = main_table.entity_id AND address_type = "billing"',
+            ['vat_id']
         );
 
         $query->where('moloni.order_id IS NULL');
-
 
         $tableDescription = $this->getConnection()->describeTable($this->getMainTable());
         foreach ($tableDescription as $columnInfo) {

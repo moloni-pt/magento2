@@ -53,6 +53,10 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
             "document_email" => $this->moloni->settings['document_email'],
             "shipping_details" => $this->moloni->settings['shipping_details'],
             "shipping_document" => $this->moloni->settings['shipping_document'],
+            "delivery_departure_address" => $this->moloni->settings['delivery_departure_address'],
+            "delivery_departure_city" => $this->moloni->settings['delivery_departure_city'],
+            "delivery_departure_zip_code" => $this->moloni->settings['delivery_departure_zip_code'],
+            "delivery_departure_country" => $this->moloni->settings['delivery_departure_country'],
         ];
 
         $this->loadedData['0']['products'] = [

@@ -21,6 +21,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnitsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxesFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxExemptionsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CountriesFactory;
 
 class Moloni implements MoloniApiRepositoryInterface
 {
@@ -54,6 +55,10 @@ class Moloni implements MoloniApiRepositoryInterface
 
         'shipping_details' => 0,
         'shipping_document' => 0,
+        'delivery_departure_address' => '',
+        'delivery_departure_city' => '',
+        'delivery_departure_zip_code' => '',
+        'delivery_departure_country' => '',
 
         'customer_vat' => '0',
 
@@ -86,7 +91,8 @@ class Moloni implements MoloniApiRepositoryInterface
         DocumentSetsFactory $documentSetsFactory,
         MeasurementUnitsFactory $measurementUnitsFactory,
         ProductsTaxesFactory $productsTaxesFactory,
-        ProductsTaxExemptionsFactory $productsTaxExemptionsFactory
+        ProductsTaxExemptionsFactory $productsTaxExemptionsFactory,
+        CountriesFactory $countries
     )
     {
         $this->curl = $curl;
@@ -102,7 +108,8 @@ class Moloni implements MoloniApiRepositoryInterface
             'documentSets' => $documentSetsFactory,
             'measurementUnits' => $measurementUnitsFactory,
             'taxes' => $productsTaxesFactory,
-            'taxExemptions' => $productsTaxExemptionsFactory
+            'taxExemptions' => $productsTaxExemptionsFactory,
+            'countries' => $countries
         ];
     }
 

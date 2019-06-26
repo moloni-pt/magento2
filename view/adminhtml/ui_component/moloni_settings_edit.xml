@@ -109,26 +109,6 @@
             </argument>
         </field>
 
-        <field name="shipping_details">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">boolean</item>
-                    <item name="formElement" xsi:type="string">checkbox</item>
-                    <item name="prefer" xsi:type="string">toggle</item>
-                    <item name="label" xsi:type="string" translate="true">Dados de transporte</item>
-                    <item name="valueMap" xsi:type="array">
-                        <item name="true" xsi:type="string">1</item>
-                        <item name="false" xsi:type="string">0</item>
-                    </item>
-                    <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string" translate="true">
-                            Incluir dados de transporte no documento gerado.
-                        </item>
-                    </item>
-                </item>
-            </argument>
-        </field>
-
         <field name="shipping_document">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -148,6 +128,69 @@
                 </item>
             </argument>
         </field>
+
+        <field name="shipping_details">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="component" xsi:type="string">Invoicing_Moloni/js/shipping_checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Dados de transporte</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Incluir dados de transporte no documento gerado.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="delivery_departure_country">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Invoicing\Moloni\Ui\Settings\Options\Countries</item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">País de carga</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="delivery_departure_address">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Morada de carga</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="delivery_departure_city">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Cidade de carga</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="delivery_departure_zip_code">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Código Postal de carga</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                </item>
+            </argument>
+        </field>
+
     </fieldset>
 
 

@@ -175,11 +175,57 @@
                 <label translate="true">ID</label>
             </settings>
         </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Data de Encomenda</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
         <column name="billing_name">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Cliente</label>
             </settings>
         </column>
+        <column name="billing_address" class="Magento\Sales\Ui\Component\Listing\Column\Address">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Morada</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="vat_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Contribuinte</label>
+            </settings>
+        </column>
+        <column name="grand_total" class="Magento\Sales\Ui\Component\Listing\Column\PurchasedPrice">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Total</label>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Sales\Ui\Component\Listing\Column\Status\Options"/>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Magento\Sales\Ui\Component\Listing\Column\ViewAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="viewUrlPath" xsi:type="string">moloni/documents/create</item>
+                    <item name="urlEntityParamName" xsi:type="string">order_id</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
     </columns>
 </listing>
