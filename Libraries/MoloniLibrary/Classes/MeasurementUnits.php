@@ -36,7 +36,7 @@ class MeasurementUnits
         } else {
             $this->moloni->errors->throwError(
                 __("Não tem acesso à informação das unidades de medida"),
-                __(print_r($result, true)),
+                __(json_encode($result, JSON_PRETTY_PRINT)),
                 __CLASS__ . "/" . __FUNCTION__
             );
             return false;

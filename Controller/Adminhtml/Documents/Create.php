@@ -57,6 +57,7 @@ class Create extends Documents
         if (!$orderId) {
             $this->messageManager->addErrorMessage(__("Encomenda não encontrada."));
             $this->_redirect('*/home/index');
+            return false;
         }
 
         $document = $this->moloniDocuments->createDocumentFromOrderId($orderId);

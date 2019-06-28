@@ -17,8 +17,12 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CustomersFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnitsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DeliveryMethodsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\PaymentMethodsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxesFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxExemptionsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CountriesFactory;
@@ -88,8 +92,12 @@ class Moloni implements MoloniApiRepositoryInterface
         DataPersistorInterface $dataPersistor,
         /** @noinspection PhpUndefinedClassInspection */
         CompaniesFactory $companiesFactory,
+        CustomersFactory $customers,
+        ProductsFactory $products,
         DocumentSetsFactory $documentSetsFactory,
         MeasurementUnitsFactory $measurementUnitsFactory,
+        DeliveryMethodsFactory $deliveryMethods,
+        PaymentMethodsFactory $paymentMethods,
         ProductsTaxesFactory $productsTaxesFactory,
         ProductsTaxExemptionsFactory $productsTaxExemptionsFactory,
         CountriesFactory $countries
@@ -105,11 +113,15 @@ class Moloni implements MoloniApiRepositoryInterface
 
         $this->factories = [
             'companies' => $companiesFactory,
+            'customers' => $customers,
+            'products' => $products,
             'documentSets' => $documentSetsFactory,
             'measurementUnits' => $measurementUnitsFactory,
             'taxes' => $productsTaxesFactory,
             'taxExemptions' => $productsTaxExemptionsFactory,
-            'countries' => $countries
+            'countries' => $countries,
+            'deliveryMethods' => $deliveryMethods,
+            'paymentMethods' => $paymentMethods
         ];
     }
 
@@ -197,7 +209,11 @@ class Moloni implements MoloniApiRepositoryInterface
         $rawResponse = $this->curl->getBody();
 
         if (!empty($rawResponse)) {
-            $response = json_decode($rawResponse, true);
+            try {
+                $response = json_decode($rawResponse, true);
+            } catch (\Exception $e) {
+                $response = [];
+            }
         }
 
         $this->logs[] = [
