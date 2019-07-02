@@ -143,7 +143,7 @@ class Products
         if ($moloniProduct && isset($moloniProduct[0]['product_id'])) {
             $product['product_id'] = $moloniProduct[0]['product_id'];
         } else {
-            $product['product_id'] = $this->createProductFromId($productId);
+            $product['product_id'] = $this->createProductFromId($productId, $orderProduct);
         }
 
         return $product;
@@ -199,7 +199,7 @@ class Products
      * @param $productId
      * @return int
      */
-    private function createProductFromId($productId)
+    private function createProductFromId($productId, $orderProduct = false)
     {
         try {
             $product = $this->productRepository->getById($productId);
@@ -207,15 +207,34 @@ class Products
             $categories = $product->getCategoryIds();
             $categoryTree = $this->getCategoryTree($categories);
 
-            $moloniProduct['name'] = $product->getName();
-            $moloniProduct['reference'] = $product->getSku();
+
+            if ($orderProduct) {
+                $moloniProduct['name'] = $orderProduct->getName();
+                $moloniProduct['reference'] = $orderProduct->getSku();
+
+                if ($orderProduct->getPrice() > 0) {
+                    $moloniProduct['price'] = $orderProduct->getPrice();
+                }
+
+                if (!empty($orderProduct->getDescription())) {
+                    $moloniProduct['summary'] = $orderProduct->getDescription();
+                }
+            } else {
+                $moloniProduct['name'] = $product->getName();
+                $moloniProduct['reference'] = $product->getSku();
+
+                if ($product->getPrice() > 0) {
+                    $moloniProduct['price'] = $product->getPrice();
+                }
+
+                if (!empty($product->getDescription())) {
+                    $moloniProduct['summary'] = $product->getDescription();
+                }
+            }
 
             $moloniProduct['stock'] = $product->getExtensionAttributes()->getStockItem()->getQty();
             $moloniProduct['category_id'] = $this->createCategoryTree($categoryTree);
 
-            if ($product->getPrice()) {
-                $moloniProduct['price'] = $product->getPrice();
-            }
 
             if (!empty($this->moloni->settings['products_at_category'])) {
                 $moloniProduct['at_product_category'] = $this->moloni->settings['products_at_category'];
@@ -240,7 +259,6 @@ class Products
             }
 
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
-
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
 
             return $insertedProduct['product_id'];
@@ -388,6 +406,11 @@ class Products
         return $tree;
     }
 
+    /**
+     * @param float $taxRate
+     * @param bool $break
+     * @return int
+     */
     private function getTaxIdFromRate($taxRate, $break = false)
     {
         $taxId = 0;
@@ -404,7 +427,7 @@ class Products
         }
 
         if ($taxId == 0 && !$break) {
-            $this->getTaxIdFromRate(23, true);
+            $taxId = $this->getTaxIdFromRate(23, true);
         }
 
         return $taxId;

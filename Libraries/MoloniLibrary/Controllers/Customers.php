@@ -143,6 +143,10 @@ class Customers
 
     private function parseCustomer()
     {
+        if (empty($this->customer['vat'])) {
+            $this->customer['vat'] = '999999990';
+        }
+
         // If the country is Portugal validate the vat Number and the Zip Code
         if ($this->customer['country_id'] == 1) {
             $this->customer['zip_code'] = $this->tools->zipCheck($this->customer['zip_code']);
@@ -155,8 +159,8 @@ class Customers
         // Lets check if the customer already exists
         // If the vat is 999 999 990 we check if it exists by email
         if ($this->customer['vat'] == '999999990') {
-            if (!empty($this->email)) {
-                $getCustomer = $this->moloni->customers->getByEmail(['email' => $this->email]);
+            if (!empty($this->customer['email'])) {
+                $getCustomer = $this->moloni->customers->getByEmail(['email' => $this->customer['email']]);
                 if ($getCustomer && count($getCustomer) > 0) {
                     $this->moloniCustomer = $getCustomer[0];
                 }

@@ -44,6 +44,17 @@ class Log extends Template
 
     public function getLogs()
     {
-        return $this->moloni->logs;
+
+        if (!empty($this->moloni->logs) && is_array($this->moloni->logs)) {
+            return $this->moloni->logs;
+        }
+
+        // Search in data persistor
+        $persistorLog = $this->dataPersistor->get('moloni_logs');
+        if (!empty($persistorLog)) {
+            return $persistorLog;
+        }
+
+        return [];
     }
 }

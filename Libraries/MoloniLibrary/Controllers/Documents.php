@@ -117,20 +117,21 @@ class Documents
         $order = $this->orderRepository->get($orderId);
         $this->parseDocument($order);
 
-        echo "<pre>";
-        print_r($this->document);
-        print_r($this->company);
-        exit;
+        $insertDraft = $this->moloni->documents->setDocumentType()->insert($this->document);
+        if (!$insertDraft) {
+            return false;
+        }
+
         return [];
     }
 
     /**
      * Populates $this->>document based on $this->order
      * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @return bool
      */
     private function parseDocument($order)
     {
-        echo "<pre>";
         $this->order = $order;
         $this->company = $this->moloni->companies->getOne();
 
@@ -163,15 +164,7 @@ class Documents
             $this->parseShippingDetails();
         }
 
-        $insert = $this->moloni->documents->setDocumentType()->insert($this->document);
-        if (!$insert) {
-            print_r($this->moloni->errors->getErrors());
-        } else {
-            print_r($insert);
-        }
-
-        print_r($this->document);
-        exit;
+        return true;
     }
 
     private function parseCurrency()
@@ -215,7 +208,7 @@ class Documents
             if ($paymentMethodId) {
                 $this->document['payments'][] = [
                     'payment_method_id' => $paymentMethodId,
-                    'amount' => $orderPayment->getAmountPaid(),
+                    'value' => $orderPayment->getAmountPaid(),
                     'date' => gmdate('Y-m-d H:i:s')
                 ];
             }
