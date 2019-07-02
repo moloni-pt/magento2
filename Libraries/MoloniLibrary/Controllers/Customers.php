@@ -86,7 +86,7 @@ class Customers
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return $this
      */
-    public function getCustomerFromOrder(OrderInterface $order)
+    public function setCustomerFromOrder(OrderInterface $order)
     {
         $billingAddress = $order->getBillingAddress();
         if ($billingAddress) {

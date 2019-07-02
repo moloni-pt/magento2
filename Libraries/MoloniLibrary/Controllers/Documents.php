@@ -80,7 +80,7 @@ class Documents
      * @param Moloni $moloni
      * @param Tools $tools
      * @param Customers $customers
-     * @param Products $products
+     * @param ProductsFactory $products
      * @param StoreManagerInterface $storeManager
      * @param OrderRepositoryInterface $orderRepository
      * @param CurrencyFactory $currencyFactory
@@ -89,7 +89,7 @@ class Documents
         Moloni $moloni,
         Tools $tools,
         Customers $customers,
-        Products $products,
+        ProductsFactory $products,
         StoreManagerInterface $storeManager,
         OrderRepositoryInterface $orderRepository,
         CurrencyFactory $currencyFactory
@@ -130,11 +130,11 @@ class Documents
      */
     private function parseDocument($order)
     {
+        echo "<pre>";
         $this->order = $order;
         $this->company = $this->moloni->companies->getOne();
 
-        $customer = $this->customers->getCustomerFromOrder($order);
-        $products = $this->products->getProductsFromOrder($order);
+        $customer = $this->customers->setCustomerFromOrder($order);
         $this->document['customer_id'] = $customer->customerId;
 
         $this->document['date'] = gmdate('Y-m-d');
@@ -142,12 +142,36 @@ class Documents
         $this->document['document_set_id'] = $this->moloni->settings['document_set_id'];
         $this->document['your_reference'] = $this->order->getIncrementId();
 
+        foreach ($order->getItems() as $key => $product) {
+            if (!$product->getParentItem()) {
+                // Skip the parent products of an order
+                $documentProduct = $this->products->create()->setProductFromOrder($product);
+                if ($documentProduct && is_array($documentProduct)) {
+                    $this->document['products'][] = $documentProduct;
+                }
+            }
+        }
+
+        if ($order->getShippingAmount() > 0) {
+            $this->document['products'][] = $this->products->create()->setShippingFromOrder($order);
+        }
+
         $this->parseCurrency();
         $this->parsePaymentMethods();
 
         if ($this->moloni->settings['shipping_details']) {
             $this->parseShippingDetails();
         }
+
+        $insert = $this->moloni->documents->setDocumentType()->insert($this->document);
+        if (!$insert) {
+            print_r($this->moloni->errors->getErrors());
+        } else {
+            print_r($insert);
+        }
+
+        print_r($this->document);
+        exit;
     }
 
     private function parseCurrency()

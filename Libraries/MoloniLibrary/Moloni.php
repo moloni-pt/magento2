@@ -19,7 +19,9 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CustomersFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsCategoriesFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnitsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DeliveryMethodsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\PaymentMethodsFactory;
@@ -90,11 +92,12 @@ class Moloni implements MoloniApiRepositoryInterface
         ApiSession $session,
         ApiErrors $errors,
         DataPersistorInterface $dataPersistor,
-        /** @noinspection PhpUndefinedClassInspection */
         CompaniesFactory $companiesFactory,
         CustomersFactory $customers,
         ProductsFactory $products,
+        ProductsCategoriesFactory $productsCategories,
         DocumentSetsFactory $documentSetsFactory,
+        DocumentsFactory $documentsFactory,
         MeasurementUnitsFactory $measurementUnitsFactory,
         DeliveryMethodsFactory $deliveryMethods,
         PaymentMethodsFactory $paymentMethods,
@@ -115,7 +118,9 @@ class Moloni implements MoloniApiRepositoryInterface
             'companies' => $companiesFactory,
             'customers' => $customers,
             'products' => $products,
+            'productsCategories' => $productsCategories,
             'documentSets' => $documentSetsFactory,
+            'documents' => $documentsFactory,
             'measurementUnits' => $measurementUnitsFactory,
             'taxes' => $productsTaxesFactory,
             'taxExemptions' => $productsTaxExemptionsFactory,

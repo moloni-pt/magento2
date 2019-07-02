@@ -30,12 +30,12 @@ class Products
     public function getAll($companyId = false)
     {
         $values = ["company_id" => ($companyId ? $companyId : $this->moloni->session->companyId)];
-        $result = $this->moloni->execute("customers/getAll", $values);
-        if (is_array($result) && isset($result[0]['customer_id'])) {
+        $result = $this->moloni->execute("products/getAll", $values);
+        if (is_array($result) && !isset($result['error'])) {
             return $result;
         } else {
             $this->moloni->errors->throwError(
-                __("Não tem acesso à informação dos clientes"),
+                __("Erro ao aceder aos artigos"),
                 __(json_encode($result, JSON_PRETTY_PRINT)),
                 __CLASS__ . "/" . __FUNCTION__
             );
@@ -48,19 +48,19 @@ class Products
      * @param int|bool $companyId
      * @return bool|mixed
      */
-    public function getByEmail($values, $companyId = false)
+    public function getByReference($values, $companyId = false)
     {
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
-        $result = $this->moloni->execute("customers/getByEmail", $values);
+        $result = $this->moloni->execute("products/getByReference", $values);
 
-        if (is_array($result) && isset($result[0]['customer_id'])) {
+        if (is_array($result) && isset($result[0]['product_id'])) {
             return $result;
         } elseif (empty($result)) {
             // No error but empty result
             return false;
         } else {
             $this->moloni->errors->throwError(
-                __("Não tem acesso à informação dos clientes"),
+                __("Erro ao aceder aos artigos"),
                 __(json_encode($result, JSON_PRETTY_PRINT)),
                 __CLASS__ . "/" . __FUNCTION__
             );
@@ -69,20 +69,20 @@ class Products
     }
 
     /**
-     * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=204
+     * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=194
      * @param int|bool $companyId
      * @return bool|array
      */
     public function insert($values, $companyId = false)
     {
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
-        $result = $this->moloni->execute("customers/insert", $values);
+        $result = $this->moloni->execute("products/insert", $values);
 
-        if (is_array($result) && isset($result['customer_id'])) {
+        if (is_array($result) && isset($result['product_id'])) {
             return $result;
         } else {
             $this->moloni->errors->throwError(
-                __("Houve um erro ao inserir o cliente"),
+                __("Errro ao inserir o artigo: " . $values['reference']),
                 __(json_encode($result, JSON_PRETTY_PRINT)),
                 __CLASS__ . "/" . __FUNCTION__
             );
@@ -91,16 +91,16 @@ class Products
     }
 
     /**
-     * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=204
+     * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=195
      * @param int|bool $companyId
      * @return bool|array
      */
     public function update($values, $companyId = false)
     {
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
-        $result = $this->moloni->execute("customers/update", $values);
+        $result = $this->moloni->execute("products/update", $values);
 
-        if (is_array($result) && isset($result['customer_id'])) {
+        if (is_array($result) && isset($result['product_id'])) {
             return $result;
         } else {
             $this->moloni->errors->throwError(
