@@ -64,7 +64,7 @@ class Create extends Documents
 
         if (!$document) {
             $errorMessage = $this->moloni->errors->getErrors('first');
-            $this->messageManager->addErrorMessage($errorMessage['title'] . "\n\r" . $errorMessage['message']);
+            $this->messageManager->addErrorMessage($errorMessage['title']);
             $this->_redirect('*/home/index');
             return false;
         }

@@ -75,11 +75,29 @@ class Documents
             return $result;
         } else {
             $this->moloni->errors->throwError(
-                __("Houve um erro ao inserir o documento"),
+                __("Ups... Erro ao inserir o documento: " . $this->getErrorMessage($result)),
                 __(json_encode($result, JSON_PRETTY_PRINT)),
                 __CLASS__ . "/" . __FUNCTION__
             );
             return false;
         }
+    }
+
+    public function getErrorMessage($result)
+    {
+        $message = '';
+
+        if (!isset($result['code']) && isset($result[0])) {
+            if (is_array($result[0])) {
+                foreach ($result[0] as $item) {
+                    if (isset($item['description'])) {
+                        $message = $item['description'];
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $message;
     }
 }
