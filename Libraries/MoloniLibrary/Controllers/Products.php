@@ -5,7 +5,7 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use \Magento\Catalog\Block\Adminhtml\Category\Tree;
+use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Tax\Api\TaxCalculationInterface;
@@ -34,18 +34,6 @@ class Products
         'pos_favorite' => '0',
         'at_product_category' => 'M',
     ];
-
-    /**
-     * Holds the values to be inserted/update
-     * @var array
-     */
-    private $orderProduct = [];
-
-    /**
-     * Hold an existing Moloni Product
-     * @var array
-     */
-    private $moloniProduct = [];
 
     /**
      * @var Moloni
@@ -77,6 +65,7 @@ class Products
         ProductRepositoryInterface $productRepository,
         CategoryCollectionFactory $categoryCollectionFactory,
         TaxCalculationInterface $taxHelper,
+        Item $taxItem,
         Moloni $moloni,
         Tools $tools
     )
@@ -84,6 +73,7 @@ class Products
         $this->productRepository = $productRepository;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->taxHelper = $taxHelper;
+        $this->taxItem = $taxItem;
         $this->moloni = $moloni;
         $this->tools = $tools;
     }
@@ -110,7 +100,6 @@ class Products
         if (!empty($orderProduct->getDescription())) {
             $product['summary'] = $orderProduct->getDescription();
         }
-
 
         /** @var $childProducts \Magento\Sales\Model\Order\Item[] */
         $childProducts = $orderProduct->getChildrenItems();
@@ -186,17 +175,21 @@ class Products
             'exact' => true
         ]);
 
+        if ($this->moloni->settings['shipping_tax'] > 0) {
+            $this->parseProductTaxes($product, $this->moloni->settings['shipping_tax']);
+        }
+
         if ($moloniProduct && isset($moloniProduct[0]['product_id'])) {
             $product['product_id'] = $moloniProduct[0]['product_id'];
         } else {
-            $product['product_id'] = $this->createShipping($order);
+            $product['product_id'] = $this->createShippingFromOrder($order);
         }
-
         return $product;
     }
 
     /**
      * @param $productId
+     * @param bool $orderProduct
      * @return int
      */
     private function createProductFromId($productId, $orderProduct = false)
@@ -264,7 +257,7 @@ class Products
             return $insertedProduct['product_id'];
 
         } catch (\Exception $e) {
-            $this->moloni->errors->throwError($e->getCode(), $e->getMessage(), __FUNCTION__);
+            $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
 
         return 0;
@@ -274,7 +267,7 @@ class Products
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return int
      */
-    private function createShipping($order)
+    private function createShippingFromOrder($order)
     {
         try {
             $moloniProduct['name'] = $order->getShippingDescription();
@@ -283,17 +276,25 @@ class Products
             $moloniProduct['has_stock'] = 0;
             $moloniProduct['category_id'] = $this->createCategoryTree([['name' => 'Portes']]);
             $moloniProduct['price'] = $order->getBaseShippingAmount();
+            $moloniProduct['price_with_taxes'] = $order->getShippingInclTax();
 
             if (!empty($this->moloni->settings['default_measurement_unit_id'])) {
                 $moloniProduct['unit_id'] = $this->moloni->settings['default_measurement_unit_id'];
             }
 
-            $defaultTaxRate = 23;
+            // Search for shipping tax
+            $taxRate = 0;
+            $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
+            foreach ($orderTaxes as $orderTax) {
+                if ($orderTax['taxable_item_type'] == 'shipping') {
+                    $taxRate = $orderTax['tax_percent'];
+                }
+            }
 
-            if ($defaultTaxRate > 0) {
+            if ($taxRate > 0) {
                 $moloniProduct['taxes'][] = [
-                    'tax_id' => $this->getTaxIdFromRate($defaultTaxRate),
-                    'value' => $defaultTaxRate,
+                    'tax_id' => $this->getTaxIdFromRate($taxRate),
+                    'value' => $taxRate,
                     'order' => 0,
                     'cumulative' => true
                 ];
@@ -301,12 +302,17 @@ class Products
                 $moloniProduct['exemption_reason'] = $this->moloni->settings['shipping_tax_exemption'];
             }
 
+            if ($this->moloni->settings['shipping_tax'] > 0) {
+                $this->parseProductTaxes($moloniProduct, $this->moloni->settings['shipping_tax']);
+            }
+
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
             return $insertedProduct['product_id'];
 
         } catch (\Exception $e) {
-            $this->moloni->errors->throwError($e->getCode(), $e->getMessage(), __FUNCTION__);
+            echo $e->getMessage();
+            $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
 
         return 0;
@@ -431,6 +437,39 @@ class Products
         }
 
         return $taxId;
+    }
+
+    /**
+     * @param array $moloniProduct
+     */
+    private function parseProductTaxes(&$moloniProduct, $taxId = 0)
+    {
+        if (!empty($moloniProduct) && $taxId > 0) {
+            $tax = 0;
+            $moloniTaxes = $this->moloni->taxes->getAll();
+            if (!empty($moloniProduct) && is_array($moloniTaxes)) {
+                foreach ($moloniTaxes as $moloniTax) {
+                    if ($moloniTax['tax_id'] == $taxId) {
+                        $tax = $moloniTax;
+                    }
+                }
+            }
+
+            if ($tax) {
+                // Percentage
+                if ($tax['type'] == 1) {
+                    if (!empty($tax['exemption_reason'])) {
+                        unset($moloniProduct['taxes']);
+                        $moloniProduct['exemption_reason'] = $tax['exemption_reason'];
+                        $moloniProduct['price'] = $moloniProduct['price_with_taxes'];
+                    } else {
+                        unset($moloniProduct['exemption_reason']);
+                        $moloniProduct['price'] = $moloniProduct['price_with_taxes'] * 100 / (100 + $tax['value']);
+                        $moloniProduct['taxes'][0] = $tax;
+                    }
+                }
+            }
+        }
     }
 
 }
