@@ -2,6 +2,7 @@
 
 namespace Invoicing\Moloni\Model\ResourceModel\Orders;
 
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
 use Magento\Framework\Event\ManagerInterface as EventManager;
@@ -11,7 +12,13 @@ use Psr\Log\LoggerInterface as Logger;
 
 class Collection extends SearchResult
 {
+    /**
+     * @var Invoicing\Moloni\Libraries\MoloniLibrary\Moloni Moloni
+     */
+    private $moloni;
+
     public function __construct(
+        Moloni $moloni,
         EntityFactory $entityFactory,
         Logger $logger,
         FetchStrategy $fetchStrategy,
@@ -20,6 +27,7 @@ class Collection extends SearchResult
         $resourceModel = \Magento\Sales\Model\ResourceModel\Order::class
     )
     {
+        $this->moloni = $moloni;
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel);
     }
 
@@ -47,7 +55,19 @@ class Collection extends SearchResult
             ['vat_id']
         );
 
-        $query->where('moloni.order_id IS NULL');
+        #$query->where('moloni.order_id IS NULL');
+
+        if ($this->moloni->settings['orders_since']) {
+            $query->where(
+                'grid.created_at > ?',
+                date("Y-m-d H:i:s", strtotime($this->moloni->settings['orders_since']))
+            );
+        }
+
+        if (is_array($this->moloni->settings['orders_statuses']) &&
+            !empty($this->moloni->settings['orders_statuses'])) {
+            $query->where('grid.status IN (?)', $this->moloni->settings['orders_statuses']);
+        }
 
         $tableDescription = $this->getConnection()->describeTable($this->getMainTable());
         foreach ($tableDescription as $columnInfo) {

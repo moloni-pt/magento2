@@ -33,10 +33,11 @@ class Companies
         if (isset($this->store[__FUNCTION__])) {
             return $this->store[__FUNCTION__];
         }
-        
+
         $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
         $result = $this->moloni->execute("companies/getOne", $values);
         if (is_array($result) && isset($result['company_id'])) {
+            $this->store[__FUNCTION__] = $result;
             return $result;
         } else {
             $this->moloni->errors->throwError(

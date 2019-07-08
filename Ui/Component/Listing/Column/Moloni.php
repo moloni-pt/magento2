@@ -19,7 +19,8 @@ class Moloni extends Column
         OrderRepositoryInterface $orderRepository,
         SearchCriteriaBuilder $criteria,
         array $components = [],
-        array $data = [])
+        array $data = []
+    )
     {
         $this->orderRepository = $orderRepository;
         $this->searchCriteria = $criteria;

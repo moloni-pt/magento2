@@ -420,9 +420,14 @@ class Products
     private function getTaxIdFromRate($taxRate, $break = false)
     {
         $taxId = 0;
+        $taxDefaultId = 0;
         $taxes = $this->moloni->taxes->getAll();
         if ($taxes && is_array($taxes)) {
             foreach ($taxes as $tax) {
+                if ($tax['active_by_default'] == 1) {
+                    $taxDefaultId = $tax['tax_id'];
+                }
+
                 if ($tax['value'] == $taxRate) {
                     $taxId = $tax['tax_id'];
                     if ($tax['name'] == 'IVA Normal') {
@@ -430,6 +435,10 @@ class Products
                     }
                 }
             }
+        }
+
+        if ($taxId == 0) {
+            $taxId = $taxDefaultId;
         }
 
         if ($taxId == 0 && !$break) {

@@ -11,8 +11,7 @@ use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
-
-use Magento\Sales\Model\Order\Address;
+use Magento\Framework\Message\ManagerInterface;
 
 class Documents
 {
@@ -56,9 +55,6 @@ class Documents
      */
     private $storeManager;
 
-    public $date;
-    public $expirationDate;
-
     /**
      * @var CurrencyFactory
      */
@@ -74,6 +70,11 @@ class Documents
      */
     private $products;
 
+    /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+
 
     /**
      * Companies constructor.
@@ -84,6 +85,7 @@ class Documents
      * @param StoreManagerInterface $storeManager
      * @param OrderRepositoryInterface $orderRepository
      * @param CurrencyFactory $currencyFactory
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         Moloni $moloni,
@@ -92,7 +94,8 @@ class Documents
         ProductsFactory $products,
         StoreManagerInterface $storeManager,
         OrderRepositoryInterface $orderRepository,
-        CurrencyFactory $currencyFactory
+        CurrencyFactory $currencyFactory,
+        ManagerInterface $messageManager
     )
     {
         $this->moloni = $moloni;
@@ -102,6 +105,7 @@ class Documents
         $this->storeManager = $storeManager;
         $this->orderRepository = $orderRepository;
         $this->currencyFactory = $currencyFactory;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -114,28 +118,90 @@ class Documents
      */
     public function createDocumentFromOrderId($orderId)
     {
-        $order = $this->orderRepository->get($orderId);
-        $this->parseDocument($order);
+        $closeDocument = false;
+        $this->order = $this->orderRepository->get($orderId);
+        $this->parseDocument();
+
+        if ($this->moloni->settings['shipping_document'] == 1) {
+            $shippingDocument = $this->createShippingDocument();
+            if (!$shippingDocument) {
+                return false;
+            }
+        }
 
         $insertDraft = $this->moloni->documents->setDocumentType()->insert($this->document);
         if (!$insertDraft) {
             return false;
         }
 
+        if ($this->moloni->settings['document_status'] == 1) {
+            $validDocument = $this->validateDocument($insertDraft['document_id'], $this->order);
+            if ($validDocument) {
+                $closeDocument = $this->moloni->documents->update([
+                    'document_id' => $insertDraft['document_id'],
+                    'status' => 1
+                ]);
+            } else {
+                $this->moloni->errors->throwError(
+                    __("Documento inserido mas os totais não batem certo"),
+                    __("Documento inserido mas os totais não batem certo."),
+                    __CLASS__ . "/" . __FUNCTION__
+                );
+                return false;
+            }
+        }
+
+        return $closeDocument;
+    }
+
+    /**
+     * @return bool|array
+     */
+    private function createShippingDocument()
+    {
+        // Add delivery datetime because its required
+        $this->document['delivery_datetime'] = gmdate('Y-m-d H:i:s');
+        $shippingDocument = $this->moloni->documents->setDocumentType('billsOfLading')->insert($this->document);
+        if (!$shippingDocument) {
+            return false;
+        }
+
+        $validDocument = $this->validateDocument($shippingDocument['document_id'], $this->order);
+        if (!$validDocument) {
+            $this->moloni->errors->throwError(
+                __("Documento inserido mas os totais não batem certo"),
+                __("Documento inserido mas os totais não batem certo."),
+                __CLASS__ . "/" . __FUNCTION__
+            );
+            return false;
+        }
+
+        $closeDocument = $this->moloni->documents->update([
+            'document_id' => $shippingDocument['document_id'],
+            'status' => 1
+        ]);
+
+        if (!$closeDocument) {
+            return false;
+        }
+
+        $this->document['associated_documents'][] = [
+            "associated_id" => $validDocument['document_id'],
+            "value" => $validDocument['net_value']
+        ];
+
         return true;
     }
 
     /**
      * Populates $this->>document based on $this->order
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return bool
      */
-    private function parseDocument($order)
+    private function parseDocument()
     {
-        $this->order = $order;
         $this->company = $this->moloni->companies->getOne();
 
-        $customer = $this->customers->setCustomerFromOrder($order);
+        $customer = $this->customers->setCustomerFromOrder($this->order);
         $this->document['customer_id'] = $customer->customerId;
 
         $this->document['date'] = gmdate('Y-m-d');
@@ -143,19 +209,7 @@ class Documents
         $this->document['document_set_id'] = $this->moloni->settings['document_set_id'];
         $this->document['your_reference'] = $this->order->getIncrementId();
 
-        foreach ($order->getItems() as $key => $product) {
-            if (!$product->getParentItem()) {
-                // Skip the parent products of an order
-                $documentProduct = $this->products->create()->setProductFromOrder($product);
-                if ($documentProduct && is_array($documentProduct)) {
-                    $this->document['products'][] = $documentProduct;
-                }
-            }
-        }
-
-        if ($order->getShippingAmount() > 0) {
-            $this->document['products'][] = $this->products->create()->setShippingFromOrder($order);
-        }
+        $this->parseProducts();
 
         $this->parseCurrency();
         $this->parsePaymentMethods();
@@ -165,6 +219,29 @@ class Documents
         }
 
         return true;
+    }
+
+    private function parseProducts()
+    {
+        $products = $this->order->getItems();
+        if (is_array($products)) {
+            foreach ($products as $key => $product) {
+                if ($product->getParentItem()) {
+                    continue;
+                }
+
+                // Skip the child products of an oder
+                $documentProduct = $this->products->create()->setProductFromOrder($product);
+                if ($documentProduct && is_array($documentProduct)) {
+                    $this->document['products'][] = $documentProduct;
+                }
+
+            }
+        }
+
+        if ($this->order->getShippingAmount() > 0) {
+            $this->document['products'][] = $this->products->create()->setShippingFromOrder($this->order);
+        }
     }
 
     private function parseCurrency()
@@ -317,6 +394,10 @@ class Documents
         return $deliveryMethodId;
     }
 
+    /**
+     * @param $name
+     * @return bool|integer
+     */
     private function handlePaymentMethod($name)
     {
         $paymentMethodId = false;
@@ -345,4 +426,25 @@ class Documents
 
         return $paymentMethodId;
     }
+
+    /**
+     * @param int $documentId
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @return bool|array
+     */
+    private function validateDocument($documentId, $order)
+    {
+        $moloniDocument = $this->moloni->documents->getOne(["document_id" => $documentId]);
+
+        if (!isset($moloniDocument['net_value'])) {
+            return false;
+        }
+
+        $moloniDocumentTotal = $moloniDocument['net_value'];
+        $magentoOrderTotal = $order->getGrandTotal();
+
+        // If the difference is less than two cents (due to rounding values)
+        return (abs($magentoOrderTotal - $moloniDocumentTotal) < 0.02) ? $moloniDocument : false;
+    }
+
 }
