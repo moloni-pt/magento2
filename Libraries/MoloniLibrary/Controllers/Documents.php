@@ -109,7 +109,7 @@ class Documents
      * Then createDocument() is called to create the document
      * @param int $orderId
      * Id of a Magento order
-     * @return array
+     * @return array|boolean
      * Return array with [valid => 1] or with errors
      */
     public function createDocumentFromOrderId($orderId)
@@ -122,7 +122,7 @@ class Documents
             return false;
         }
 
-        return [];
+        return true;
     }
 
     /**

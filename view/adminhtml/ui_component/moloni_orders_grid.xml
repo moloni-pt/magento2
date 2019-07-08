@@ -216,15 +216,28 @@
                 <label translate="true">Status</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Magento\Sales\Ui\Component\Listing\Column\ViewAction">
+        <actionsColumn name="order_view" class="Invoicing\Moloni\Ui\Component\Listing\Column\ViewAction">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="viewUrlPath" xsi:type="string">moloni/documents/create</item>
+                    <item name="viewUrlPath" xsi:type="string">sales/order/view</item>
                     <item name="urlEntityParamName" xsi:type="string">order_id</item>
                 </item>
             </argument>
             <settings>
                 <indexField>entity_id</indexField>
+                <label translate="true">Encomenda</label>
+            </settings>
+        </actionsColumn>
+        <actionsColumn name="document_create" class="Invoicing\Moloni\Ui\Component\Listing\Column\CreateAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="createUrlPath" xsi:type="string">moloni/documents/create</item>
+                    <item name="urlEntityParamName" xsi:type="string">order_id</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>entity_id</indexField>
+                <label translate="true">Documento</label>
             </settings>
         </actionsColumn>
     </columns>

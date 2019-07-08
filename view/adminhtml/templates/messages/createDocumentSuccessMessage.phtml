@@ -1,0 +1,10 @@
+<?php
+// @codingStandardsIgnoreFile
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+
+<?= $block->escapeHtml(__(
+    'Document was sucessefuly created: <a href="%1">Open document</a>.',
+    $block->getData('document_url')),
+    ['a']
+);

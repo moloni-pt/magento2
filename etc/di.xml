@@ -15,6 +15,7 @@
     <preference for="Invoicing\Moloni\Api\Data\DocumentsInterface" type="Invoicing\Moloni\Model\Documents"/>
     <preference for="Invoicing\Moloni\Api\Data\DocumentsSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <!-- Virtual DOM for admin documents GRID -->
     <virtualType name="moloni_orders_grid_data_provider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
         <arguments>
             <argument name="collection" xsi:type="object" shared="false">Magento\Sales\Model\ResourceModel\Order\Collection</argument>

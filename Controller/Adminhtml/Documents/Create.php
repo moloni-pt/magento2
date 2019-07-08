@@ -63,11 +63,21 @@ class Create extends Documents
         $document = $this->moloniDocuments->createDocumentFromOrderId($orderId);
 
         if (!$document) {
-            $errorMessage = $this->moloni->errors->getErrors('first');
-            $this->messageManager->addErrorMessage($errorMessage['title']);
-            $this->_redirect('*/home/index');
-            return false;
+            #  $errorMessage = $this->moloni->errors->getErrors('first');
+            #  $this->messageManager->addErrorMessage($errorMessage['title']);
+            #  $this->_redirect('*/home/index');
+            #  return false;
         }
+
+        $this->messageManager->addComplexSuccessMessage(
+            'createDocumentSuccessMessage',
+            [
+                'document_url' => $this->_url->getUrl('document/url')
+            ]
+        );
+
+        $this->_redirect('*/home/index');
+        return false;
 
         return $page;
     }
