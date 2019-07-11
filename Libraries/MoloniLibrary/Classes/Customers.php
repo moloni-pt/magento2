@@ -13,6 +13,7 @@ class Customers
 {
 
     private $moloni;
+    private $store = [];
 
     /**
      * Customers constructor.
@@ -50,8 +51,18 @@ class Customers
      */
     public function getByEmail($values, $companyId = false)
     {
+        if (!isset($values['email'])) {
+            return false;
+        }
+
+        if (isset($this->store[__FUNCTION__][$values['email']])) {
+            return $this->store[__FUNCTION__][$values['email']];
+        }
+
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("customers/getByEmail", $values);
+
+        $this->store[__FUNCTION__][$values['email']] = $result;
 
         if (is_array($result) && isset($result[0]['customer_id'])) {
             return $result;
@@ -120,6 +131,7 @@ class Customers
      */
     public function insert($values, $companyId = false)
     {
+        $this->store = [];
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("customers/insert", $values);
 

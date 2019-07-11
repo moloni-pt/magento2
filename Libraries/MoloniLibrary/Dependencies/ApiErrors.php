@@ -47,6 +47,11 @@ class ApiErrors
         }
     }
 
+    public function clearErrors()
+    {
+        $this->error_log = [];
+    }
+
     private function logError($title, $message, $where, $received = false, $sent = false)
     {
         $this->error_log[] = [

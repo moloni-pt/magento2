@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface as Logger;
 class Collection extends SearchResult
 {
     /**
-     * @var Invoicing\Moloni\Libraries\MoloniLibrary\Moloni Moloni
+     * @var Moloni $Moloni
      */
     private $moloni;
 
@@ -34,6 +34,7 @@ class Collection extends SearchResult
     protected function _initSelect()
     {
         parent::_initSelect();
+        $this->moloni->checkActiveSession();
 
         $query = $this->getSelect();
 
@@ -74,6 +75,22 @@ class Collection extends SearchResult
             $this->addFilterToMap($columnInfo['COLUMN_NAME'], 'main_table.' . $columnInfo['COLUMN_NAME']);
         }
 
+        if ($this->moloni->settings['orders_since']) {
+            $sinceDate = date("Y-m-d h:i:s", strtotime($this->moloni->settings['orders_since']));
+            $this->addFieldToFilter('grid.created_at', ['gteq' => $sinceDate]);
+
+        }
+
+        if (is_array($this->moloni->settings['orders_statuses']) &&
+            !empty($this->moloni->settings['orders_statuses'])) {
+            $this->addFieldToFilter('grid.status', ['in' => $this->moloni->settings['orders_statuses']]); // Not working
+        }
+
         return $this;
+    }
+
+    public function getTotalCount()
+    {
+        return $this->getSize();
     }
 }

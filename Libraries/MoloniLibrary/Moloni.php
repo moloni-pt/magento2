@@ -34,6 +34,9 @@ class Moloni implements MoloniApiRepositoryInterface
     const API_URL = 'https://api.moloni.pt/v1/';
 
     public $logs = [];
+    /**
+     * @var ApiErrors
+     */
     public $errors;
     public $curl;
     public $tokensRepository;

@@ -13,6 +13,7 @@ class DeliveryMethods
 {
 
     private $moloni;
+    private $store = [];
 
     /**
      * Companies constructor.
@@ -29,8 +30,14 @@ class DeliveryMethods
      */
     public function getAll($company_id = false)
     {
+        if (isset($this->store[__FUNCTION__])) {
+            return $this->store[__FUNCTION__];
+        }
+
         $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
         $result = $this->moloni->execute("deliveryMethods/getAll", $values);
+        $this->store[__FUNCTION__] = $result;
+
         if (is_array($result) && isset($result[0]['delivery_method_id'])) {
             return $result;
         } else {
@@ -50,6 +57,7 @@ class DeliveryMethods
      */
     public function insert($values, $companyId = false)
     {
+        $this->store = [];
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("deliveryMethods/insert", $values);
 

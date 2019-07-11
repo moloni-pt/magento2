@@ -36,7 +36,7 @@ class Documents
     /**
      * @var \Magento\Sales\Api\Data\OrderInterface Order interface
      */
-    private $order = [];
+    public $order = [];
 
     /**
      * @var array
@@ -118,7 +118,6 @@ class Documents
      */
     public function createDocumentFromOrderId($orderId)
     {
-        $closeDocument = false;
         $this->order = $this->orderRepository->get($orderId);
         $this->parseDocument();
 
@@ -134,24 +133,24 @@ class Documents
             return false;
         }
 
-        if ($this->moloni->settings['document_status'] == 1) {
-            $validDocument = $this->validateDocument($insertDraft['document_id'], $this->order);
-            if ($validDocument) {
-                $closeDocument = $this->moloni->documents->update([
-                    'document_id' => $insertDraft['document_id'],
-                    'status' => 1
-                ]);
-            } else {
-                $this->moloni->errors->throwError(
-                    __("Documento inserido mas os totais não batem certo"),
-                    __("Documento inserido mas os totais não batem certo."),
-                    __CLASS__ . "/" . __FUNCTION__
-                );
-                return false;
-            }
+        $validDocument = $this->validateDocument($insertDraft['document_id'], $this->order);
+        if (!$validDocument) {
+            $this->moloni->errors->throwError(
+                __($this->order->getIncrementId() . " - Documento inserido mas os totais não batem certo"),
+                __($this->order->getIncrementId() . " - Documento inserido mas os totais não batem certo."),
+                __CLASS__ . "/" . __FUNCTION__
+            );
+            return false;
         }
 
-        return $closeDocument;
+        if ($this->moloni->settings['document_status'] == 1 && $validDocument) {
+            $validDocument = $this->moloni->documents->update([
+                'document_id' => $insertDraft['document_id'],
+                'status' => 1
+            ]);
+        }
+
+        return $validDocument;
     }
 
     /**
@@ -169,8 +168,8 @@ class Documents
         $validDocument = $this->validateDocument($shippingDocument['document_id'], $this->order);
         if (!$validDocument) {
             $this->moloni->errors->throwError(
-                __("Documento inserido mas os totais não batem certo"),
-                __("Documento inserido mas os totais não batem certo."),
+                __($this->order->getIncrementId() . " - Documento de transporte inserido mas os totais não batem certo"),
+                __($this->order->getIncrementId() . " - Documento de transporte inserido mas os totais não batem certo."),
                 __CLASS__ . "/" . __FUNCTION__
             );
             return false;

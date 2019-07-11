@@ -13,6 +13,7 @@ class Products
 {
 
     private $moloni;
+    private $store = [];
 
     /**
      * Customers constructor.
@@ -50,8 +51,19 @@ class Products
      */
     public function getByReference($values, $companyId = false)
     {
+
+        if (!isset($values['reference'])) {
+            return false;
+        }
+
+        if (isset($this->store[__FUNCTION__][$values['reference']])) {
+            return $this->store[__FUNCTION__][$values['reference']];
+        }
+
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("products/getByReference", $values);
+
+        $this->store[__FUNCTION__][$values['reference']] = $result;
 
         if (is_array($result) && isset($result[0]['product_id'])) {
             return $result;
@@ -75,6 +87,7 @@ class Products
      */
     public function insert($values, $companyId = false)
     {
+        $this->store = [];
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("products/insert", $values);
 
@@ -97,6 +110,7 @@ class Products
      */
     public function update($values, $companyId = false)
     {
+        $this->store = [];
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("products/update", $values);
 

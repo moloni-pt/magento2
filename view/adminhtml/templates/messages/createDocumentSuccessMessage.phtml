@@ -1,5 +1,8 @@
-<?= $block->escapeHtml(__(
-    $block->getData('document_name') . ' inserido com sucesso: <a href="%1" target="_blank">Abrir documento</a>.',
-    $block->getData('document_url')),
-    ['a']
-);
+<?php
+
+$message = $block->getData('order_number');
+$message .= ' - ';
+$message .= $block->getData('document_name');
+$message .= ' inserido com sucesso: <a href="%1" target="_blank">Abrir documento</a>.';
+
+echo $block->escapeHtml(__($message, $block->getData('document_url')), ['a']);

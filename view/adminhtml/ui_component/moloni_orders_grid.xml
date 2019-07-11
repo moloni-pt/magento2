@@ -65,18 +65,7 @@
                 </item>
             </argument>
         </component>
-        <filterSearch name="fulltext">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="provider" xsi:type="string">moloni_orders_grid.moloni_orders_grid_data_source</item>
-                    <item name="chipsProvider" xsi:type="string">moloni_orders_grid.moloni_orders_grid.listing_top.listing_filters_chips</item>
-                    <item name="storageConfig" xsi:type="array">
-                        <item name="provider" xsi:type="string">moloni_orders_grid.moloni_orders_grid.listing_top.bookmarks</item>
-                        <item name="namespace" xsi:type="string">current.search</item>
-                    </item>
-                </item>
-            </argument>
-        </filterSearch>
+        <filterSearch name="fulltext"/>
         <filters name="listing_filters">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -128,6 +117,24 @@
                 </item>
             </argument>
         </paging>
+
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <action name="create">
+                <settings>
+                    <url path="moloni/documents/massCreate"/>
+                    <type>create</type>
+                    <label translate="true">Gerar documentos</label>
+                </settings>
+            </action>
+            <action name="remove">
+                <settings>
+                    <url path="moloni/documents/massRemove"/>
+                    <type>remove</type>
+                    <label translate="true">Não gerar documentos</label>
+                </settings>
+            </action>
+        </massaction>
+
     </container>
     <columns name="moloni_orders_grid_columns">
         <argument name="data" xsi:type="array">
@@ -216,18 +223,6 @@
                 <label translate="true">Status</label>
             </settings>
         </column>
-        <actionsColumn name="order_view" class="Invoicing\Moloni\Ui\Component\Listing\Column\ViewAction">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="viewUrlPath" xsi:type="string">sales/order/view</item>
-                    <item name="urlEntityParamName" xsi:type="string">order_id</item>
-                </item>
-            </argument>
-            <settings>
-                <indexField>entity_id</indexField>
-                <label translate="true">Encomenda</label>
-            </settings>
-        </actionsColumn>
         <actionsColumn name="document_create" class="Invoicing\Moloni\Ui\Component\Listing\Column\CreateAction">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -238,6 +233,20 @@
             <settings>
                 <indexField>entity_id</indexField>
                 <label translate="true">Documento</label>
+            </settings>
+        </actionsColumn>
+
+        <actionsColumn name="order_view" class="Invoicing\Moloni\Ui\Component\Listing\Column\MoreActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="viewUrlPath" xsi:type="string">sales/order/view</item>
+                    <item name="removeUrlPath" xsi:type="string">moloni/documents/remove</item>
+                    <item name="urlEntityParamName" xsi:type="string">order_id</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>entity_id</indexField>
+                <label translate="true">Encomenda</label>
             </settings>
         </actionsColumn>
     </columns>

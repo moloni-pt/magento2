@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Invoicing\Moloni\Ui\Component\Listing\Column;
 
@@ -7,7 +11,10 @@ use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
-class CreateAction extends Column
+/**
+ * Class ViewAction
+ */
+class MoreActions extends Column
 {
     /**
      * @var UrlInterface
@@ -46,16 +53,29 @@ class CreateAction extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item['entity_id'])) {
-                    $createUrlPath = $this->getData('config/createUrlPath') ?: '#';
+                    $viewUrlPath = $this->getData('config/viewUrlPath') ?: '#';
+                    $removeUrlPath = $this->getData('config/removeUrlPath') ?: '#';
                     $urlEntityParamName = $this->getData('config/urlEntityParamName') ?: 'entity_id';
                     $item[$this->getData('name')] = [
-                        'create' => [
-                            'href' => $this->urlBuilder->getUrl($createUrlPath, [
+                        'view' => [
+                            'href' => $this->urlBuilder->getUrl(
+                                $viewUrlPath,
+                                [
                                     $urlEntityParamName => $item['entity_id']
                                 ]
                             ),
-                            'label' => __('Gerar')
+                            'label' => __('Ver encomenda'),
+                            'target' => '_BLANK'
                         ],
+                        'remove' => [
+                            'href' => $this->urlBuilder->getUrl(
+                                $removeUrlPath,
+                                [
+                                    $urlEntityParamName => $item['entity_id']
+                                ]
+                            ),
+                            'label' => __('Não gerar documento'),
+                        ]
                     ];
                 }
             }

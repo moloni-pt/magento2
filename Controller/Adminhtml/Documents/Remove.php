@@ -27,7 +27,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents as MoloniDocuments;
 use Magento\Framework\View\Result\PageFactory;
 
-class Create extends Documents
+class Remove extends Documents
 {
 
     protected $moloniDocuments;
@@ -59,25 +59,9 @@ class Create extends Documents
             return false;
         }
 
-        $document = $this->moloniDocuments->createDocumentFromOrderId($orderId);
+        $this->messageManager->addSuccessMessage(__("O documento não irá ser gerado no Moloni."));
 
-        if (!$document) {
-            $errorMessage = $this->moloni->errors->getErrors('first');
-            $this->messageManager->addErrorMessage($errorMessage['title']);
-            $this->_redirect('*/home/index');
-            return false;
-        }
-
-        $this->messageManager->addComplexSuccessMessage(
-            'createDocumentSuccessMessage',
-            [
-                'order_number' => $this->moloniDocuments->order->getIncrementId(),
-                'document_name' => $this->moloni->documents->documentTypeName,
-                'document_url' => $this->moloni->documents->getViewUrl($document['document_id'])
-            ]
-        );
-
-        $this->_redirect('*/home/index');
-        return true;
+        $this->_redirect('moloni/home/index');
+        return false;
     }
 }

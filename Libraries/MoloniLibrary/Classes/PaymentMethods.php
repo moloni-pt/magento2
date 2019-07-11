@@ -13,6 +13,7 @@ class PaymentMethods
 {
 
     private $moloni;
+    private $store = [];
 
     /**
      * Payment Methods constructor.
@@ -29,8 +30,13 @@ class PaymentMethods
      */
     public function getAll($company_id = false)
     {
+        if (isset($this->store[__FUNCTION__])) {
+            return $this->store[__FUNCTION__];
+        }
+
         $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
         $result = $this->moloni->execute("paymentMethods/getAll", $values);
+        $this->store[__FUNCTION__] = $result;
         if (is_array($result) && isset($result[0]['payment_method_id'])) {
             return $result;
         } else {
@@ -50,6 +56,7 @@ class PaymentMethods
      */
     public function insert($values, $companyId = false)
     {
+        $this->store = [];
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("paymentMethods/insert", $values);
 

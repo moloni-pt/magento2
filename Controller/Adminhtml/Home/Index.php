@@ -25,7 +25,6 @@ use Invoicing\Moloni\Controller\Adminhtml\Home;
 
 class Index extends Home
 {
-
     public function execute()
     {
         $page = $this->initAction();
@@ -33,9 +32,7 @@ class Index extends Home
             $this->_redirect($this->moloni->redirectTo);
             return false;
         }
-
         // $this->_redirect("*/ajax/documents");
-
         return $page;
     }
 }
