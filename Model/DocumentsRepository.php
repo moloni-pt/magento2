@@ -23,6 +23,7 @@ namespace Invoicing\Moloni\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -44,12 +45,24 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     public $searchCriteriaBuilder;
     public $logger;
 
+    /**
+     * @var SortOrder SortOrder
+     */
+    private $sortOrder;
+
+    /**
+     * @var SortOrderBuilder ortOrderBuilder
+     */
+    private $sortOrderBuilder;
+
     public function __construct(
         ObjectResourceModel $objectResourceModel,
         DocumentsFactory $objectFactory,
         CollectionFactory $collectionFactory,
         SearchResultsFactory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
+        SortOrder $sortOrder,
+        SortOrderBuilder $sortOrderBuilder,
         LoggerInterface $logger
     )
     {
@@ -58,10 +71,23 @@ class DocumentsRepository implements DocumentsRepositoryInterface
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->sortOrder = $sortOrder;
+        $this->sortOrderBuilder = $sortOrderBuilder;
         $this->logger = $logger;
     }
 
+    /**
+     * @return Documents
+     */
+    public function create()
+    {
+        return $this->objectFactory->create();
+    }
 
+    /**
+     * @param DocumentsInterface $document
+     * @return DocumentsInterface
+     */
     public function save(DocumentsInterface $document)
     {
         $this->documentsResults = false;
@@ -78,7 +104,7 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     /**
      * @param $documentId
      * @return \Invoicing\Moloni\Api\Data\DocumentsInterface int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getById($documentId)
     {
@@ -90,6 +116,25 @@ class DocumentsRepository implements DocumentsRepositoryInterface
         }
 
         return $object;
+    }
+
+    /**
+     * @param $orderId
+     * @return DocumentsInterface[]|\Magento\Framework\Api\AbstractExtensibleObject[]
+     */
+    public function getByOrderId($orderId)
+    {
+        $sortOrder = $this->sortOrderBuilder
+            ->setField("document_id")
+            ->setDirection('DESC')
+            ->create();
+
+        $filter = $this->searchCriteriaBuilder
+            ->addFilter("order_id", $orderId)
+            ->addSortOrder($sortOrder)
+            ->create();
+
+        return $this->getList($filter)->getItems();
     }
 
     /**
@@ -108,7 +153,7 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return bool
      * @throws \Exception
      */
@@ -126,6 +171,9 @@ class DocumentsRepository implements DocumentsRepositoryInterface
      */
     public function getList(SearchCriteriaInterface $criteria)
     {
+        /**
+         * @var $searchResults \Magento\Framework\Api\SearchResults
+         */
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
         $collection = $this->collectionFactory->create();

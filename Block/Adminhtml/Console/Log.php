@@ -52,6 +52,7 @@ class Log extends Template
         // Search in data persistor
         $persistorLog = $this->dataPersistor->get('moloni_logs');
         if (!empty($persistorLog)) {
+            $this->dataPersistor->set('moloni_logs', []);
             return $persistorLog;
         }
 

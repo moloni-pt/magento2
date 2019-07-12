@@ -33,6 +33,59 @@ interface DocumentsInterface
     const INVOICE_TOTAL = 'invoice_total';
     const INVOICE_STATUS = 'invoice_status';
     const INVOICE_TYPE = 'invoice_type';
+    const INVOICE_DATE = 'invoice_date';
     const METADATA = 'metadata';
 
+    /**
+     * @param int $companyId
+     * @return $this
+     */
+    public function setCompanyId(int $companyId);
+
+    /**
+     *
+     * @param int $orderId
+     */
+    public function setOrderId($orderId);
+
+    /**
+     *
+     * @param float $orderTotal
+     */
+    public function setOrderTotal($orderTotal);
+
+    /**
+     *
+     * @param int $invoiceId
+     */
+    public function setInvoiceId($invoiceId);
+
+    /**
+     *
+     * @param float $invoiceTotal
+     */
+    public function setInvoiceTotal($invoiceTotal);
+
+    /**
+     *
+     * @param int $invoiceStatus
+     */
+    public function setInvoiceStatus($invoiceStatus);
+
+    /**
+     *
+     * @param string $invoiceDate
+     */
+    public function setInvoiceDate($invoiceDate);
+
+    /**
+     *
+     * @param string in JSON $metadata
+     */
+    public function setMetadata($metadata);
+
+    /**
+     * @return string|null
+     */
+    public function getInvoiceDate();
 }

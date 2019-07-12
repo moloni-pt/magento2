@@ -56,7 +56,7 @@ class Collection extends SearchResult
             ['vat_id']
         );
 
-        #$query->where('moloni.order_id IS NULL');
+        $query->where('moloni.order_id IS NULL');
 
         if ($this->moloni->settings['orders_since']) {
             $query->where(

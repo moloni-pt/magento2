@@ -13,6 +13,7 @@ class Documents
 {
 
     private $moloni;
+    private $store = [];
     public $documentTypeId = 1;
     public $documentTypeName = "Fatura";
     public $documentTypeClass = "invoices";
@@ -75,9 +76,17 @@ class Documents
         return $this;
     }
 
-    public function getEditUrl()
+    /**
+     * @param int $documentId
+     * @return string
+     */
+    public function getEditUrl($documentId)
     {
+        $company = $this->moloni->companies->getOne();
+        $url = "https://www.moloni.pt/" . $company['slug'] . "/" . $this->documentTypeClassMoloni . "/showUpdate/" .
+            $documentId;
 
+        return $url;
     }
 
     /**
@@ -97,8 +106,8 @@ class Documents
     {
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute("documents/getPdfLink", $values);
-        if (is_array($result) && isset($result[0]['document_id'])) {
-            return $result[0];
+        if (is_array($result) && isset($result['url'])) {
+            return $result['url'];
         } else {
             $this->moloni->errors->throwError(
                 __("Falhou a obter o documento para download " . $values['document_id']),
@@ -131,8 +140,19 @@ class Documents
 
     public function getOne($values, $companyId = false)
     {
+        if (!isset($values['document_id'])) {
+            return false;
+        }
+
+        if (isset($this->store[$values['document_id']])) {
+            return $this->store[$values['document_id']];
+        }
+
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
         $result = $this->moloni->execute($this->documentTypeClass . "/getOne", $values);
+
+        $this->store[$values['document_id']] = $result;
+
         if (is_array($result) && isset($result['document_id'])) {
             return $result;
         } else {

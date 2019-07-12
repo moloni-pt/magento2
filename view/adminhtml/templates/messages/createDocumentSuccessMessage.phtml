@@ -1,8 +1,31 @@
-<?php
+<div style="display: flex; justify-content: space-between;">
+    <div>
+        <?php echo $block->getData('message'); ?>
+    </div>
 
-$message = $block->getData('order_number');
-$message .= ' - ';
-$message .= $block->getData('document_name');
-$message .= ' inserido com sucesso: <a href="%1" target="_blank">Abrir documento</a>.';
+    <div>
+        <?php if ($block->getData('url')) { ?>
+            <a href="<?php echo $block->getData('url'); ?>" target="_blank">
+                <button id="downloadDocument"
+                        title="Descarregar Documento" type="button" class="action- scalable action-default"
+                        style="margin-right: 10px"
+                        data-ui-id="addattribute-button">
+                <span>
+                    <?php echo $block->getData('button_text') ? $block->getData('button_text') : "Ver documento"; ?>
+                </span>
+                </button>
+            </a>
+        <?php } ?>
 
-echo $block->escapeHtml(__($message, $block->getData('document_url')), ['a']);
+        <?php if ($block->getData('download_url')) { ?>
+            <a href="<?php echo $block->getData('download_url'); ?>" target="_blank">
+                <button id="viewDocument" title="Ver documento" type="button" class="action- scalable action-default"
+                        data-ui-id="addattribute-button">
+                <span>
+                    Descarregar documento
+                </span>
+                </button>
+            </a>
+        <?php } ?>
+    </div>
+</div>

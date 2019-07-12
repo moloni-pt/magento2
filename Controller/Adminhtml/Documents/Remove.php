@@ -22,28 +22,9 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
-use Magento\Backend\App\Action\Context;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents as MoloniDocuments;
-use Magento\Framework\View\Result\PageFactory;
 
 class Remove extends Documents
 {
-
-    protected $moloniDocuments;
-
-    public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory,
-        Moloni $moloni,
-        MoloniDocuments $moloniDocuments
-    )
-    {
-        parent::__construct($context, $resultPageFactory, $moloni);
-
-        $this->moloniDocuments = $moloniDocuments;
-    }
-
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
@@ -55,12 +36,28 @@ class Remove extends Documents
 
         if (!$orderId) {
             $this->messageManager->addErrorMessage(__("Encomenda não encontrada."));
-            $this->_redirect('*/home/index');
+            $this->_redirect('moloni/home/index');
+            return false;
+        }
+
+        try {
+            $newDocument = $this->documentsRepository->create();
+            $newDocument->setCompanyid($this->moloni->getSession()->companyId);
+            $newDocument->setOrderId($orderId);
+            $newDocument->setOrderTotal(0);
+            $newDocument->setInvoiceId(0);
+            $newDocument->setInvoiceTotal(0);
+            $newDocument->setInvoiceStatus(-1);
+            $newDocument->setInvoiceDate(date('Y-m-d H:s:i'));
+            $newDocument->setInvoiceType('Anulada');
+            $this->documentsRepository->save($newDocument);
+        } catch (\Exception $exception) {
+            $this->messageManager->addErrorMessage($exception->getMessage());
+            $this->_redirect('moloni/home/index');
             return false;
         }
 
         $this->messageManager->addSuccessMessage(__("O documento não irá ser gerado no Moloni."));
-
         $this->_redirect('moloni/home/index');
         return false;
     }

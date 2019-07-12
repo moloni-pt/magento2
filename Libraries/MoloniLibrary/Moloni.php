@@ -44,6 +44,10 @@ class Moloni implements MoloniApiRepositoryInterface
 
     public $request;
     public $dataPersistor;
+
+    /**
+     * @var ApiSession
+     */
     public $session;
 
     private $factories = [];
@@ -140,6 +144,14 @@ class Moloni implements MoloniApiRepositoryInterface
         }
 
         return $this->{$name};
+    }
+
+    /**
+     * @return ApiSession
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     public function checkActiveSession()

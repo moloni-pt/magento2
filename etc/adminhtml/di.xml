@@ -9,6 +9,13 @@
                         <item name="template" xsi:type="string">Invoicing_Moloni::messages/createDocumentSuccessMessage.phtml</item>
                     </item>
                 </item>
+
+                <item name="createDocumentExistsMessage" xsi:type="array">
+                    <item name="renderer" xsi:type="const">\Magento\Framework\View\Element\Message\Renderer\BlockRenderer::CODE</item>
+                    <item name="data" xsi:type="array">
+                        <item name="template" xsi:type="string">Invoicing_Moloni::messages/createDocumentExistsMessage.phtml</item>
+                    </item>
+                </item>
             </argument>
         </arguments>
     </type>

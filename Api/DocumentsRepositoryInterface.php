@@ -61,4 +61,5 @@ interface DocumentsRepositoryInterface
      * @return \Invoicing\Moloni\Api\Data\DocumentsSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $criteria);
+
 }

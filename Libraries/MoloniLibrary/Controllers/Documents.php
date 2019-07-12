@@ -12,6 +12,7 @@ use Magento\Directory\Model\CurrencyFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Message\ManagerInterface;
+use Invoicing\Moloni\Model\DocumentsRepository;
 
 class Documents
 {
@@ -77,6 +78,16 @@ class Documents
 
 
     /**
+     * @var DocumentsRepository
+     */
+    private $documentsRepository;
+
+    /**
+     * @var array[]
+     */
+    private $messages = [];
+
+    /**
      * Companies constructor.
      * @param Moloni $moloni
      * @param Tools $tools
@@ -86,6 +97,7 @@ class Documents
      * @param OrderRepositoryInterface $orderRepository
      * @param CurrencyFactory $currencyFactory
      * @param ManagerInterface $messageManager
+     * @param DocumentsRepository $documentsRepository
      */
     public function __construct(
         Moloni $moloni,
@@ -95,7 +107,8 @@ class Documents
         StoreManagerInterface $storeManager,
         OrderRepositoryInterface $orderRepository,
         CurrencyFactory $currencyFactory,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        DocumentsRepository $documentsRepository
     )
     {
         $this->moloni = $moloni;
@@ -106,6 +119,46 @@ class Documents
         $this->orderRepository = $orderRepository;
         $this->currencyFactory = $currencyFactory;
         $this->messageManager = $messageManager;
+        $this->documentsRepository = $documentsRepository;
+    }
+
+    public function getMessages()
+    {
+        return !empty($this->messages) ? $this->messages : false;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addWarning($message)
+    {
+        $this->messages['warning'][] = $message;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function addError($message)
+    {
+        $this->messages['error'][] = $message;
+    }
+
+    /**
+     * @param string $message
+     * @param array $values
+     */
+    public function addComplexSuccess($message, $values = [])
+    {
+        $this->messages['complex_success'][] = array_merge(['message' => $message], $values);
+    }
+
+    /**
+     * @param string $message
+     * @param array $values
+     */
+    public function addComplexWarning($message, $values = [])
+    {
+        $this->messages['complex_warning'][] = array_merge(['message' => $message], $values);
     }
 
     /**
@@ -124,69 +177,84 @@ class Documents
         if ($this->moloni->settings['shipping_document'] == 1) {
             $shippingDocument = $this->createShippingDocument();
             if (!$shippingDocument) {
+                $this->addError($this->moloni->errors->getErrors('first')['message']);
                 return false;
             }
         }
 
-        $insertDraft = $this->moloni->documents->setDocumentType()->insert($this->document);
-        if (!$insertDraft) {
+        $result = $this->moloni->documents->setDocumentType()->insert($this->document);
+        if (!isset($result['document_id'])) {
+            $this->addError($this->moloni->errors->getErrors('first')['message']);
             return false;
         }
 
-        $validDocument = $this->validateDocument($insertDraft['document_id'], $this->order);
-        if (!$validDocument) {
-            $this->moloni->errors->throwError(
-                __($this->order->getIncrementId() . " - Documento inserido mas os totais não batem certo"),
-                __($this->order->getIncrementId() . " - Documento inserido mas os totais não batem certo."),
-                __CLASS__ . "/" . __FUNCTION__
+        $hasValidTotals = $this->validateDocumentTotals($result['document_id'], $this->order);
+
+        if (!$hasValidTotals) {
+            $this->addComplexWarning(
+                "Documento inserido como rascunho mas os totais não batem certo",
+                [
+                    'url' => $this->moloni->documents->getEditUrl($result['document_id']),
+                    'button_text' => 'Editar documento'
+                ]
             );
-            return false;
         }
 
-        if ($this->moloni->settings['document_status'] == 1 && $validDocument) {
-            $validDocument = $this->moloni->documents->update([
-                'document_id' => $insertDraft['document_id'],
-                'status' => 1
-            ]);
+        if ($this->moloni->settings['document_status'] == 1 && $hasValidTotals) {
+            $result = $this->moloni->documents->update(['document_id' => $result['document_id'], 'status' => 1]);
+
+
+            $this->addComplexSuccess(
+                "Documento emitido com sucesso",
+                [
+                    'url' => $this->moloni->documents->getViewUrl($result['document_id']),
+                    'download_url' => $this->moloni->documents->getDownloadUrl(['document_id' => $result['document_id']])
+                ]
+            );
         }
 
-        return $validDocument;
+        $this->setDocumentHasCreated($result['document_id'], $orderId);
+        return $result;
     }
 
     /**
-     * @return bool|array
+     * @return bool
      */
     private function createShippingDocument()
     {
         // Add delivery datetime because its required
         $this->document['delivery_datetime'] = gmdate('Y-m-d H:i:s');
-        $shippingDocument = $this->moloni->documents->setDocumentType('billsOfLading')->insert($this->document);
-        if (!$shippingDocument) {
+        $shippingDocumentInserted = $this->moloni->documents->setDocumentType('billsOfLading')->insert($this->document);
+        if (!$shippingDocumentInserted) {
             return false;
         }
 
-        $validDocument = $this->validateDocument($shippingDocument['document_id'], $this->order);
+        $validDocument = $this->validateDocumentTotals($shippingDocumentInserted['document_id'], $this->order);
         if (!$validDocument) {
-            $this->moloni->errors->throwError(
-                __($this->order->getIncrementId() . " - Documento de transporte inserido mas os totais não batem certo"),
-                __($this->order->getIncrementId() . " - Documento de transporte inserido mas os totais não batem certo."),
-                __CLASS__ . "/" . __FUNCTION__
+            $this->addComplexWarning(
+                "Documento de transporte inserido como rascunho mas os totais não batem certo",
+                [
+                    'url' => $this->moloni->documents->getEditUrl($shippingDocumentInserted['document_id']),
+                    'button_text' => 'Editar documento'
+                ]
             );
-            return false;
+            return true;
         }
 
         $closeDocument = $this->moloni->documents->update([
-            'document_id' => $shippingDocument['document_id'],
+            'document_id' => $shippingDocumentInserted['document_id'],
             'status' => 1
         ]);
 
-        if (!$closeDocument) {
+        if (!isset($closeDocument['document_id'])) {
             return false;
         }
 
+        $moloniDocument = $this->moloni->documents->getOne(["document_id" => $closeDocument['document_id']]);
+
         $this->document['associated_documents'][] = [
-            "associated_id" => $validDocument['document_id'],
-            "value" => $validDocument['net_value']
+            "associated_id" => $moloniDocument['document_id'],
+            "value" => $moloniDocument['net_value']
         ];
 
         return true;
@@ -207,6 +275,7 @@ class Documents
         $this->document['expiration_date'] = gmdate('Y-m-d');
         $this->document['document_set_id'] = $this->moloni->settings['document_set_id'];
         $this->document['your_reference'] = $this->order->getIncrementId();
+        $this->document['plugin_id'] = 19;
 
         $this->parseProducts();
 
@@ -331,6 +400,9 @@ class Documents
         return true;
     }
 
+    /**
+     * @return bool
+     */
     private function parseShippingDestinationAddress()
     {
         $shippingAddress = $this->order->getShippingAddress();
@@ -426,12 +498,36 @@ class Documents
         return $paymentMethodId;
     }
 
+
+    /**
+     * @param int $documentId
+     * @param $orderId
+     */
+    private function setDocumentHasCreated($documentId, $orderId)
+    {
+        $insertedDocument = $this->moloni->documents->getOne(['document_id' => $documentId]);
+
+        $newDocument = $this->documentsRepository->create();
+        $newDocument->setOrderId($orderId);
+        $newDocument->setOrderTotal($this->order->getGrandTotal());
+
+        $newDocument->setInvoiceId($insertedDocument['document_id']);
+        $newDocument->setInvoiceTotal($insertedDocument['net_value']);
+        $newDocument->setInvoiceStatus($insertedDocument['status']);
+        $newDocument->setInvoiceDate(date('Y-m-d H:s:i'));
+        $newDocument->setInvoiceType($insertedDocument['document_type']['saft_code']);
+        $newDocument->setCompanyid($this->moloni->getSession()->companyId);
+        $newDocument->setMetadata(json_encode($this->document));
+
+        $this->documentsRepository->save($newDocument);
+    }
+
     /**
      * @param int $documentId
      * @param \Magento\Sales\Api\Data\OrderInterface $order
-     * @return bool|array
+     * @return bool
      */
-    private function validateDocument($documentId, $order)
+    private function validateDocumentTotals($documentId, $order)
     {
         $moloniDocument = $this->moloni->documents->getOne(["document_id" => $documentId]);
 
@@ -443,7 +539,33 @@ class Documents
         $magentoOrderTotal = $order->getGrandTotal();
 
         // If the difference is less than two cents (due to rounding values)
-        return (abs($magentoOrderTotal - $moloniDocumentTotal) < 0.02) ? $moloniDocument : false;
+        return (abs($magentoOrderTotal - $moloniDocumentTotal) < 0.02);
     }
 
+    /**
+     * @return void
+     */
+    public function throwMessages()
+    {
+        if (!empty($this->messages)) {
+            foreach ($this->messages as $type => $list) {
+                foreach ($list as $message) {
+                    switch ($type) {
+                        case 'complex_success':
+                            $this->messageManager->addComplexSuccessMessage('createDocumentSuccessMessage', $message);
+                            break;
+                        case 'complex_warning':
+                            $this->messageManager->addComplexWarningMessage('createDocumentSuccessMessage', $message);
+                            break;
+                        case 'warning':
+                            $this->messageManager->addWarningMessage($message);
+                            break;
+                        case 'error':
+                            $this->messageManager->addErrorMessage($message);
+                            break;
+                    }
+                }
+            }
+        }
+    }
 }

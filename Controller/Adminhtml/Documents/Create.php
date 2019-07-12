@@ -22,27 +22,9 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
-use Magento\Backend\App\Action\Context;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents as MoloniDocuments;
-use Magento\Framework\View\Result\PageFactory;
 
 class Create extends Documents
 {
-
-    protected $moloniDocuments;
-
-    public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory,
-        Moloni $moloni,
-        MoloniDocuments $moloniDocuments
-    )
-    {
-        parent::__construct($context, $resultPageFactory, $moloni);
-
-        $this->moloniDocuments = $moloniDocuments;
-    }
 
     public function execute()
     {
@@ -55,29 +37,46 @@ class Create extends Documents
 
         if (!$orderId) {
             $this->messageManager->addErrorMessage(__("Encomenda não encontrada."));
-            $this->_redirect('*/home/index');
+            $this->_redirect('moloni/home/index');
             return false;
         }
 
-        $document = $this->moloniDocuments->createDocumentFromOrderId($orderId);
-
-        if (!$document) {
-            $errorMessage = $this->moloni->errors->getErrors('first');
-            $this->messageManager->addErrorMessage($errorMessage['title']);
-            $this->_redirect('*/home/index');
+        if ($this->documentExists($orderId)) {
+            $this->_redirect('moloni/home/index');
             return false;
         }
 
-        $this->messageManager->addComplexSuccessMessage(
-            'createDocumentSuccessMessage',
-            [
-                'order_number' => $this->moloniDocuments->order->getIncrementId(),
-                'document_name' => $this->moloni->documents->documentTypeName,
-                'document_url' => $this->moloni->documents->getViewUrl($document['document_id'])
-            ]
-        );
+        $newDocument = $this->moloniDocumentsFactory->create();
+        $newDocument->createDocumentFromOrderId($orderId);
+        $newDocument->throwMessages();
 
         $this->_redirect('*/home/index');
         return true;
+    }
+
+    /**
+     * @param int $orderId
+     * @return bool
+     */
+    private function documentExists($orderId)
+    {
+        $forceDocumentCreation = $this->getRequest()->getParam('force') == 1;
+        $hasDocument = $this->documentsRepository->getByOrderId($orderId);
+        if ($hasDocument && !$forceDocumentCreation) {
+            $forceCreateUrlParams = ['order_id' => $orderId, 'force' => true];
+            $forceCreateUrl = $this->_url->getUrl('moloni/documents/create', $forceCreateUrlParams);
+
+            $this->messageManager->addComplexErrorMessage(
+                'createDocumentExistsMessage',
+                [
+                    'invoice_date' => $hasDocument[0]->getInvoiceDate(),
+                    'create_url' => $forceCreateUrl,
+                ]
+            );
+
+            return true;
+        }
+
+        return false;
     }
 }

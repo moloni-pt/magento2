@@ -21,13 +21,13 @@
 
 namespace Invoicing\Moloni\Model;
 
+use Invoicing\Moloni\Api\Data\DocumentsInterface;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\DataObject\IdentityInterface;
-use Invoicing\Moloni\Api\Data\SettingsInterface;
 
 class Documents extends AbstractModel implements
     IdentityInterface,
-    SettingsInterface
+    DocumentsInterface
 {
 
     const CACHE_TAG = 'moloni_documents';
@@ -35,6 +35,11 @@ class Documents extends AbstractModel implements
     public $cacheTag = 'moloni_documents';
     public $eventPrefix = 'moloni_documents';
 
+    /**
+     * Initialize resource model
+     *
+     * @return void
+     */
     public function _construct()
     {
         $this->_init(ResourceModel\Settings::class);
@@ -43,5 +48,114 @@ class Documents extends AbstractModel implements
     public function getIdentities()
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string|null
+     */
+    public function getInvoiceDate()
+    {
+        return $this->getData(self::INVOICE_DATE);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param int $companyId
+     * @return $this
+     */
+    public function setCompanyId($companyId)
+    {
+        return $this->setData(self::COMPANY_ID, $companyId);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param int $orderId
+     * @return $this
+     */
+    public function setOrderId($orderId)
+    {
+        return $this->setData(self::ORDER_ID, $orderId);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param float $orderTotal
+     * @return $this
+     */
+    public function setOrderTotal($orderTotal)
+    {
+        return $this->setData(self::ORDER_TOTAL, $orderTotal);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param int $invoiceId
+     * @return $this
+     */
+    public function setInvoiceId($invoiceId)
+    {
+        return $this->setData(self::INVOICE_ID, $invoiceId);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param float $invoiceTotal
+     * @return $this
+     */
+    public function setInvoiceTotal($invoiceTotal)
+    {
+        return $this->setData(self::INVOICE_TOTAL, $invoiceTotal);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param int $invoiceStatus
+     * @return $this
+     */
+    public function setInvoiceStatus($invoiceStatus)
+    {
+        return $this->setData(self::INVOICE_STATUS, $invoiceStatus);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param string $invoiceStatus
+     * @return $this
+     */
+    public function setInvoiceDate($invoiceDate)
+    {
+        return $this->setData(self::INVOICE_DATE, $invoiceDate);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param string
+     * @return $this
+     */
+    public function setMetadata($metadata)
+    {
+        return $this->setData(self::METADATA, $metadata);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param string $invoiceType
+     * @return $this
+     */
+    public function setInvoiceType($invoiceType)
+    {
+        return $this->setData(self::INVOICE_TYPE, $invoiceType);
     }
 }

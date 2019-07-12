@@ -23,9 +23,8 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
 
-class MassCreate extends Documents
+class MassRemove extends Documents
 {
-
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
@@ -34,6 +33,7 @@ class MassCreate extends Documents
         }
 
         $selectedOrders = $this->getRequest()->getParam('selected');
+
         if (!is_array($selectedOrders) || empty($selectedOrders)) {
             $this->messageManager->addErrorMessage(__("Não foram seleccionadas encomendas"));
             $this->_redirect('moloni/home/index');
@@ -41,26 +41,24 @@ class MassCreate extends Documents
         }
 
         foreach ($selectedOrders as $orderId) {
-            $this->moloni->errors->clearErrors();
+            try {
+                $newDocument = $this->documentsRepository->create();
+                $newDocument->setCompanyid($this->moloni->getSession()->companyId);
+                $newDocument->setOrderId($orderId);
+                $newDocument->setOrderTotal(0);
+                $newDocument->setInvoiceId(0);
+                $newDocument->setInvoiceTotal(0);
+                $newDocument->setInvoiceStatus(-1);
+                $newDocument->setInvoiceDate(date('Y-m-d H:s:i'));
+                $newDocument->setInvoiceType('Anulada');
+                $this->documentsRepository->save($newDocument);
 
-            /**
-             * @var $documentFactory \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents
-             */
-            $documentFactory = $this->moloniDocumentsFactory->create();
-            $document = $documentFactory->createDocumentFromOrderId($orderId);
+                $this->messageManager->addSuccessMessage(__("O documento %1 não irá ser gerado no Moloni.", $orderId));
 
-            if (!$document) {
-                $errorMessage = $this->moloni->errors->getErrors('first');
-                $this->messageManager->addErrorMessage($errorMessage['title']);
-            } else {
-                $this->messageManager->addComplexSuccessMessage(
-                    'createDocumentSuccessMessage',
-                    [
-                        'order_number' => $documentFactory->order->getIncrementId(),
-                        'document_name' => $this->moloni->documents->documentTypeName,
-                        'document_url' => $this->moloni->documents->getViewUrl($document['document_id'])
-                    ]
-                );
+            } catch (\Exception $exception) {
+                $this->messageManager->addErrorMessage($exception->getMessage());
+                $this->_redirect('moloni/home/index');
+                return false;
             }
         }
 
