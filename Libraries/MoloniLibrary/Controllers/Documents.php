@@ -177,14 +177,14 @@ class Documents
         if ($this->moloni->settings['shipping_document'] == 1) {
             $shippingDocument = $this->createShippingDocument();
             if (!$shippingDocument) {
-                $this->addError($this->moloni->errors->getErrors('first')['message']);
+                $this->addError($this->moloni->errors->getErrors('first')['title']);
                 return false;
             }
         }
 
         $result = $this->moloni->documents->setDocumentType()->insert($this->document);
         if (!isset($result['document_id'])) {
-            $this->addError($this->moloni->errors->getErrors('first')['message']);
+            $this->addError($this->moloni->errors->getErrors('first')['title']);
             return false;
         }
 
@@ -208,7 +208,9 @@ class Documents
                 "Documento emitido com sucesso",
                 [
                     'url' => $this->moloni->documents->getViewUrl($result['document_id']),
-                    'download_url' => $this->moloni->documents->getDownloadUrl(['document_id' => $result['document_id']])
+                    'download_url' => $this->moloni->documents->getDownloadUrl(
+                        ['document_id' => $result['document_id']]
+                    )
                 ]
             );
         }

@@ -51,9 +51,8 @@ class CreateAction extends Column
                     $item[$this->getData('name')] = [
                         'create' => [
                             'href' => $this->urlBuilder->getUrl($createUrlPath, [
-                                    $urlEntityParamName => $item['entity_id']
-                                ]
-                            ),
+                                $urlEntityParamName => $item['entity_id']
+                            ]),
                             'label' => __('Gerar')
                         ],
                     ];

@@ -53,30 +53,4 @@ class Create extends Documents
         $this->_redirect('*/home/index');
         return true;
     }
-
-    /**
-     * @param int $orderId
-     * @return bool
-     */
-    private function documentExists($orderId)
-    {
-        $forceDocumentCreation = $this->getRequest()->getParam('force') == 1;
-        $hasDocument = $this->documentsRepository->getByOrderId($orderId);
-        if ($hasDocument && !$forceDocumentCreation) {
-            $forceCreateUrlParams = ['order_id' => $orderId, 'force' => true];
-            $forceCreateUrl = $this->_url->getUrl('moloni/documents/create', $forceCreateUrlParams);
-
-            $this->messageManager->addComplexErrorMessage(
-                'createDocumentExistsMessage',
-                [
-                    'invoice_date' => $hasDocument[0]->getInvoiceDate(),
-                    'create_url' => $forceCreateUrl,
-                ]
-            );
-
-            return true;
-        }
-
-        return false;
-    }
 }

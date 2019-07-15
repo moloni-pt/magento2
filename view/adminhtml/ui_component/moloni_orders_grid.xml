@@ -223,6 +223,7 @@
                 <label translate="true">Status</label>
             </settings>
         </column>
+
         <actionsColumn name="document_create" class="Invoicing\Moloni\Ui\Component\Listing\Column\CreateAction">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

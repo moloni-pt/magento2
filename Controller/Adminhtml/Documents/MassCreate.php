@@ -43,24 +43,10 @@ class MassCreate extends Documents
         foreach ($selectedOrders as $orderId) {
             $this->moloni->errors->clearErrors();
 
-            /**
-             * @var $documentFactory \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents
-             */
-            $documentFactory = $this->moloniDocumentsFactory->create();
-            $document = $documentFactory->createDocumentFromOrderId($orderId);
-
-            if (!$document) {
-                $errorMessage = $this->moloni->errors->getErrors('first');
-                $this->messageManager->addErrorMessage($errorMessage['title']);
-            } else {
-                $this->messageManager->addComplexSuccessMessage(
-                    'createDocumentSuccessMessage',
-                    [
-                        'order_number' => $documentFactory->order->getIncrementId(),
-                        'document_name' => $this->moloni->documents->documentTypeName,
-                        'document_url' => $this->moloni->documents->getViewUrl($document['document_id'])
-                    ]
-                );
+            if (!$this->documentExists($orderId)) {
+                $newDocument = $this->moloniDocumentsFactory->create();
+                $newDocument->createDocumentFromOrderId($orderId);
+                $newDocument->throwMessages();
             }
         }
 

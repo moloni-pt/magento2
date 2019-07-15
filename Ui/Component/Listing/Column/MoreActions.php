@@ -75,6 +75,10 @@ class MoreActions extends Column
                                 ]
                             ),
                             'label' => __('Não gerar documento'),
+                            'confirm' => [
+                                'title' => __('Não gerar documento'),
+                                'message' => __('Tem a certeza que não quer gerar o documento?')
+                            ],
                         ]
                     ];
                 }

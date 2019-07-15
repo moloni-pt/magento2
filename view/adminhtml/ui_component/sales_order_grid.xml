@@ -2,13 +2,11 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <listingToolbar name="listing_top"/>
     <columns name="sales_order_columns">
-        <column name="moloni" class="\Invoicing\Moloni\Ui\Component\Listing\Column\Moloni">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="visible" xsi:type="boolean">true</item>
-                    <item name="label" xsi:type="string" translate="true">Moloni</item>
-                </item>
-            </argument>
-        </column>
+        <actionsColumn name="document_create" class="\Invoicing\Moloni\Ui\Component\Listing\Column\Moloni">
+            <settings>
+                <indexField>entity_id</indexField>
+                <label translate="true">Moloni</label>
+            </settings>
+        </actionsColumn>
     </columns>
 </listing>
