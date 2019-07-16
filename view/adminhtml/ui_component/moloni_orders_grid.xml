@@ -11,7 +11,7 @@
             <button name="add">
                 <url path="*/*/*"/>
                 <class>primary</class>
-                <label translate="true">Ainda não sei o que fazer</label>
+                <label translate="true">Botão</label>
             </button>
         </buttons>
         <spinner>moloni_orders_grid_columns</spinner>

@@ -95,14 +95,14 @@
                     <item name="dataType" xsi:type="string">boolean</item>
                     <item name="formElement" xsi:type="string">checkbox</item>
                     <item name="prefer" xsi:type="string">toggle</item>
-                    <item name="label" xsi:type="string" translate="true">Enviar email</item>
+                    <item name="label" xsi:type="string" translate="true">Enviar e-mail</item>
                     <item name="valueMap" xsi:type="array">
                         <item name="true" xsi:type="string">1</item>
                         <item name="false" xsi:type="string">0</item>
                     </item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
-                            O email só enviado se o documento for correctamente inserido como fechado.
+                            O e-mail só enviado se o documento for correctamente inserido como fechado.
                         </item>
                     </item>
                 </item>
@@ -122,7 +122,7 @@
                     </item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
-                            Emitir automaticamente um documento de transporte.
+                            Emitir automaticamente uma guia de transporte juntamente com o tipo de documento de venda escolhido e criar a associação entre ambos.
                         </item>
                     </item>
                 </item>
@@ -171,21 +171,21 @@
             </argument>
         </field>
 
-        <field name="delivery_departure_city">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Cidade de carga</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                </item>
-            </argument>
-        </field>
-
         <field name="delivery_departure_zip_code">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Código Postal de carga</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="delivery_departure_city">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Localidade de carga</item>
                     <item name="formElement" xsi:type="string">input</item>
                 </item>
             </argument>
@@ -223,7 +223,7 @@
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
                             Unidade de medida por defeito a ser aplicada aos artigos. Pode a qualquer altura trocar a
-                            unidade de medida nos artigos no Moloni
+                            unidade de medida dos artigos no Moloni
                         </item>
                     </item>
                 </item>
@@ -258,8 +258,8 @@
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
-                            Se os artigos da sua loja online estiverem criados já com IVA incluído, pode seleccionar a
-                            taxa de IVA que o plugin vai usar.
+                            Se numa encomenda os artigos não tiverem uma taxa de IVA associada,
+                            irá ser aplicada o motivo de isenção seleccionada.
                         </item>
                     </item>
                 </item>
@@ -294,15 +294,16 @@
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
-                            Se os portes da encomenda não tiverem uma taxa de IVA, terá que seleccionar uma razão de
-                            isenção.
+                            Se numa encomenda os portes não tiverem uma taxa de IVA associada,
+                            irá ser aplicada o motivo de isenção seleccionada.
                         </item>
                     </item>
                 </item>
             </argument>
         </field>
 
-        <field name="products_auto_create">
+        <!--
+           <field name="products_auto_create">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">boolean</item>
@@ -320,7 +321,7 @@
                     </item>
                 </item>
             </argument>
-        </field>
+        </field> -->
     </fieldset>
 
 
@@ -409,7 +410,7 @@
                     </item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">
-                            Os preços do Magento são actualizados com base preços do Moloni a cada minuto.
+                            Os preços do Magento são actualizados com base nos preços do Moloni a cada minuto.
                         </item>
                     </item>
                 </item>

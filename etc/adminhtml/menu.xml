@@ -11,7 +11,7 @@
            resource="Invoicing_Moloni::home"/>
 
       <add id="Invoicing_Moloni::home"
-           title="Início"
+           title="Encomendas"
            translate="title"
            module="Invoicing_Moloni"
            parent="Invoicing_Moloni::title"
@@ -21,7 +21,7 @@
            resource="Invoicing_Moloni::title"/>
 
         <add id="Invoicing_Moloni::documents"
-             title="Documents"
+             title="Documentos"
              translate="title"
              module="Invoicing_Moloni"
              parent="Invoicing_Moloni::title"
@@ -31,7 +31,7 @@
              resource="Invoicing_Moloni::documents"/>
 
       <add id="Invoicing_Moloni::settings"
-           title="Settings"
+           title="Configurações"
            translate="title"
            module="Invoicing_Moloni"
            parent="Invoicing_Moloni::title"
