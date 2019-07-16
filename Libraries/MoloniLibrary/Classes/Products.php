@@ -44,6 +44,47 @@ class Products
         }
     }
 
+    public function getModifiedSinceAll($values, $companyId = false)
+    {
+        if (!isset($values['lastmodified'])) {
+            return [];
+        }
+
+        $results = [];
+        $loopCounter = 0;
+        $resultsCounter = 50;
+
+        while ($resultsCounter > 0) {
+            $values['offset'] = count($results);
+            $products = $this->getModifiedSince($values, $companyId);
+            $results = array_merge($results, $products);
+            $resultsCounter = count($products);
+            $loopCounter++;
+            // 1500 Products
+            if ($loopCounter > 30) {
+                break;
+            }
+        }
+
+        return $results;
+    }
+
+    public function getModifiedSince($values, $companyId)
+    {
+        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $result = $this->moloni->execute("products/getModifiedSince", $values);
+        if (is_array($result) && !isset($result['error'])) {
+            return $result;
+        } else {
+            $this->moloni->errors->throwError(
+                __("Erro ao aceder aos artigos"),
+                __(json_encode($result, JSON_PRETTY_PRINT)),
+                __CLASS__ . "/" . __FUNCTION__
+            );
+            return [];
+        }
+    }
+
     /**
      * @param array $values
      * @param int|bool $companyId
@@ -61,6 +102,7 @@ class Products
         }
 
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['exact'] = true;
         $result = $this->moloni->execute("products/getByReference", $values);
 
         $this->store[__FUNCTION__][$values['reference']] = $result;

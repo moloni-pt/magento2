@@ -39,6 +39,7 @@ class Save extends Settings
             $settings = array_merge($settings, $this->getRequest()->getParam('general'));
             $settings = array_merge($settings, $this->getRequest()->getParam('products'));
             $settings = array_merge($settings, $this->getRequest()->getParam('orders'));
+            $settings = array_merge($settings, $this->getRequest()->getParam('sync'));
             $companyId = $this->moloni->session->companyId;
 
             foreach ($settings as $label => $value) {

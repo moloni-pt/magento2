@@ -74,6 +74,11 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
             "orders_statuses" => $this->moloni->settings['orders_statuses'],
         ];
 
+        $this->loadedData['0']['sync'] = [
+            "products_sync_stock" => $this->moloni->settings['products_sync_stock'],
+            "products_sync_price" => $this->moloni->settings['products_sync_price'],
+        ];
+
         /*if (is_array($this->moloni->settings) && !empty($this->moloni->settings)) {
             foreach ($this->moloni->settings as $option => $value) {
                 // Lazy way for not setting each one individually

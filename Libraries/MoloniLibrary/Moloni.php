@@ -81,6 +81,7 @@ class Moloni implements MoloniApiRepositoryInterface
         'products_at_category' => 'M',
         'products_auto_create' => '0',
         'products_sync_stock' => '0',
+        'products_sync_price' => '0',
         'products_tax' => '0',
         'products_tax_exemption' => '',
 
@@ -89,6 +90,8 @@ class Moloni implements MoloniApiRepositoryInterface
 
         'orders_since' => '2019-01-01 00:00:00',
         'orders_statuses' => [],
+
+        'cron_date' => false
     ];
 
     public function __construct(

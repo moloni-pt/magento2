@@ -61,6 +61,11 @@ class Products
      */
     private $taxHelper;
 
+    /**
+     * @var bool
+     */
+    public $productInserted = false;
+
     public function __construct(
         ProductRepositoryInterface $productRepository,
         CategoryCollectionFactory $categoryCollectionFactory,
@@ -187,6 +192,62 @@ class Products
         return $product;
     }
 
+
+    /**
+     * @param int $productId
+     * @return int|bool
+     */
+    public function syncProductFromId($productId)
+    {
+        try {
+            $product = $this->productRepository->getById($productId);
+            $sku = $product->getSku();
+
+            $moloniProduct = $this->moloni->products->getByReference(['reference' => $sku]);
+            if (!$moloniProduct[0]) {
+                $productId = $this->createProductFromId($productId);
+                if ($productId > 0) {
+                    return $productId;
+                }
+            } else {
+                return $this->syncProductFromMoloni($moloniProduct[0]);
+            }
+
+        } catch (\Exception $e) {
+            $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $moloniProduct
+     * @return bool
+     */
+    public function syncProductFromMoloni($moloniProduct)
+    {
+        if (!isset($moloniProduct['reference'])) {
+            return false;
+        }
+
+        try {
+            $product = $this->productRepository->get($moloniProduct['reference']);
+
+            if ($this->moloni->settings['products_sync_price']) {
+                $product->setPrice($moloniProduct['price']);
+            }
+
+            if ($this->moloni->settings['products_sync_stock']) {
+                $product->getExtensionAttributes()->getStockItem()->setQty($moloniProduct['stock']);
+            }
+
+            $product->save();
+            return $moloniProduct['product_id'];
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+            return false;
+        }
+    }
+
     /**
      * @param $productId
      * @param bool $orderProduct
@@ -240,7 +301,9 @@ class Products
             $taxClassId = $product->getTaxClassId();
             $defaultTaxRate = $this->taxHelper->getCalculatedRate($taxClassId);
 
-            if ($defaultTaxRate > 0) {
+            if ($this->moloni->settings['products_tax'] > 0) {
+                $this->parseProductTaxes($moloniProduct);
+            } elseif ($defaultTaxRate > 0) {
                 $moloniProduct['taxes'][] = [
                     'tax_id' => $this->getTaxIdFromRate($defaultTaxRate),
                     'value' => $defaultTaxRate,
@@ -253,6 +316,7 @@ class Products
 
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
+            $this->productInserted = true;
 
             return $insertedProduct['product_id'];
 
@@ -308,6 +372,7 @@ class Products
 
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
+            $this->productInserted = true;
             return $insertedProduct['product_id'];
 
         } catch (\Exception $e) {

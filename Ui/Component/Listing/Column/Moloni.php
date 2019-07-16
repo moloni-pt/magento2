@@ -3,17 +3,14 @@
 namespace Invoicing\Moloni\Ui\Component\Listing\Column;
 
 use Magento\Framework\UrlInterface;
-use \Magento\Sales\Api\OrderRepositoryInterface;
 use \Magento\Framework\View\Element\UiComponent\ContextInterface;
 use \Magento\Framework\View\Element\UiComponentFactory;
 use \Magento\Ui\Component\Listing\Columns\Column;
-use \Magento\Framework\Api\SearchCriteriaBuilder;
 use Invoicing\Moloni\Model\DocumentsRepository;
-
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni as MoloniLibrary;
 
 class Moloni extends Column
 {
-    protected $orderRepository;
     protected $searchCriteria;
 
     /**
@@ -34,18 +31,14 @@ class Moloni extends Column
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $criteria,
         UrlInterface $urlBuilder,
         DocumentsRepository $documentsRepository,
-        Moloni $moloni,
+        MoloniLibrary $moloni,
         array $components = [],
         array $data = []
     )
     {
         $this->documentsRepository = $documentsRepository;
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteria = $criteria;
         $this->urlBuilder = $urlBuilder;
         $this->moloni = $moloni;
         parent::__construct($context, $uiComponentFactory, $components, $data);
@@ -64,16 +57,24 @@ class Moloni extends Column
         return $dataSource;
     }
 
+    /**
+     * @param int $orderId
+     * @return array
+     */
     private function getOptions($orderId)
     {
         $moloniLog = $this->hasMoloniLog($orderId);
         if (!$moloniLog) {
             return $this->getMoloniCreateObject($orderId);
         } else {
-            return $this->getMoloniMoreActionsObject($moloniLog);
+            return $this->getMoloniMoreActionsObject();
         }
     }
 
+    /**
+     * @param int $orderId
+     * @return bool|\Invoicing\Moloni\Api\Data\DocumentsInterface[]|\Magento\Framework\Api\AbstractExtensibleObject[]
+     */
     private function hasMoloniLog($orderId)
     {
         $hasDocument = $this->documentsRepository->getByOrderId($orderId);
@@ -83,6 +84,10 @@ class Moloni extends Column
         return $hasDocument;
     }
 
+    /**
+     * @param int $orderId
+     * @return array
+     */
     private function getMoloniCreateObject($orderId)
     {
         return [
@@ -93,8 +98,11 @@ class Moloni extends Column
         ];
     }
 
-    private function getMoloniMoreActionsObject($moloniDocumentId)
+    /**
+     * @return array
+     */
+    private function getMoloniMoreActionsObject()
     {
-
+        return [];
     }
 }

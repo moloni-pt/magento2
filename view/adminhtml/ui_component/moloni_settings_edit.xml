@@ -367,6 +367,54 @@
                 </item>
             </argument>
         </field>
+    </fieldset>
+
+    <fieldset name="sync">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Sincronização</item>
+            </item>
+        </argument>
+
+        <field name="products_sync_stock">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Sincronizar Stocks</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Os stocks do Magento são sincronizados com base nos stocks do Moloni a cada minuto.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="products_sync_price">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Sincronizar Preços</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Os preços do Magento são actualizados com base preços do Moloni a cada minuto.
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
 
     </fieldset>
 
