@@ -66,7 +66,7 @@ class Documents extends AbstractModel implements
      * @param int $companyId
      * @return $this
      */
-    public function setCompanyId($companyId)
+    public function setCompanyId(int $companyId)
     {
         return $this->setData(self::COMPANY_ID, $companyId);
     }
