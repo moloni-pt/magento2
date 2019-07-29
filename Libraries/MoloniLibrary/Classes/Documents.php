@@ -35,39 +35,68 @@ class Documents
      */
     public function setDocumentType($documentType = false)
     {
-        if ($documentType) {
-            $this->documentTypeClass = $documentType;
-        } else {
-            $this->documentTypeClass = $this->moloni->settings['document_type'];
+        if (!$documentType) {
+            $documentType = $this->moloni->settings['document_type'];
         }
 
 
-        switch ($this->documentTypeClass) {
+        switch ($documentType) {
             case "invoices":
+            case "Fatura":
+            case "Faturas":
+            case "1":
+                $this->documentTypeId = 1;
+                $this->documentTypeClass = "invoices";
                 $this->documentTypeName = 'Fatura';
                 $this->documentTypeClassMoloni = 'Faturas';
                 break;
+
             case "invoiceReceipts":
+            case "Fatura/Recibo":
+            case "FaturasRecibo":
+            case "27":
+                $this->documentTypeId = 27;
+                $this->documentTypeClass = "invoiceReceipts";
                 $this->documentTypeName = 'Fatura/Recibo';
                 $this->documentTypeClassMoloni = 'FaturasRecibo';
                 break;
 
             case "simplifiedInvoices":
+            case "Fatura Simplificada":
+            case "FaturaSimplificada":
+            case "21":
+                $this->documentTypeId = 21;
+                $this->documentTypeClass = "simplifiedInvoices";
                 $this->documentTypeName = 'Fatura Simplificada';
                 $this->documentTypeClassMoloni = 'FaturaSimplificada';
                 break;
 
             case "billsOfLading":
+            case "Guia de Transporte":
+            case "GuiasTransporte":
+            case "15":
+                $this->documentTypeId = "15";
+                $this->documentTypeClass = "billsOfLading";
                 $this->documentTypeName = 'Guia de Transporte';
                 $this->documentTypeClassMoloni = 'GuiasTransporte';
                 break;
 
             case "deliveryNotes":
+            case "Nota de encomenda":
+            case "NotasEncomenda":
+            case "28":
+                $this->documentTypeId = "28";
+                $this->documentTypeClass = "deliveryNotes";
                 $this->documentTypeName = 'Nota de encomenda';
                 $this->documentTypeClassMoloni = 'NotasEncomenda';
                 break;
 
             case "estimates":
+            case "Orçamento":
+            case "Orcamentos":
+            case "14":
+                $this->documentTypeId = "14";
+                $this->documentTypeClass = "estimates";
                 $this->documentTypeName = 'Orçamento';
                 $this->documentTypeClassMoloni = 'Orcamentos';
                 break;
@@ -149,7 +178,7 @@ class Documents
         }
 
         $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
-        $result = $this->moloni->execute($this->documentTypeClass . "/getOne", $values);
+        $result = $this->moloni->execute("documents/getOne", $values);
 
         $this->store[$values['document_id']] = $result;
 

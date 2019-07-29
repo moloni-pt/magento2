@@ -67,7 +67,7 @@ class Moloni extends Column
         if (!$moloniLog) {
             return $this->getMoloniCreateObject($orderId);
         } else {
-            return $this->getMoloniMoreActionsObject();
+            return $this->getMoloniMoreActionsObject($moloniLog);
         }
     }
 
@@ -93,16 +93,84 @@ class Moloni extends Column
         return [
             'create' => [
                 'href' => $this->urlBuilder->getUrl("moloni/documents/create", ['order_id' => $orderId]),
-                'label' => __('Gerar')
+                'label' => __('Gerar'),
+                'target' => '_BLANK'
             ],
         ];
     }
 
     /**
+     * @param \Invoicing\Moloni\Api\Data\DocumentsInterface[]|\
+     * Magento\Framework\Api\AbstractExtensibleObject[] $moloniLog
      * @return array
      */
-    private function getMoloniMoreActionsObject()
+    private function getMoloniMoreActionsObject($moloniLog)
     {
-        return [];
+        $options = [];
+        if (!$this->moloni->checkActiveSession()) {
+            return $options;
+        }
+
+        $documentId = $moloniLog[0]->getInvoiceId();
+        $moloniDocument = $this->moloni->documents->getOne(['document_id' => $documentId]);
+        if ($moloniDocument) {
+            $documentTypeId = $moloniDocument['document_type']['document_type_id'];
+            if ($moloniDocument['status'] == 1) {
+                $moloniDocument = $this->moloni->documents->setDocumentType($documentTypeId);
+
+                $options = [
+                    'download' => [
+                        'href' => $moloniDocument->getDownloadUrl(['document_id' => $documentId]),
+                        'label' => __('Descarregar documento'),
+                        'target' => '_BLANK'
+                    ],
+                    'view' => [
+                        'href' => $moloniDocument->getViewUrl($documentId),
+                        'label' => __('Ver documento'),
+                        'target' => '_BLANK'
+                    ],
+                    'create' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            "moloni/documents/create",
+                            ['order_id' => $moloniLog[0]->getOrderId(), 'force' => 1]
+                        ),
+                        'label' => __('Gerar novamente'),
+                        'target' => '_BLANK'
+                    ],
+                ];
+            } elseif ($moloniDocument['status'] == 0) {
+                $moloniDocumentEditUrl = $this->moloni->documents->setDocumentType($documentTypeId)
+                    ->getEditUrl($documentId);
+
+                $options = [
+                    'edit' => [
+                        'href' => $moloniDocumentEditUrl,
+                        'label' => __('Editar documento'),
+                        'target' => '_BLANK'
+                    ],
+                    'create' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            "moloni/documents/create",
+                            ['order_id' => $moloniLog[0]->getOrderId(), 'force' => 1]
+                        ),
+                        'label' => __('Gerar novamente'),
+                        'target' => '_BLANK'
+                    ],
+                ];
+            } else {
+                $options = [
+                    'create' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            "moloni/documents/create",
+                            ['order_id' => $moloniLog[0]->getOrderId(), 'force' => 1]
+                        ),
+                        'label' => __('Gerar novamente'),
+                        'target' => '_BLANK'
+                    ],
+                ];
+            }
+        }
+
+        return $options;
     }
 }

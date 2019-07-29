@@ -6,7 +6,6 @@ use \Invoicing\Moloni\Logger\Logger;
 use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
 
-
 class ProductsSync
 {
 
@@ -30,8 +29,6 @@ class ProductsSync
         Logger $logger,
         Moloni $moloni,
         MoloniProductsFactory $productsFactory
-
-
     )
     {
         $this->logger = $logger;
