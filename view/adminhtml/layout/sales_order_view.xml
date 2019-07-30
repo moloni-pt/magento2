@@ -1,18 +1,24 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="sales_order_transactions_grid_block"/>
+    <head>
+        <link src="Magento_Sales::js/bootstrap/order-create-index.js"/>
+        <link src="Magento_Sales::js/bootstrap/order-post-action.js"/>
+    </head>
+    <update handle="sales_order_item_price"/>
     <body>
         <referenceContainer name="left">
             <referenceBlock name="sales_order_tabs">
-                <block class="Invoicing\Moloni\Block\Adminhtml\Order\View\Tab\Documents" name="sales_order_documents.grid.container"/>
+                <block class="Invoicing\Moloni\Block\Adminhtml\Order\View\Tab\Documents" name="sales_order_view_document.grid.container"/>
                 <action method="addTabAfter">
                     <argument name="name" xsi:type="string">moloni_documents</argument>
-                    <argument name="block" xsi:type="string">sales_order_documents.grid.container</argument>
+                    <argument name="block" xsi:type="string">sales_order_view_document.grid.container</argument>
                     <argument name="after" xsi:type="string">order_invoices</argument>
                 </action>
             </referenceBlock>
-            <referenceBlock name="sales_order_documents.grid.container">
-                <uiComponent name="orders_documents_grid"/>
-            </referenceBlock>
         </referenceContainer>
+        <referenceBlock name="sales_order_view_document.grid.container">
+            <uiComponent name="sales_order_view_document_grid"/>
+        </referenceBlock>
     </body>
 </page>

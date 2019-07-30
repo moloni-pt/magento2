@@ -36,8 +36,7 @@
             <argument name="mainTable" xsi:type="string">sales_order</argument>
             <argument name="eventPrefix" xsi:type="string">invoicing_moloni_grid_collection</argument>
             <argument name="eventObject" xsi:type="string">invoicing_moloni_collection</argument>
-            <argument name="resourceModel" xsi:type="string">Magento\Sales\Model\ResourceModel\Order
-            </argument>
+            <argument name="resourceModel" xsi:type="string">Magento\Sales\Model\ResourceModel\Order</argument>
         </arguments>
     </type>
 
@@ -48,7 +47,7 @@
             </argument>
         </arguments>
     </type>
-
+    
     <!-- Custom Moloni Logger -->
     <type name="Invoicing\Moloni\Logger\Handler">
         <arguments>

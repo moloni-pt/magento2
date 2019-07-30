@@ -82,33 +82,12 @@ class OrderDocumentsProvider extends AbstractDataProvider
      */
     public function getData()
     {
-        $documentsList = [];
-        try {
-            $documentsList = [['entity_name' => print_r($this->request->getParams(), true), 'entity_vat' => print_r($this->data, true)]];
-            /*$incrementId = $this->getOrder()->getIncrementId();
-
-            if ((int)$incrementId > 0) {
-               /* if ($this->moloni->checkActiveSession()) {
-
-                    //$moloniDocuments = $this->moloni->documents->setDocumentType('documents');
-                    //$documentsList = $moloniDocuments->getAll(['status' => 1, 'your_reference' => $incrementId]);
-
-                    /*foreach ($documentsList as &$document) {
-                        if ($document['status'] == 1) {
-                            $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
-                            $documentDownloadUrl = $currentDocumentType->getDownloadUrl(['document_id' => $document['document_id']]);
-                            $document['document_type_name'] = $currentDocumentType->documentTypeName;
-
-                            if ($documentDownloadUrl) {
-                                $document['download_url'] = $documentDownloadUrl;
-                            }
-                        }
-                    }*/
-            //}
-            //}
-        } catch (\Exception $ex) {
-
-        }
+        $documentsList = [
+            [
+                'entity_name' => print_r($this->request->getParams(), true),
+                'entity_vat' => print_r($this->data, true)
+            ]
+        ];
 
         return [
             'totalRecords' => count($documentsList),
