@@ -59,7 +59,7 @@
     <type name="Invoicing\Moloni\Logger\Logger">
         <arguments>
             <argument name="name" xsi:type="string">moloni</argument>
-            <argument name="handlers"  xsi:type="array">
+            <argument name="handlers" xsi:type="array">
                 <item name="system" xsi:type="object">Invoicing\Moloni\Logger\Handler</item>
             </argument>
         </arguments>

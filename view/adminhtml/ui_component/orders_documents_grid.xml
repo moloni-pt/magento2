@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">orders_documents_grid.orders_documents_grid_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>orders_documents_grid_columns</spinner>
+        <deps>
+            <dep>orders_documents_grid.orders_documents_grid_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="orders_documents_grid_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <dataProvider class="Invoicing\Moloni\Ui\DataProvider\OrderDocumentsProvider" name="orders_documents_grid_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <columns name="orders_documents_grid_columns">
+        <column name="entity_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Nome</label>
+            </settings>
+        </column>
+
+        <column name="entity_vat">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Contribuinte</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

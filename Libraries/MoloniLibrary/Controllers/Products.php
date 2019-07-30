@@ -515,6 +515,7 @@ class Products
 
     /**
      * @param array $moloniProduct
+     * @param int $taxId
      */
     private function parseProductTaxes(&$moloniProduct, $taxId = 0)
     {
@@ -532,6 +533,8 @@ class Products
             if ($tax) {
                 // Percentage
                 if ($tax['type'] == 1) {
+                    $tax['order'] = 0;
+                    $tax['cumulative'] = 0;
                     if (!empty($tax['exemption_reason'])) {
                         unset($moloniProduct['taxes']);
                         $moloniProduct['exemption_reason'] = $tax['exemption_reason'];

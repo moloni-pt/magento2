@@ -201,7 +201,17 @@ class Documents
         }
 
         if ($this->moloni->settings['document_status'] == 1 && $hasValidTotals) {
-            $result = $this->moloni->documents->update(['document_id' => $result['document_id'], 'status' => 1]);
+            $update = ['document_id' => $result['document_id'], 'status' => 1];
+
+            if ($this->moloni->settings['document_email'] && !empty($this->order->getCustomerEmail())) {
+                $update['send_email'][] = [
+                    'email' => $this->order->getCustomerEmail(),
+                    'name' => $this->order->getCustomerFirstname() . ' ' . $this->order->getCustomerLastname(),
+                    'message' => ''
+                ];
+            }
+
+            $result = $this->moloni->documents->update($update);
 
 
             $this->addComplexSuccess(

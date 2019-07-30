@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales.order.info.links">
+            <block class="Magento\Sales\Block\Order\Link" name="sales.order.info.links.moloni.documents" after="sales.order.info.links.information">
+                <arguments>
+                    <argument name="key" xsi:type="string">Documents</argument>
+                    <argument name="path" xsi:type="string">moloni/documents/view</argument>
+                    <argument name="label" xsi:type="string" translate="true">Documents</argument>
+                    <argument name="after" xsi:type="string">sales.order.info.links.information</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

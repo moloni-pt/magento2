@@ -1,0 +1,43 @@
+<div class="order-details-items documents">
+    <?php $orderDocuments = $block->getOrderDocuments(); ?>
+    <?php if (is_array($orderDocuments) && !empty($orderDocuments)) : ?>
+        <div class="order-items table-wrapper table-order-items documents">
+            <table class="data table table-order-items documents">
+                <caption class="table-caption"><?= __('Documentos da encomenda') ?></caption>
+                <thead>
+
+                <tr>
+                    <th class="col name"><?= __('Nome') ?></th>
+                    <th class="col sku"><?= __('Contribuinte') ?></th>
+                    <th class="col sku"><?= __('Documento') ?></th>
+                    <th class="col price"><?= __('Total') ?></th>
+                    <th class="col qty"><?= __('Taxas') ?></th>
+                    <th class="col subtotal"><?= __('Descarregar') ?></th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <?php foreach ($orderDocuments as $document): ?>
+                    <tr>
+                        <td><b><?= $document['entity_name'] ?></b><br><?= $document['entity_address'] ?></td>
+                        <td><?php echo $document['entity_vat']; ?></td>
+                        <td><?= $document['document_type_name'] ?></td>
+                        <td class="col price"><?= round($document['net_value'], 2) ?>€</td>
+                        <td class="col price"><?= round($document['taxes_value'], 2) ?>€</td>
+                        <td class="col qty">
+                            <a href="<?= $document['download_url'] ?>"
+                               target="_blank"><?php echo __('Descarregar') ?>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+                </tbody>
+            </table>
+        </div>
+    <?php else: ?>
+        <?= __("Não foram encontrados documentos associados a esta encomenda"); ?>
+    <?php endif; ?>
+</div>
+

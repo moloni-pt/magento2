@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="left">
+            <referenceBlock name="sales_order_tabs">
+                <block class="Invoicing\Moloni\Block\Adminhtml\Order\View\Tab\Documents" name="sales_order_documents.grid.container"/>
+                <action method="addTabAfter">
+                    <argument name="name" xsi:type="string">moloni_documents</argument>
+                    <argument name="block" xsi:type="string">sales_order_documents.grid.container</argument>
+                    <argument name="after" xsi:type="string">order_invoices</argument>
+                </action>
+            </referenceBlock>
+            <referenceBlock name="sales_order_documents.grid.container">
+                <uiComponent name="orders_documents_grid"/>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>

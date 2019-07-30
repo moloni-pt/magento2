@@ -41,6 +41,11 @@ class Documents
 
 
         switch ($documentType) {
+            case 'documents':
+            case '-1':
+                $this->documentTypeId = -1;
+                $this->documentTypeClass = "documents";
+                break;
             case "invoices":
             case "Fatura":
             case "Faturas":
@@ -148,12 +153,14 @@ class Documents
     }
 
     /**
+     * @param array $values
      * @param bool|int $companyId
      * @return bool|mixed
      */
-    public function getAll($companyId = false)
+    public function getAll($values = [], $companyId = false)
     {
-        $values = ["company_id" => ($companyId ? $companyId : $this->moloni->session->companyId)];
+        $values["company_id"] = $companyId ? $companyId : $this->moloni->session->companyId;
+
         $result = $this->moloni->execute($this->documentTypeClass . "/getAll", $values);
         if (is_array($result) && isset($result[0]['document_id'])) {
             return $result;
