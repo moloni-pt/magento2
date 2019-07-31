@@ -44,10 +44,12 @@
         <arguments>
             <argument name="collections" xsi:type="array">
                 <item name="moloni_orders_grid_data_source" xsi:type="string">Invoicing\Moloni\Model\ResourceModel\Orders\Collection</item>
+                <item name="sales_order_view_document_grid_data_source" xsi:type="string">Invoicing\Moloni\Model\ResourceModel\Documents\Grid\Collection</item>
             </argument>
         </arguments>
     </type>
-    
+
+
     <!-- Custom Moloni Logger -->
     <type name="Invoicing\Moloni\Logger\Handler">
         <arguments>

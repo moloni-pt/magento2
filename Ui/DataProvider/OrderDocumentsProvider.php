@@ -9,11 +9,15 @@
 namespace Invoicing\Moloni\Ui\DataProvider;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\App\Request\Http;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\ReportingInterface;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\App\RequestInterface;
 
-class OrderDocumentsProvider extends AbstractDataProvider
+class OrderDocumentsProvider extends DataProvider
 {
     /**
      * @var \Magento\Ui\DataProvider\AddFieldToCollectionInterface[]
@@ -41,12 +45,17 @@ class OrderDocumentsProvider extends AbstractDataProvider
     private $moloni;
 
     /**
-     * Construct
+     * OrderDocumentsProvider constructor.
      *
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param Http $request
+     * @param ReportingInterface $reporting
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param RequestInterface $request
+     * @param FilterBuilder $filterBuilder
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Moloni $moloni
      * @param array $meta
      * @param array $data
      */
@@ -54,7 +63,10 @@ class OrderDocumentsProvider extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        Http $request,
+        ReportingInterface $reporting,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        RequestInterface $request,
+        FilterBuilder $filterBuilder,
         OrderRepositoryInterface $orderRepository,
         Moloni $moloni,
         array $meta = [],
@@ -65,7 +77,7 @@ class OrderDocumentsProvider extends AbstractDataProvider
         $this->moloni = $moloni;
         $this->orderRepository = $orderRepository;
         $this->data = $data;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $reporting, $searchCriteriaBuilder, $request, $filterBuilder, $meta, $data);
     }
 
     /**
@@ -82,12 +94,40 @@ class OrderDocumentsProvider extends AbstractDataProvider
      */
     public function getData()
     {
-        $documentsList = [
-            [
-                'entity_name' => print_r($this->request->getParams(), true),
-                'entity_vat' => print_r($this->data, true)
-            ]
-        ];
+
+        $documentsList = [];
+        $incrementId = $this->getOrder()->getIncrementId();
+        if (!empty($incrementId)) {
+            if ($this->moloni->checkActiveSession()) {
+                $moloniDocuments = $this->moloni->documents->setDocumentType('documents');
+                $documentsList = $moloniDocuments->getAll(['your_reference' => $incrementId]);
+
+                foreach ($documentsList as &$document) {
+                    $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
+                    $document['document_type_name'] = $currentDocumentType->documentTypeName;
+                    $document['document_set'] = $currentDocumentType->documentTypeName . ' ' . $document['document_set_name'] . '/' . $document['number'];
+                    $document['document_date'] = date("Y-m-d", strtotime($document['date']));
+                    $document['net_value'] = $document['net_value'] . '€';
+                    $document['download_url'] = '';
+
+                    if ($document['status'] == 1) {
+                        $document['status_name'] = __("Fechado");
+                        $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
+                        $documentDownloadUrl = $currentDocumentType->getDownloadUrl(['document_id' => $document['document_id']]);
+                        if ($documentDownloadUrl) {
+                            $document['download_url'] = $documentDownloadUrl;
+                        }
+                    } elseif ($document['status'] == 0) {
+                        $document['status_name'] = __("Rascunho");
+                        $document['view_url'] = $currentDocumentType->getEditUrl($document['document_id']);
+                    } else {
+                        $document['status_name'] = __("Anulado");
+                        $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
+                    }
+                }
+            }
+
+        }
 
         return [
             'totalRecords' => count($documentsList),
