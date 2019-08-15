@@ -100,29 +100,32 @@ class OrderDocumentsProvider extends DataProvider
         if (!empty($incrementId)) {
             if ($this->moloni->checkActiveSession()) {
                 $moloniDocuments = $this->moloni->documents->setDocumentType('documents');
-                $documentsList = $moloniDocuments->getAll(['your_reference' => $incrementId]);
+                $documentsListSearch = $moloniDocuments->getAll(['your_reference' => $incrementId]);
 
-                foreach ($documentsList as &$document) {
-                    $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
-                    $document['document_type_name'] = $currentDocumentType->documentTypeName;
-                    $document['document_set'] = $currentDocumentType->documentTypeName . ' ' . $document['document_set_name'] . '/' . $document['number'];
-                    $document['document_date'] = date("Y-m-d", strtotime($document['date']));
-                    $document['net_value'] = $document['net_value'] . '€';
-                    $document['download_url'] = '';
+                if (is_array($documentsListSearch)) {
+                    $documentsList = $documentsListSearch;
+                    foreach ($documentsList as &$document) {
+                        $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
+                        $document['document_type_name'] = $currentDocumentType->documentTypeName;
+                        $document['document_set'] = $currentDocumentType->documentTypeName . ' ' . $document['document_set_name'] . '/' . $document['number'];
+                        $document['document_date'] = date("Y-m-d", strtotime($document['date']));
+                        $document['net_value'] = $document['net_value'] . '€';
+                        $document['download_url'] = '';
 
-                    if ($document['status'] == 1) {
-                        $document['status_name'] = __("Fechado");
-                        $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
-                        $documentDownloadUrl = $currentDocumentType->getDownloadUrl(['document_id' => $document['document_id']]);
-                        if ($documentDownloadUrl) {
-                            $document['download_url'] = $documentDownloadUrl;
+                        if ($document['status'] == 1) {
+                            $document['status_name'] = __("Fechado");
+                            $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
+                            $documentDownloadUrl = $currentDocumentType->getDownloadUrl(['document_id' => $document['document_id']]);
+                            if ($documentDownloadUrl) {
+                                $document['download_url'] = $documentDownloadUrl;
+                            }
+                        } elseif ($document['status'] == 0) {
+                            $document['status_name'] = __("Rascunho");
+                            $document['view_url'] = $currentDocumentType->getEditUrl($document['document_id']);
+                        } else {
+                            $document['status_name'] = __("Anulado");
+                            $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
                         }
-                    } elseif ($document['status'] == 0) {
-                        $document['status_name'] = __("Rascunho");
-                        $document['view_url'] = $currentDocumentType->getEditUrl($document['document_id']);
-                    } else {
-                        $document['status_name'] = __("Anulado");
-                        $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
                     }
                 }
             }

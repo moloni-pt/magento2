@@ -44,6 +44,9 @@ class DocumentsList extends \Magento\Framework\View\Element\Template
         return $this->orderRepository->get($orderId);
     }
 
+    /**
+     * @return array
+     */
     public function getOrderDocuments()
     {
         $documentsList = [];
@@ -52,15 +55,18 @@ class DocumentsList extends \Magento\Framework\View\Element\Template
             if ($this->moloni->checkActiveSession()) {
                 $moloniDocuments = $this->moloni->documents->setDocumentType('documents');
                 $documentsList = $moloniDocuments->getAll(['status' => 1, 'your_reference' => $incrementId]);
+                if ($documentsList && is_array($documentsList)) {
+                    foreach ($documentsList as &$document) {
+                        if ($document['status'] == 1) {
+                            $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
+                            $documentDownloadUrl = $currentDocumentType->getDownloadUrl(
+                                ['document_id' => $document['document_id']]
+                            );
+                            $document['document_type_name'] = $currentDocumentType->documentTypeName;
 
-                foreach ($documentsList as &$document) {
-                    if ($document['status'] == 1) {
-                        $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
-                        $documentDownloadUrl = $currentDocumentType->getDownloadUrl(['document_id' => $document['document_id']]);
-                        $document['document_type_name'] = $currentDocumentType->documentTypeName;
-                        
-                        if ($documentDownloadUrl) {
-                            $document['download_url'] = $documentDownloadUrl;
+                            if ($documentDownloadUrl) {
+                                $document['download_url'] = $documentDownloadUrl;
+                            }
                         }
                     }
                 }

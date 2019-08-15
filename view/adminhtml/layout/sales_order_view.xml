@@ -18,6 +18,7 @@
             </referenceBlock>
         </referenceContainer>
         <referenceBlock name="sales_order_view_document.grid.container">
+            <block class="Invoicing\Moloni\Block\Adminhtml\Buttons\Sales\Actions" name="sales_order_view_document.grid.actions" template="Invoicing_Moloni::sales_order_view_grid_actions.phtml"/>
             <uiComponent name="sales_order_view_document_grid"/>
         </referenceBlock>
     </body>

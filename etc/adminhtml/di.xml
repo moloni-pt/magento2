@@ -19,4 +19,8 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="vendor_module_adminhtml_order_view_add_button" type="Invoicing\Moloni\Block\Adminhtml\Buttons\Sales\Document" sortOrder="10"/>
+    </type>
 </config>
