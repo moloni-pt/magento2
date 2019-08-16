@@ -50,18 +50,33 @@
     </type>
 
 
-    <!-- Custom Moloni Logger -->
-    <type name="Invoicing\Moloni\Logger\Handler">
+    <!-- Custom Moloni Loggers -->
+    <type name="Invoicing\Moloni\Logger\SyncLoggerHandler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
         </arguments>
     </type>
 
-    <type name="Invoicing\Moloni\Logger\Logger">
+    <type name="Invoicing\Moloni\Logger\DocumentsLoggerHandler">
         <arguments>
-            <argument name="name" xsi:type="string">moloni</argument>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="Invoicing\Moloni\Logger\SyncLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">moloni.sync</argument>
             <argument name="handlers" xsi:type="array">
-                <item name="system" xsi:type="object">Invoicing\Moloni\Logger\Handler</item>
+                <item name="system" xsi:type="object">Invoicing\Moloni\Logger\SyncLoggerHandler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Invoicing\Moloni\Logger\DocumentsLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">moloni.documents</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Invoicing\Moloni\Logger\DocumentsLoggerHandler</item>
             </argument>
         </arguments>
     </type>

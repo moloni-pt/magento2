@@ -49,6 +49,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
         $this->loadedData['0']['general'] = [
             "document_set_id" => $this->moloni->settings['document_set_id'],
             "document_type" => $this->moloni->settings['document_type'],
+            "document_auto" => $this->moloni->settings['document_auto'],
             "document_status" => $this->moloni->settings['document_status'],
             "document_email" => $this->moloni->settings['document_email'],
             "shipping_details" => $this->moloni->settings['shipping_details'],
@@ -70,6 +71,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
         ];
 
         $this->loadedData['0']['orders'] = [
+            "document_auto" => $this->moloni->settings['document_auto'],
             "orders_since" => $this->moloni->settings['orders_since'],
             "orders_statuses" => $this->moloni->settings['orders_statuses'],
         ];

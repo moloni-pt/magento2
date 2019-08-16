@@ -12,6 +12,12 @@
             <item name="navContainerName" xsi:type="string">left</item>
         </item>
         <item name="buttons" xsi:type="array">
+            <item name="logout" xsi:type="array">
+                <item name="name" xsi:type="string">logout</item>
+                <item name="label" xsi:type="string" translate="true">Logout</item>
+                <item name="class" xsi:type="string">secondary</item>
+                <item name="url" xsi:type="string">moloni/home/welcome</item>
+            </item>
             <item name="save" xsi:type="array">
                 <item name="name" xsi:type="string">save</item>
                 <item name="label" xsi:type="string" translate="true">Guardar Alterações</item>
@@ -64,6 +70,26 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Tipo de documento</item>
                     <item name="formElement" xsi:type="string">select</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="document_auto">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Criar documento automaticamente</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Criar automaticamente um documento assim que uma encomenda é colocada num dos estados definidos em "Encomendas".
+                        </item>
+                    </item>
                 </item>
             </argument>
         </field>

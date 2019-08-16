@@ -65,6 +65,7 @@ class Moloni implements MoloniApiRepositoryInterface
         'document_type' => 'invoices',
         'document_status' => 0,
         'document_email' => 0,
+        'document_auto' => 0,
 
         'shipping_details' => 0,
         'shipping_document' => 0,

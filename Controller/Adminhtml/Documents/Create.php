@@ -26,6 +26,9 @@ use Invoicing\Moloni\Controller\Adminhtml\Documents;
 class Create extends Documents
 {
 
+    /**
+     * @return bool|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     */
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {

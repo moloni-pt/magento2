@@ -29,6 +29,7 @@ class Welcome extends Home
     public function execute()
     {
         $page = $this->initAction();
+
         if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
             $this->handleAuthentication();
         } elseif ($this->getRequest()->getParam("code")) {
@@ -37,6 +38,8 @@ class Welcome extends Home
             } else {
                 $this->_redirect->redirect($this->_response, 'moloni/home/company/');
             }
+        } else {
+            $this->moloni->dropActiveSession();
         }
         return $page;
     }

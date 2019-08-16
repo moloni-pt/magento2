@@ -4,7 +4,7 @@ namespace Invoicing\Moloni\Logger;
 
 use Monolog\Logger;
 
-class Handler extends \Magento\Framework\Logger\Handler\Base
+class SyncLoggerHandler extends \Magento\Framework\Logger\Handler\Base
 {
     /**
      * Logging level
@@ -16,5 +16,5 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
      * File name
      * @var string
      */
-    protected $fileName = '/var/log/moloni.log';
+    protected $fileName = '/var/log/moloni.sync.log';
 }

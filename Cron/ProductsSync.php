@@ -2,15 +2,15 @@
 
 namespace Invoicing\Moloni\Cron;
 
-use \Invoicing\Moloni\Logger\Logger;
+use \Invoicing\Moloni\Logger\SyncLogger;
 use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
+use \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
 
 class ProductsSync
 {
 
     /**
-     * @var Logger
+     * @var SyncLogger
      */
     protected $logger;
 
@@ -26,7 +26,7 @@ class ProductsSync
 
 
     public function __construct(
-        Logger $logger,
+        SyncLogger $logger,
         Moloni $moloni,
         MoloniProductsFactory $productsFactory
     )
@@ -58,8 +58,8 @@ class ProductsSync
 
             if ($this->moloni->settings['products_sync_stock'] || $this->moloni->settings['products_sync_price']) {
                 $changedMoloniProducts = $this->moloni->products->getModifiedSinceAll(['lastmodified' => $updateSince]);
-
                 if (!empty($changedMoloniProducts) && is_array($changedMoloniProducts)) {
+                    $this->logger->info("Found " . count($changedMoloniProducts) . " products do sync");
                     foreach ($changedMoloniProducts as $moloniProduct) {
                         $syncProduct = $this->productsFactory->create();
 
@@ -77,9 +77,9 @@ class ProductsSync
                         }
                     }
                 }
-                $this->logger->info("Finish updating products ");
+                $this->logger->info("Finish updating products");
             } else {
-                $this->logger->info("Sync functions disabled ");
+                $this->logger->info("Sync functions disabled");
             }
 
             $companyId = $this->moloni->session->companyId;
