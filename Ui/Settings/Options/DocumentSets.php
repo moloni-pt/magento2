@@ -35,10 +35,12 @@ class DocumentSets implements OptionSourceInterface
 
         if ($documentSets && is_array($documentSets)) {
             foreach ($documentSets as $documentSet) {
-                $result[] = [
-                    "value" => $documentSet['document_set_id'],
-                    "label" => $documentSet['name']
-                ];
+                if (!$documentSet['is_invisible']) {
+                    $result[] = [
+                        "value" => $documentSet['document_set_id'],
+                        "label" => $documentSet['name']
+                    ];
+                }
             }
         }
 

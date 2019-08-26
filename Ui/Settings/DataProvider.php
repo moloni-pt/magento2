@@ -71,9 +71,8 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
         ];
 
         $this->loadedData['0']['orders'] = [
-            "document_auto" => $this->moloni->settings['document_auto'],
-            "orders_since" => $this->moloni->settings['orders_since'],
             "orders_statuses" => $this->moloni->settings['orders_statuses'],
+            "orders_since" => $this->moloni->settings['orders_since'],
         ];
 
         $this->loadedData['0']['sync'] = [

@@ -66,6 +66,9 @@ class Products
      */
     public $productInserted = false;
 
+    /** @var Item */
+    private $taxItem;
+
     public function __construct(
         ProductRepositoryInterface $productRepository,
         CategoryCollectionFactory $categoryCollectionFactory,
@@ -161,8 +164,16 @@ class Products
         if ($order->getShippingDiscountAmount() > 0 && $order->getShippingDiscountAmount() < 100) {
             $product['discount'] = $order->getShippingDiscountAmount();
         }
-
+        
+        // Search for shipping tax
         $taxRate = 0;
+        $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
+        foreach ($orderTaxes as $orderTax) {
+            if ($orderTax['taxable_item_type'] == 'shipping') {
+                $taxRate = $orderTax['tax_percent'];
+            }
+        }
+
         if ($taxRate > 0) {
             $product['taxes'][] = [
                 'tax_id' => $this->getTaxIdFromRate($taxRate),

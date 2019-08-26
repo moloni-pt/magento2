@@ -276,7 +276,7 @@ class Moloni implements MoloniApiRepositoryInterface
                 }
             }
 
-            if (isset($savedSettings['orders_statuses']) && is_array($savedSettings['orders_statuses'])) {
+            if (isset($savedSettings['orders_statuses']) && !empty($savedSettings['orders_statuses'])) {
                 $savedSettings['orders_statuses'] = json_decode($savedSettings['orders_statuses'], true);
             } else {
                 $savedSettings['orders_statuses'] = [];
