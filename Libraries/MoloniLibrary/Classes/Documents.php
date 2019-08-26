@@ -105,6 +105,26 @@ class Documents
                 $this->documentTypeName = 'Orçamento';
                 $this->documentTypeClassMoloni = 'Orcamentos';
                 break;
+
+            case "receipts":
+            case "Recibos":
+            case "Recibo":
+            case "2":
+                $this->documentTypeId = "2";
+                $this->documentTypeClass = "receitps";
+                $this->documentTypeName = 'Recibo';
+                $this->documentTypeClassMoloni = 'Recibos';
+                break;
+
+            case "creditNotes":
+            case "NotasCredito":
+            case "NotaCredito":
+            case "3":
+                $this->documentTypeId = "3";
+                $this->documentTypeClass = "creditNotes";
+                $this->documentTypeName = 'Nota de crédito';
+                $this->documentTypeClassMoloni = 'NotasCredito';
+                break;
         }
 
         return $this;
