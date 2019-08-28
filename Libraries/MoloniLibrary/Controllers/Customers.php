@@ -98,8 +98,8 @@ class Customers
 
             $company = $billingAddress->getCompany();
             $name = $billingAddress->getFirstname();
-            $name .= empty($billingAddress->getMiddlename()) ?: ' ' . $billingAddress->getMiddlename();
-            $name .= empty($billingAddress->getLastname()) ?: ' ' . $billingAddress->getLastname();
+            $name .= empty($billingAddress->getMiddlename()) ? '' : ' ' . $billingAddress->getMiddlename();
+            $name .= empty($billingAddress->getLastname()) ? '' : ' ' . $billingAddress->getLastname();
 
             if (!empty($company)) {
                 $this->customer['name'] = $company;
