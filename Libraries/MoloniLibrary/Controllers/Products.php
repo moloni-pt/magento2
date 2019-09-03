@@ -164,7 +164,7 @@ class Products
         if ($order->getShippingDiscountAmount() > 0 && $order->getShippingDiscountAmount() < 100) {
             $product['discount'] = $order->getShippingDiscountAmount();
         }
-        
+
         // Search for shipping tax
         $taxRate = 0;
         $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
@@ -297,7 +297,8 @@ class Products
                 }
             }
 
-            $moloniProduct['stock'] = $product->getExtensionAttributes()->getStockItem()->getQty();
+            $productStock = $product->getExtensionAttributes()->getStockItem()->getQty();
+            $moloniProduct['stock'] = (float)$productStock;
             $moloniProduct['category_id'] = $this->createCategoryTree($categoryTree);
 
 
@@ -313,7 +314,7 @@ class Products
             $defaultTaxRate = $this->taxHelper->getCalculatedRate($taxClassId);
 
             if ($this->moloni->settings['products_tax'] > 0) {
-                $this->parseProductTaxes($moloniProduct);
+                $this->parseProductTaxes($moloniProduct, $this->moloni->settings['products_tax']);
             } elseif ($defaultTaxRate > 0) {
                 $moloniProduct['taxes'][] = [
                     'tax_id' => $this->getTaxIdFromRate($defaultTaxRate),
@@ -531,6 +532,9 @@ class Products
     private function parseProductTaxes(&$moloniProduct, $taxId = 0)
     {
         if (!empty($moloniProduct) && $taxId > 0) {
+
+            $price = (isset($moloniProduct['price_with_taxes']) && (float)$moloniProduct['price_with_taxes'] > 0) ? $moloniProduct['price_with_taxes'] : $moloniProduct['price'];
+
             $tax = 0;
             $moloniTaxes = $this->moloni->taxes->getAll();
             if (!empty($moloniProduct) && is_array($moloniTaxes)) {
@@ -549,10 +553,10 @@ class Products
                     if (!empty($tax['exemption_reason'])) {
                         unset($moloniProduct['taxes']);
                         $moloniProduct['exemption_reason'] = $tax['exemption_reason'];
-                        $moloniProduct['price'] = $moloniProduct['price_with_taxes'];
+                        $moloniProduct['price'] = $price;
                     } else {
                         unset($moloniProduct['exemption_reason']);
-                        $moloniProduct['price'] = $moloniProduct['price_with_taxes'] * 100 / (100 + $tax['value']);
+                        $moloniProduct['price'] = $price * 100 / (100 + $tax['value']);
                         $moloniProduct['taxes'][0] = $tax;
                     }
                 }
