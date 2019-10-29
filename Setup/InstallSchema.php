@@ -42,7 +42,7 @@ class InstallSchema implements InstallSchemaInterface
         foreach ($this->tables as $table) {
             if (!$this->installer->tableExists($table)) {
                 $this->{"setTable".str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))}();
-                $this->{"setIndex".str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))}();
+               // $this->{"setIndex".str_replace(' ', '', ucwords(str_replace('_', ' ', $table)))}();
             }
         }
         
