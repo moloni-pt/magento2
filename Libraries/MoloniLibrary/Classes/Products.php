@@ -7,7 +7,7 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
 class Products
 {
@@ -30,21 +30,21 @@ class Products
      */
     public function getAll($companyId = false)
     {
-        $values = ["company_id" => ($companyId ? $companyId : $this->moloni->session->companyId)];
+        $values = ["company_id" => ($companyId ?: $this->moloni->session->companyId)];
         $result = $this->moloni->execute("products/getAll", $values);
         if (is_array($result) && !isset($result['error'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Erro ao aceder aos artigos"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Erro ao aceder aos artigos"),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
-    public function getModifiedSinceAll($values, $companyId = false)
+    public function getModifiedSinceAll($values, $companyId = false): array
     {
         if (!isset($values['lastmodified'])) {
             return [];
@@ -71,18 +71,18 @@ class Products
 
     public function getModifiedSince($values, $companyId)
     {
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("products/getModifiedSince", $values);
         if (is_array($result) && !isset($result['error'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Erro ao aceder aos artigos"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return [];
         }
+
+        $this->moloni->errors->throwError(
+            __("Erro ao aceder aos artigos"),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return [];
     }
 
     /**
@@ -90,7 +90,7 @@ class Products
      * @param int|bool $companyId
      * @return bool|mixed
      */
-    public function getByReference($values, $companyId = false)
+    public function getByReference($values, $companyId = false, $debug = false)
     {
 
         if (!isset($values['reference'])) {
@@ -101,25 +101,26 @@ class Products
             return $this->store[__FUNCTION__][$values['reference']];
         }
 
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $values['exact'] = true;
         $result = $this->moloni->execute("products/getByReference", $values);
 
-        $this->store[__FUNCTION__][$values['reference']] = $result;
-
         if (is_array($result) && isset($result[0]['product_id'])) {
+            $this->store[__FUNCTION__][$values['reference']] = $result;
             return $result;
-        } elseif (empty($result)) {
+        }
+
+        if (empty($result)) {
             // No error but empty result
             return false;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Erro ao aceder aos artigos"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Erro ao aceder aos artigos"),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
     /**
@@ -130,19 +131,19 @@ class Products
     public function insert($values, $companyId = false)
     {
         $this->store = [];
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("products/insert", $values);
 
         if (is_array($result) && isset($result['product_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Errro ao inserir o artigo: " . $values['reference']),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Errro ao inserir o artigo: " . $values['reference']),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
     /**
@@ -153,18 +154,18 @@ class Products
     public function update($values, $companyId = false)
     {
         $this->store = [];
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("products/update", $values);
 
         if (is_array($result) && isset($result['product_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Houve um erro ao actualziar o cliente"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Houve um erro ao actualziar o cliente"),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 }

@@ -31,7 +31,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CountriesFactory;
 
 class Moloni implements MoloniApiRepositoryInterface
 {
-    const API_URL = 'https://api.moloni.pt/v1/';
+    public const API_URL = 'https://api.moloni.pt/v1/';
 
     public $logs = [];
     /**

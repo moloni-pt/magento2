@@ -130,7 +130,7 @@ class Documents
     /**
      * @param string $message
      */
-    public function addWarning($message)
+    public function addWarning($message): void
     {
         $this->messages['warning'][] = $message;
     }
@@ -138,7 +138,7 @@ class Documents
     /**
      * @param string $message
      */
-    public function addError($message)
+    public function addError($message): void
     {
         $this->messages['error'][] = $message;
     }
@@ -147,7 +147,7 @@ class Documents
      * @param string $message
      * @param array $values
      */
-    public function addComplexSuccess($message, $values = [])
+    public function addComplexSuccess($message, $values = []): void
     {
         $this->messages['complex_success'][] = array_merge(['message' => $message], $values);
     }
@@ -156,7 +156,7 @@ class Documents
      * @param string $message
      * @param array $values
      */
-    public function addComplexWarning($message, $values = [])
+    public function addComplexWarning($message, $values = []): void
     {
         $this->messages['complex_warning'][] = array_merge(['message' => $message], $values);
     }
@@ -232,7 +232,7 @@ class Documents
     /**
      * @return bool
      */
-    private function createShippingDocument()
+    private function createShippingDocument(): bool
     {
         // Add delivery datetime because its required
         $this->document['delivery_datetime'] = gmdate('Y-m-d H:i:s');
@@ -276,7 +276,7 @@ class Documents
      * Populates $this->>document based on $this->order
      * @return bool
      */
-    private function parseDocument()
+    private function parseDocument(): bool
     {
         $this->company = $this->moloni->companies->getOne();
 
@@ -301,12 +301,12 @@ class Documents
         return true;
     }
 
-    private function parseProducts()
+    private function parseProducts(): void
     {
         $products = $this->order->getItems();
         if (is_array($products)) {
             foreach ($products as $key => $product) {
-                if ($product->getParentItem()) {
+                if ($product->isDeleted() || $product->getParentItem()) {
                     continue;
                 }
 
@@ -324,7 +324,7 @@ class Documents
         }
     }
 
-    private function parseCurrency()
+    private function parseCurrency(): void
     {
         $orderCurrencyCode = $this->order->getOrderCurrencyCode();
 
@@ -339,7 +339,7 @@ class Documents
     /**
      * Set the document Shipping details
      */
-    private function parseShippingDetails()
+    private function parseShippingDetails(): void
     {
         $shippingDescription = $this->order->getShippingDescription();
         if (!empty($shippingDescription)) {
@@ -355,7 +355,7 @@ class Documents
         $this->parseShippingDestinationAddress();
     }
 
-    private function parsePaymentMethods()
+    private function parsePaymentMethods(): void
     {
         $orderPayment = $this->order->getPayment();
         if ($orderPayment && (float)$orderPayment->getAmountPaid() > 0) {
@@ -373,7 +373,7 @@ class Documents
     }
 
 
-    private function parseShippingDepartureAddress()
+    private function parseShippingDepartureAddress(): bool
     {
         if (isset($this->moloni->settings['delivery_departure_address']) &&
             !empty($this->moloni->settings['delivery_departure_address'])) {
@@ -415,7 +415,7 @@ class Documents
     /**
      * @return bool
      */
-    private function parseShippingDestinationAddress()
+    private function parseShippingDestinationAddress(): bool
     {
         $shippingAddress = $this->order->getShippingAddress();
         if ($shippingAddress) {
@@ -515,7 +515,7 @@ class Documents
      * @param int $documentId
      * @param $orderId
      */
-    private function setDocumentHasCreated($documentId, $orderId)
+    private function setDocumentHasCreated($documentId, $orderId): void
     {
         $insertedDocument = $this->moloni->documents->getOne(['document_id' => $documentId]);
 
@@ -539,7 +539,7 @@ class Documents
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return bool
      */
-    private function validateDocumentTotals($documentId, $order)
+    private function validateDocumentTotals($documentId, $order): bool
     {
         $moloniDocument = $this->moloni->documents->getOne(["document_id" => $documentId]);
 
@@ -557,7 +557,7 @@ class Documents
     /**
      * @return void
      */
-    public function throwMessages()
+    public function throwMessages(): void
     {
         if (!empty($this->messages)) {
             foreach ($this->messages as $type => $list) {

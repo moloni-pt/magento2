@@ -2,12 +2,17 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 
+use Exception;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\Category as CategoryModel;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Tax\Api\TaxCalculationInterface;
 
 class Products
@@ -69,13 +74,19 @@ class Products
     /** @var Item */
     private $taxItem;
 
+    /**
+     * @var ProductsFactory
+     */
+    private $products;
+
     public function __construct(
         ProductRepositoryInterface $productRepository,
         CategoryCollectionFactory $categoryCollectionFactory,
         TaxCalculationInterface $taxHelper,
         Item $taxItem,
         Moloni $moloni,
-        Tools $tools
+        Tools $tools,
+        ProductsFactory $products
     )
     {
         $this->productRepository = $productRepository;
@@ -84,25 +95,35 @@ class Products
         $this->taxItem = $taxItem;
         $this->moloni = $moloni;
         $this->tools = $tools;
+        $this->products = $products;
     }
 
     /**
-     * @param \Magento\Sales\Api\Data\OrderItemInterface $orderProduct
+     * @param OrderItemInterface $orderProduct
      * @return array
      */
-    public function setProductFromOrder($orderProduct)
+    public function setProductFromOrder($orderProduct): array
     {
         $productId = $orderProduct->getProductId();
 
         $product = [];
         $product['name'] = $orderProduct->getName();
-        $product['reference'] = $orderProduct->getSku();
+
+        $product['reference'] = mb_substr($orderProduct->getSku(), 0, 30);
+
         $product['price'] = $orderProduct->getBasePrice();
         $product['price_with_taxes'] = $orderProduct->getPriceInclTax();
         $product['qty'] = $orderProduct->getQtyOrdered();
 
-        if ($orderProduct->getDiscountPercent() > 0 && $orderProduct->getDiscountPercent() < 100) {
-            $product['discount'] = $orderProduct->getDiscountPercent();
+        $discountPercent = $orderProduct->getDiscountPercent();
+
+        $baseDiscountAmount = $orderProduct->getBaseDiscountAmount();
+        if ((float)$discountPercent === (float)0 && $baseDiscountAmount > 0) {
+            $discountPercent = $baseDiscountAmount * 100 / $orderProduct->getRowTotal();
+        }
+
+        if ($discountPercent > 0 && $discountPercent < 100) {
+            $product['discount'] = $discountPercent;
         }
 
         if (!empty($orderProduct->getDescription())) {
@@ -111,11 +132,14 @@ class Products
 
         /** @var $childProducts \Magento\Sales\Model\Order\Item[] */
         $childProducts = $orderProduct->getChildrenItems();
-        if ($childProducts && is_array($childProducts)) {
-            foreach ($childProducts as $childProduct) {
-                $product['name'] = $childProduct->getName();
-                $product['reference'] = $childProduct->getSku();
-                $productId = $childProduct->getProductId();
+
+        if ($orderProduct->getProductType() === 'bundle' && !empty($childProducts) && is_array($childProducts)) {
+            $product['composition_type'] = 1;
+            $product['child_products'] = [];
+            foreach ($childProducts as $child) {
+                if ($child->getProductId() !== $productId) {
+                    $product['child_products'][] = $this->products->create()->setProductFromOrder($child);
+                }
             }
         }
 
@@ -127,7 +151,7 @@ class Products
                 'order' => 0,
                 'cumulative' => true
             ];
-        } else {
+        } elseif (isset($product['composition_type']) && $product['composition_type'] !== 1) {
             $product['exemption_reason'] = $this->moloni->settings['products_tax_exemption'];
         }
 
@@ -147,10 +171,10 @@ class Products
     }
 
     /**
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param OrderInterface $order
      * @return array
      */
-    public function setShippingFromOrder($order)
+    public function setShippingFromOrder($order): array
     {
 
         $product = [];
@@ -161,15 +185,17 @@ class Products
         $product['qty'] = 1;
 
         // @todo calc shipping discount percentage
-        if ($order->getShippingDiscountAmount() > 0 && $order->getShippingDiscountAmount() < 100) {
-            $product['discount'] = $order->getShippingDiscountAmount();
+
+        $discountPercent = $order->getShippingDiscountAmount();
+        if ($discountPercent > 0 && $discountPercent < 100) {
+            $product['discount'] = $discountPercent;
         }
 
         // Search for shipping tax
         $taxRate = 0;
         $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
         foreach ($orderTaxes as $orderTax) {
-            if ($orderTax['taxable_item_type'] == 'shipping') {
+            if ($orderTax['taxable_item_type'] === 'shipping') {
                 $taxRate = $orderTax['tax_percent'];
             }
         }
@@ -224,7 +250,7 @@ class Products
                 return $this->syncProductFromMoloni($moloniProduct[0]);
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
 
@@ -235,7 +261,7 @@ class Products
      * @param $moloniProduct
      * @return bool
      */
-    public function syncProductFromMoloni($moloniProduct)
+    public function syncProductFromMoloni($moloniProduct): ?bool
     {
         if (!isset($moloniProduct['reference'])) {
             return false;
@@ -249,25 +275,36 @@ class Products
             }
 
             if ($this->moloni->settings['products_sync_stock']) {
-                $product->getExtensionAttributes()->getStockItem()->setQty($moloniProduct['stock']);
+                try {
+                    $product->getExtensionAttributes()->getStockItem()->setQty($moloniProduct['stock']);
+                    $product->getExtensionAttributes()->getStockItem()->setIsInStock(true);
+
+                } catch (Exception $exception) {
+                    return false;
+                }
             }
 
             $product->save();
             return $moloniProduct['product_id'];
-        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+        } catch (NoSuchEntityException $exception) {
             return false;
         }
     }
 
     /**
-     * @param $productId
-     * @param bool $orderProduct
+     * @param int|ProductInterface $productId
+     * @param bool|OrderItemInterface $orderProduct
      * @return int
      */
-    private function createProductFromId($productId, $orderProduct = false)
+    private function createProductFromId($productId, $orderProduct = false): int
     {
         try {
-            $product = $this->productRepository->getById($productId);
+            if ($productId instanceof ProductInterface) {
+                $product = $productId;
+            } else {
+                $product = $this->productRepository->getById($productId);
+            }
+
 
             $categories = $product->getCategoryIds();
             $categoryTree = $this->getCategoryTree($categories);
@@ -313,6 +350,42 @@ class Products
             $taxClassId = $product->getTaxClassId();
             $defaultTaxRate = $this->taxHelper->getCalculatedRate($taxClassId);
 
+            try {
+                $typeInstance = $product->getTypeInstance();
+                $productOptions = $typeInstance->getChildrenIds($product->getId(), false);
+                if (!empty($productOptions) && is_array($productOptions)) {
+                    $moloniProduct['composition_type'] = 1;
+                    $moloniProduct['child_products'] = [];
+
+                    foreach ($productOptions as $requiredChildrenIds) {
+                        foreach ($requiredChildrenIds as $childrenId) {
+
+                            $childProduct = $this->productRepository->getById($childrenId);
+                            $childProductReference = $childProduct->getSku();
+
+                            $moloniProductExists = $this->moloni->products->getByReference([
+                                'reference' => $childProductReference,
+                                'exact' => true
+                            ]);
+
+                            if (!isset($moloniProductExists[0]['product_id'])) {
+                                $moloniChildProductId = $this->products->create()->createProductFromId($childProduct);
+                            } else {
+                                $moloniChildProductId = $moloniProductExists[0]['product_id'];
+                            }
+
+                            /** @todo Validar a quantidade por defeito de cada artigo */
+                            $moloniProduct['child_products'][] = [
+                                'product_child_id' => $moloniChildProductId,
+                                'qty' => 1,
+                                'price' => $childProduct->getPrice()
+                            ];
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+            }
+
             if ($this->moloni->settings['products_tax'] > 0) {
                 $this->parseProductTaxes($moloniProduct, $this->moloni->settings['products_tax']);
             } elseif ($defaultTaxRate > 0) {
@@ -326,13 +399,16 @@ class Products
                 $moloniProduct['exemption_reason'] = $this->moloni->settings['products_tax_exemption'];
             }
 
+
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
+
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
+
             $this->productInserted = true;
 
-            return $insertedProduct['product_id'];
+            return $insertedProduct['product_id'] ?: 0;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
 
@@ -340,10 +416,10 @@ class Products
     }
 
     /**
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param OrderInterface $order
      * @return int
      */
-    private function createShippingFromOrder($order)
+    private function createShippingFromOrder($order): int
     {
         try {
             $moloniProduct['name'] = $order->getShippingDescription();
@@ -362,7 +438,7 @@ class Products
             $taxRate = 0;
             $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
             foreach ($orderTaxes as $orderTax) {
-                if ($orderTax['taxable_item_type'] == 'shipping') {
+                if ($orderTax['taxable_item_type'] === 'shipping') {
                     $taxRate = $orderTax['tax_percent'];
                 }
             }
@@ -387,7 +463,7 @@ class Products
             $this->productInserted = true;
             return $insertedProduct['product_id'];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo $e->getMessage();
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
@@ -438,11 +514,11 @@ class Products
      * @param $categories
      * @return array
      */
-    private function getCategoryTree($categories)
+    private function getCategoryTree($categories): array
     {
 
         try {
-            /* @var $matchingNamesCollection \Magento\Catalog\Model\ResourceModel\Category\Collection */
+            /* @var $matchingNamesCollection Collection */
             $matchingNamesCollection = $this->categoryCollectionFactory->create();
 
             $matchingNamesCollection->addAttributeToSelect('path')
@@ -458,7 +534,7 @@ class Products
                 }
             }
 
-            /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
+            /* @var $collection Collection */
             $collection = $this->categoryCollectionFactory->create();
 
             $collection->addAttributeToFilter('entity_id', ['in' => array_keys($shownCategoriesIds)])
@@ -482,7 +558,7 @@ class Products
             }
 
             $tree = $categoryById[CategoryModel::TREE_ROOT_ID]['child'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [["name" => 'Magento']];
         }
 
@@ -494,7 +570,7 @@ class Products
      * @param bool $break
      * @return int
      */
-    private function getTaxIdFromRate($taxRate, $break = false)
+    private function getTaxIdFromRate($taxRate, $break = false): int
     {
         $taxId = 0;
         $taxDefaultId = 0;
@@ -507,7 +583,7 @@ class Products
 
                 if ($tax['value'] == $taxRate) {
                     $taxId = $tax['tax_id'];
-                    if ($tax['name'] == 'IVA Normal') {
+                    if ($tax['name'] === 'IVA Normal') {
                         return $taxId;
                     }
                 }
@@ -529,7 +605,7 @@ class Products
      * @param array $moloniProduct
      * @param int $taxId
      */
-    private function parseProductTaxes(&$moloniProduct, $taxId = 0)
+    private function parseProductTaxes(&$moloniProduct, $taxId = 0): void
     {
         if (!empty($moloniProduct) && $taxId > 0) {
 
@@ -537,7 +613,7 @@ class Products
 
             $tax = 0;
             $moloniTaxes = $this->moloni->taxes->getAll();
-            if (!empty($moloniProduct) && is_array($moloniTaxes)) {
+            if (is_array($moloniTaxes)) {
                 foreach ($moloniTaxes as $moloniTax) {
                     if ($moloniTax['tax_id'] == $taxId) {
                         $tax = $moloniTax;
@@ -545,20 +621,18 @@ class Products
                 }
             }
 
-            if ($tax) {
-                // Percentage
-                if ($tax['type'] == 1) {
-                    $tax['order'] = 0;
-                    $tax['cumulative'] = 0;
-                    if (!empty($tax['exemption_reason'])) {
-                        unset($moloniProduct['taxes']);
-                        $moloniProduct['exemption_reason'] = $tax['exemption_reason'];
-                        $moloniProduct['price'] = $price;
-                    } else {
-                        unset($moloniProduct['exemption_reason']);
-                        $moloniProduct['price'] = $price * 100 / (100 + $tax['value']);
-                        $moloniProduct['taxes'][0] = $tax;
-                    }
+            // Percentage
+            if ($tax && (int)$tax['type'] === 1) {
+                $tax['order'] = 0;
+                $tax['cumulative'] = 0;
+                if (!empty($tax['exemption_reason'])) {
+                    unset($moloniProduct['taxes']);
+                    $moloniProduct['exemption_reason'] = $tax['exemption_reason'];
+                    $moloniProduct['price'] = $price;
+                } else {
+                    unset($moloniProduct['exemption_reason']);
+                    $moloniProduct['price'] = $price * 100 / (100 + $tax['value']);
+                    $moloniProduct['taxes'][0] = $tax;
                 }
             }
         }

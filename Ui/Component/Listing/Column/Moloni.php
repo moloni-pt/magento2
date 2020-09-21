@@ -2,12 +2,12 @@
 
 namespace Invoicing\Moloni\Ui\Component\Listing\Column;
 
-use Magento\Framework\UrlInterface;
-use \Magento\Framework\View\Element\UiComponent\ContextInterface;
-use \Magento\Framework\View\Element\UiComponentFactory;
-use \Magento\Ui\Component\Listing\Columns\Column;
-use Invoicing\Moloni\Model\DocumentsRepository;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni as MoloniLibrary;
+use Invoicing\Moloni\Model\DocumentsRepository;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Ui\Component\Listing\Columns\Column;
 
 class Moloni extends Column
 {
@@ -67,7 +67,7 @@ class Moloni extends Column
         if (!$moloniLog) {
             return $this->getMoloniCreateObject($orderId);
         } else {
-            return $this->getMoloniMoreActionsObject($moloniLog);
+            return $this->getMoloniMoreActionsObject($moloniLog, $orderId);
         }
     }
 
@@ -104,7 +104,7 @@ class Moloni extends Column
      * Magento\Framework\Api\AbstractExtensibleObject[] $moloniLog
      * @return array
      */
-    private function getMoloniMoreActionsObject($moloniLog)
+    private function getMoloniMoreActionsObject($moloniLog, $orderId)
     {
         $options = [];
         if (!$this->moloni->checkActiveSession()) {
@@ -157,18 +157,15 @@ class Moloni extends Column
                         'target' => '_BLANK'
                     ],
                 ];
-            } else {
-                $options = [
-                    'create' => [
-                        'href' => $this->urlBuilder->getUrl(
-                            "moloni/documents/create",
-                            ['order_id' => $moloniLog[0]->getOrderId(), 'force' => 1]
-                        ),
-                        'label' => __('Gerar novamente'),
-                        'target' => '_BLANK'
-                    ],
-                ];
             }
+        } else {
+            return [
+                'create' => [
+                    'href' => $this->urlBuilder->getUrl("moloni/documents/create", ['order_id' => $orderId]),
+                    'label' => __('Gerar'),
+                    'target' => '_BLANK'
+                ],
+            ];
         }
 
         return $options;
