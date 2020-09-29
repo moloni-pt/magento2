@@ -255,14 +255,14 @@ class Documents
 
         if (is_array($result) && isset($result['document_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Erro ao fechar o documento: " . $this->getErrorMessage($result)),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Erro ao fechar o documento: " . $this->getErrorMessage($result)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
     public function getErrorMessage($result)

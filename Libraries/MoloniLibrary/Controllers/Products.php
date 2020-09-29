@@ -143,6 +143,8 @@ class Products
             }
         }
 
+
+
         $taxRate = $orderProduct->getTaxPercent();
         if ($taxRate > 0) {
             $product['taxes'][] = [
@@ -151,7 +153,7 @@ class Products
                 'order' => 0,
                 'cumulative' => true
             ];
-        } elseif (isset($product['composition_type']) && $product['composition_type'] !== 1) {
+        } elseif (!isset($product['composition_type']) || $product['composition_type'] !== 1) {
             $product['exemption_reason'] = $this->moloni->settings['products_tax_exemption'];
         }
 
