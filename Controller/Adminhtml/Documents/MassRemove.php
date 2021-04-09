@@ -22,9 +22,51 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as MoloniDocumentsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Model\DocumentsRepository;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Result\PageFactory;
 
 class MassRemove extends Documents
 {
+    private array $data;
+
+    /**
+     * Documents constructor.
+     *
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param Moloni $moloni
+     * @param MoloniDocumentsFactory $moloniDocumentsFactory
+     * @param DocumentsRepository $documentsRepository
+     * @param UrlInterface $urlBuilder
+     * @param array $data
+     */
+    public function __construct(
+        Context $context,
+        PageFactory $resultPageFactory,
+        Moloni $moloni,
+        MoloniDocumentsFactory $moloniDocumentsFactory,
+        DocumentsRepository $documentsRepository,
+        UrlInterface $urlBuilder,
+        array $data = []
+    )
+    {
+        /** @noinspection UnusedConstructorDependenciesInspection */
+        $this->data = $data;
+
+        parent::__construct(
+            $context,
+            $resultPageFactory,
+            $moloni,
+            $moloniDocumentsFactory,
+            $documentsRepository,
+            $urlBuilder
+        );
+    }
+
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {

@@ -10,6 +10,11 @@
             "name": "Moloni, lda"
         }
     ],
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
     "minimum-stability": "dev",
     "require": {
         "ext-json": "*"

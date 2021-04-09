@@ -316,7 +316,6 @@ class Products
             $categories = $product->getCategoryIds();
             $categoryTree = $this->getCategoryTree($categories);
 
-
             if ($orderProduct) {
                 $moloniProduct['name'] = $orderProduct->getName();
                 $moloniProduct['reference'] = $orderProduct->getSku();
@@ -344,7 +343,6 @@ class Products
             $productStock = $product->getExtensionAttributes()->getStockItem()->getQty();
             $moloniProduct['stock'] = (float)$productStock;
             $moloniProduct['category_id'] = $this->createCategoryTree($categoryTree);
-
 
             if (!empty($this->moloni->settings['products_at_category'])) {
                 $moloniProduct['at_product_category'] = $this->moloni->settings['products_at_category'];
@@ -478,10 +476,10 @@ class Products
     /**
      * @param $categoryTree
      * @param int $parentId
-     * @return bool
+     * @return bool|int
      * @throws \JsonException
      */
-    private function createCategoryTree($categoryTree, $parentId = 0): bool
+    private function createCategoryTree($categoryTree, $parentId = 0)
     {
         if (!empty($categoryTree) && is_array($categoryTree)) {
             $categoryId = false;
@@ -490,7 +488,7 @@ class Products
                 $moloniCategories = $this->moloni->productsCategories->getAll(['parent_id' => $parentId]);
                 if ($moloniCategories && is_array($moloniCategories)) {
                     foreach ($moloniCategories as $moloniCategory) {
-                        if (strcasecmp($moloniCategory['name'], $category['name']) == 0) {
+                        if (strcasecmp($moloniCategory['name'], $category['name']) === 0) {
                             $categoryId = $moloniCategory['category_id'];
                             break;
                         }
