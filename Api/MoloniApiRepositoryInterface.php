@@ -23,5 +23,5 @@ namespace Invoicing\Moloni\Api;
 
 interface MoloniApiRepositoryInterface
 {
-    public function checkActiveSession();
+    public function checkActiveSession(): bool;
 }

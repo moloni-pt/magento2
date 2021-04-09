@@ -30,35 +30,35 @@ class Welcome extends Home
     {
         $page = $this->initAction();
 
-        if ($this->getRequest()->getPostValue("developer_id") && $this->getRequest()->getPostValue('secret_token')) {
+        if ($this->request->getParam("developer_id") && $this->request->getParam('secret_token')) {
             $this->handleAuthentication();
-        } elseif ($this->getRequest()->getParam("code")) {
-            if (!$this->moloni->checkAuthorizationCode($this->getRequest()->getParam('code'))) {
+        } elseif ($this->request->getParam("code")) {
+            if (!$this->moloni->checkAuthorizationCode($this->request->getParam('code'))) {
                 $this->messageManager->addErrorMessage($this->moloni->errors->getErrors('last')['message']);
             } else {
-                $this->_redirect->redirect($this->_response, 'moloni/home/company/');
+                $this->redirect->redirect($this->response, 'moloni/home/company/');
             }
         } else {
             $this->moloni->dropActiveSession();
         }
+
         return $page;
     }
 
-    private function handleAuthentication()
+    private function handleAuthentication(): void
     {
         $tokens = $this->tokensRepository->getTokens();
 
-        $tokens->setDeveloperId($this->getRequest()->getPostValue('developer_id'));
-        $tokens->setRedirectUri($this->getRequest()->getPostValue('redirect_uri'));
-        $tokens->setSecretToken($this->getRequest()->getPostValue('secret_token'));
+        $tokens->setDeveloperId($this->request->getParam('developer_id'));
+        $tokens->setRedirectUri($this->request->getParam('redirect_uri'));
+        $tokens->setSecretToken($this->request->getParam('secret_token'));
         $tokens->save();
 
         $authenticationUrl = $this->moloni->getAuthenticationUrl();
         if ($authenticationUrl) {
-            $this->_redirect($authenticationUrl);
+            $this->redirect->redirect($this->response, $authenticationUrl);
         } else {
             $this->messageManager->addErrorMessage(__("Houve um erro ao guardar alterações"));
-
         }
     }
 }

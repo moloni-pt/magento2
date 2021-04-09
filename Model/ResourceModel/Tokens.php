@@ -32,6 +32,7 @@ class Tokens extends AbstractDb
         parent::__construct($context);
     }
 
+    /** @noinspection MagicMethodsValidityInspection */
     public function _construct()
     {
         $this->_init('moloni_tokens', 'id');

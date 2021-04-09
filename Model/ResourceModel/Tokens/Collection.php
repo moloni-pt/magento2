@@ -16,13 +16,22 @@ class Collection extends AbstractCollection
      * @var string
      */
     protected $_idFieldName = 'id';
+
+    /**
+     * @var string
+     */
     protected $_eventPrefix = 'invoicing_moloni_tokens_collection';
+
+    /**
+     * @var string
+     */
     protected $_eventObject = 'tokens_collection';
 
     /**
      * Define resource model
      *
      * @return void
+     * @noinspection MagicMethodsValidityInspection
      */
     protected function _construct()
     {

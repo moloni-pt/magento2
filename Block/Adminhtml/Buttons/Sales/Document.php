@@ -2,24 +2,30 @@
 
 namespace Invoicing\Moloni\Block\Adminhtml\Buttons\Sales;
 
-use Magento\Sales\Block\Adminhtml\Order\View as OrderView;
-use Magento\Framework\UrlInterface;
-use Magento\Framework\AuthorizationInterface;
-use Invoicing\Moloni\Model\DocumentsRepository;
+use Invoicing\Moloni\Api\Data\DocumentsInterface;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni as MoloniLibrary;
+use Invoicing\Moloni\Model\DocumentsRepository;
+use Magento\Framework\Api\AbstractExtensibleObject;
+use Magento\Framework\AuthorizationInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Sales\Block\Adminhtml\Order\View as OrderView;
 
 class Document
 {
-    /** @var \Magento\Framework\UrlInterface */
-    protected $urlBuilder;
+    /** @var UrlInterface */
+    protected UrlInterface $urlBuilder;
 
-    /** @var \Magento\Framework\AuthorizationInterface */
-    protected $authorization;
+    /** @var AuthorizationInterface */
+    protected AuthorizationInterface $authorization;
 
     /**
      * @var DocumentsRepository
      */
-    private $documentsRepository;
+    private DocumentsRepository $documentsRepository;
+    /**
+     * @var MoloniLibrary
+     */
+    protected MoloniLibrary $moloni;
 
     public function __construct(
         UrlInterface $urlBuilder,
@@ -56,9 +62,9 @@ class Document
 
     /**
      * @param int $orderId
-     * @return bool|\Invoicing\Moloni\Api\Data\DocumentsInterface[]|\Magento\Framework\Api\AbstractExtensibleObject[]
+     * @return bool|DocumentsInterface[]|AbstractExtensibleObject[]
      */
-    private function hasMoloniLog($orderId)
+    private function hasMoloniLog(int $orderId)
     {
         $hasDocument = $this->documentsRepository->getByOrderId($orderId);
         if (!$hasDocument) {

@@ -1,5 +1,8 @@
 <?php
+
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
+
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Factory class for @see \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents
@@ -9,7 +12,7 @@ class DocumentsFactory
     /**
      * Object Manager instance
      *
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager = null;
 
@@ -23,10 +26,10 @@ class DocumentsFactory
     /**
      * Factory constructor
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      * @param string $instanceName
      */
-    public function __construct(\Magento\Framework\ObjectManagerInterface $objectManager, $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Documents')
+    public function __construct(ObjectManagerInterface $objectManager, $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Documents')
     {
         $this->_objectManager = $objectManager;
         $this->_instanceName = $instanceName;
@@ -36,7 +39,7 @@ class DocumentsFactory
      * Create class instance with specified parameters
      *
      * @param array $data
-     * @return \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Documents
+     * @return Documents
      */
     public function create(array $data = [])
     {

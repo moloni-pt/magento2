@@ -7,12 +7,14 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Model\DocumentsRepository;
+use JsonException;
 use Magento\Directory\Model\CurrencyFactory;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Message\ManagerInterface;
-use Invoicing\Moloni\Model\DocumentsRepository;
 
 class Documents
 {
@@ -21,21 +23,21 @@ class Documents
      * @var Moloni
      * Moloni library with tokens and settings
      */
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * @var Tools
      * Tools for validation and creating valid info
      */
-    private $tools;
+    private Tools $tools;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
     /**
-     * @var \Magento\Sales\Api\Data\OrderInterface Order interface
+     * @var OrderInterface Order interface
      */
     public $order = [];
 
@@ -43,28 +45,28 @@ class Documents
      * @var array
      * Document array to be inserted
      */
-    private $document = [];
+    private array $document = [];
 
     /**
      * @var array
      * Array from companies/getOne endpoint
      */
-    private $company = [];
+    private array $company = [];
 
     /**
      * @var StoreManagerInterface
      */
-    private $storeManager;
+    private StoreManagerInterface $storeManager;
 
     /**
      * @var CurrencyFactory
      */
-    private $currencyFactory;
+    private CurrencyFactory $currencyFactory;
 
     /**
      * @var Customers
      */
-    private $customers;
+    private Customers $customers;
 
     /**
      * @var Products
@@ -74,18 +76,18 @@ class Documents
     /**
      * @var ManagerInterface
      */
-    private $messageManager;
+    private ManagerInterface $messageManager;
 
 
     /**
      * @var DocumentsRepository
      */
-    private $documentsRepository;
+    private DocumentsRepository $documentsRepository;
 
     /**
      * @var array[]
      */
-    private $messages = [];
+    private array $messages = [];
 
     /**
      * Companies constructor.
@@ -130,7 +132,7 @@ class Documents
     /**
      * @param string $message
      */
-    public function addWarning($message): void
+    public function addWarning(string $message): void
     {
         $this->messages['warning'][] = $message;
     }
@@ -138,7 +140,7 @@ class Documents
     /**
      * @param string $message
      */
-    public function addError($message): void
+    public function addError(string $message): void
     {
         $this->messages['error'][] = $message;
     }
@@ -147,7 +149,7 @@ class Documents
      * @param string $message
      * @param array $values
      */
-    public function addComplexSuccess($message, $values = []): void
+    public function addComplexSuccess(string $message, $values = []): void
     {
         $this->messages['complex_success'][] = array_merge(['message' => $message], $values);
     }
@@ -156,7 +158,7 @@ class Documents
      * @param string $message
      * @param array $values
      */
-    public function addComplexWarning($message, $values = []): void
+    public function addComplexWarning(string $message, $values = []): void
     {
         $this->messages['complex_warning'][] = array_merge(['message' => $message], $values);
     }
@@ -168,23 +170,29 @@ class Documents
      * Id of a Magento order
      * @return array|boolean
      * Return array with [valid => 1] or with errors
+     *
+     * @throws JsonException
      */
-    public function createDocumentFromOrderId($orderId)
+    public function createDocumentFromOrderId(int $orderId)
     {
         $this->order = $this->orderRepository->get($orderId);
         $this->parseDocument();
 
-        if ($this->moloni->settings['shipping_document'] == 1) {
+        if ((int)$this->moloni->settings['shipping_document'] === 1) {
             $shippingDocument = $this->createShippingDocument();
             if (!$shippingDocument) {
-                $this->addError($this->moloni->errors->getErrors('first')['title']);
+                $message = $this->moloni->errors->getErrors('first')['title'];
+                $message .= ' - ' . $this->moloni->errors->getErrors('first')['message'];
+                $this->addError($message);
                 return false;
             }
         }
 
         $result = $this->moloni->documents->setDocumentType()->insert($this->document);
         if (!isset($result['document_id'])) {
-            $this->addError($this->moloni->errors->getErrors('first')['title']);
+            $message = $this->moloni->errors->getErrors('first')['title'];
+            $message .= ' - ' . $this->moloni->errors->getErrors('first')['message'];
+            $this->addError($message);
             return false;
         }
 
@@ -200,7 +208,7 @@ class Documents
             );
         }
 
-        if ($this->moloni->settings['document_status'] == 1 && $hasValidTotals) {
+        if ((int)$this->moloni->settings['document_status'] === 1 && $hasValidTotals) {
             $update = ['document_id' => $result['document_id'], 'status' => 1];
 
             if ($this->moloni->settings['document_email'] && !empty($this->order->getCustomerEmail())) {
@@ -231,6 +239,7 @@ class Documents
 
     /**
      * @return bool
+     * @throws JsonException
      */
     private function createShippingDocument(): bool
     {
@@ -275,6 +284,7 @@ class Documents
     /**
      * Populates $this->>document based on $this->order
      * @return bool
+     * @throws JsonException
      */
     private function parseDocument(): bool
     {
@@ -315,7 +325,6 @@ class Documents
                 if ($documentProduct && is_array($documentProduct)) {
                     $this->document['products'][] = $documentProduct;
                 }
-
             }
         }
 
@@ -329,7 +338,7 @@ class Documents
         $orderCurrencyCode = $this->order->getOrderCurrencyCode();
 
         // @todo decide what to do when a company is not portuguese
-        if ($this->company['country_id'] == 1 && $orderCurrencyCode !== 'EUR') {
+        if ((int)$this->company['country_id'] === 1 && $orderCurrencyCode !== 'EUR') {
             $rate = $this->currencyFactory->create()->load($orderCurrencyCode)->getAnyRate("EUR");
             $this->document['exchange_currency_id'] = 1; // EUR
             $this->document['exchange_rate'] = $rate;
@@ -360,14 +369,16 @@ class Documents
         $orderPayment = $this->order->getPayment();
         if ($orderPayment && (float)$orderPayment->getAmountPaid() > 0) {
             $paymentName = $orderPayment->getMethodInstance()->getTitle();
-            $paymentMethodId = $this->handlePaymentMethod($paymentName);
-
-            if ($paymentMethodId) {
-                $this->document['payments'][] = [
-                    'payment_method_id' => $paymentMethodId,
-                    'value' => $orderPayment->getAmountPaid(),
-                    'date' => gmdate('Y-m-d H:i:s')
-                ];
+            try {
+                $paymentMethodId = $this->handlePaymentMethod($paymentName);
+                if ($paymentMethodId) {
+                    $this->document['payments'][] = [
+                        'payment_method_id' => $paymentMethodId,
+                        'value' => $orderPayment->getAmountPaid(),
+                        'date' => gmdate('Y-m-d H:i:s')
+                    ];
+                }
+            } catch (JsonException $e) {
             }
         }
     }
@@ -404,7 +415,7 @@ class Documents
         }
 
         // If the delivery departure country is Portugal check if the vat is valid
-        if ($this->document['delivery_departure_country'] == 1) {
+        if ((int)$this->document['delivery_departure_country'] === 1) {
             $checkZipCode = $this->tools->zipCheck($this->document['delivery_departure_zip_code']);
             $this->document['delivery_departure_zip_code'] = $checkZipCode;
         }
@@ -431,12 +442,11 @@ class Documents
             $countryId = $this->tools->getCountryIdByISO($countryCode);
             $this->document['delivery_destination_country'] = $countryId;
 
-            if ($this->document['delivery_destination_country'] == 1 &&
+            if ((int)$this->document['delivery_destination_country'] === 1 &&
                 !empty($this->document['delivery_destination_zip_code'])) {
                 $checkZipCode = $this->tools->zipCheck($this->document['delivery_destination_zip_code']);
                 $this->document['delivery_destination_zip_code'] = $checkZipCode;
             }
-
         }
 
         return true;
@@ -447,8 +457,9 @@ class Documents
      * If the delivery method does not exist create it
      * @param string $name
      * @return bool|int
+     * @throws JsonException
      */
-    private function handleDeliveryMethod($name)
+    private function handleDeliveryMethod(string $name)
     {
         $deliveryMethodId = false;
 
@@ -459,7 +470,7 @@ class Documents
         $deliveryMethods = $this->moloni->deliveryMethods->getAll();
         if (!empty($deliveryMethods) && is_array($deliveryMethods)) {
             foreach ($deliveryMethods as $deliveryMethod) {
-                if (mb_strtolower($name) == mb_strtolower($deliveryMethod['name'])) {
+                if (mb_strtolower($name) === mb_strtolower($deliveryMethod['name'])) {
                     $deliveryMethodId = $deliveryMethod['delivery_method_id'];
                     break;
                 }
@@ -480,6 +491,7 @@ class Documents
     /**
      * @param $name
      * @return bool|integer
+     * @throws JsonException
      */
     private function handlePaymentMethod($name)
     {
@@ -492,7 +504,7 @@ class Documents
         $paymentMethods = $this->moloni->paymentMethods->getAll();
         if (!empty($paymentMethods) && is_array($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
-                if (mb_strtolower($name) == mb_strtolower($paymentMethod['name'])) {
+                if (mb_strtolower($name) === mb_strtolower($paymentMethod['name'])) {
                     $paymentMethodId = $paymentMethod['payment_method_id'];
                     break;
                 }
@@ -513,9 +525,11 @@ class Documents
 
     /**
      * @param int $documentId
-     * @param $orderId
+     * @param int $orderId
+     *
+     * @throws JsonException
      */
-    private function setDocumentHasCreated($documentId, $orderId): void
+    private function setDocumentHasCreated(int $documentId, int $orderId): void
     {
         $insertedDocument = $this->moloni->documents->getOne(['document_id' => $documentId]);
 
@@ -529,17 +543,17 @@ class Documents
         $newDocument->setInvoiceDate(date('Y-m-d H:s:i'));
         $newDocument->setInvoiceType($insertedDocument['document_type']['saft_code']);
         $newDocument->setCompanyid($this->moloni->getSession()->companyId);
-        $newDocument->setMetadata(json_encode($this->document));
+        $newDocument->setMetadata(json_encode($this->document, JSON_THROW_ON_ERROR));
 
         $this->documentsRepository->save($newDocument);
     }
 
     /**
      * @param int $documentId
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param OrderInterface $order
      * @return bool
      */
-    private function validateDocumentTotals($documentId, $order): bool
+    private function validateDocumentTotals(int $documentId, OrderInterface $order): bool
     {
         $moloniDocument = $this->moloni->documents->getOne(["document_id" => $documentId]);
 

@@ -28,15 +28,15 @@ class MassRemove extends Documents
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirect->redirect($this->context->getResponse(), $this->moloni->redirectTo);
             return false;
         }
 
-        $selectedOrders = $this->getRequest()->getParam('selected');
+        $selectedOrders = $this->request->getParam('selected');
 
         if (!is_array($selectedOrders) || empty($selectedOrders)) {
             $this->messageManager->addErrorMessage(__("Não foram seleccionadas encomendas"));
-            $this->_redirect('moloni/home/index');
+            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
             return false;
         }
 
@@ -57,12 +57,12 @@ class MassRemove extends Documents
 
             } catch (\Exception $exception) {
                 $this->messageManager->addErrorMessage($exception->getMessage());
-                $this->_redirect('moloni/home/index');
+                $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
                 return false;
             }
         }
 
-        $this->_redirect('moloni/home/index');
+        $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
         return true;
     }
 }

@@ -7,13 +7,13 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
 class ProductsTaxes
 {
 
-    private $moloni;
-    private $store = [];
+    private Moloni $moloni;
+    private array $store = [];
 
     /**
      * ProductsTaxes constructor.
@@ -27,6 +27,7 @@ class ProductsTaxes
     /**
      * @param bool $company_id
      * @return bool|mixed
+     * @throws \JsonException
      */
     public function getAll($company_id = false)
     {
@@ -34,18 +35,18 @@ class ProductsTaxes
             return $this->store[__FUNCTION__];
         }
 
-        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
+        $values = ["company_id" => ($company_id ?: $this->moloni->session->companyId)];
         $result = $this->moloni->execute("taxes/getAll", $values);
         $this->store[__FUNCTION__] = $result;
         if (is_array($result) && isset($result[0]['tax_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Não tem acesso à informação das taxas de artigos"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Não tem acesso à informação das taxas de artigos"),
+            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 }

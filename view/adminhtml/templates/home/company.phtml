@@ -4,32 +4,35 @@
     </h2>
     <br>
     <div class="companies-holder">
-        <?php foreach ($block->getCompanies() as $company): ?>
-            <div class="company">
+        <?php if (isset($block)): ?>
+            <?php foreach ($block->getCompanies() as $company): ?>
+                <div class="company">
 
-                <div class="company-image">
-                    <?php if (!empty($company['image'])): ?>
-                    <div style="width: auto; margin-right: 2rem;">
-                        <img src="https://www.moloni.pt/_imagens/?macro=imgAC_iconeEmpresa_s1&img=<?= $company['image'] ?>"
-                             alt="<?= $company['name'] ?>"/>
-                    </div>
-                    <?php endif; ?>
+                    <div class="company-image">
+                        <?php if (!empty($company['image'])): ?>
+                            <div style="width: auto; margin-right: 2rem;">
+                                <img
+                                    src="https://www.moloni.pt/_imagens/?macro=imgAC_iconeEmpresa_s1&img=<?= $company['image'] ?>"
+                                    alt="<?= $company['name'] ?>"/>
+                            </div>
+                        <?php endif; ?>
 
-                    <div>
-                        <h4><?= $company['name'] ?></h4>
-                        <?= $company['vat'] ?>
-                        <br>
-                        <?= $company['address'] ?>
+                        <div>
+                            <h4><?= $company['name'] ?></h4>
+                            <?= $company['vat'] ?>
+                            <br>
+                            <?= $company['address'] ?>
+                        </div>
                     </div>
+                    <br>
+                    <br>
+                    <a href="<?= $block->getUrl('moloni/settings/edit/invoicing/0/', ['company_id' => $company['company_id']]); ?>">
+                        <button class="scalable primary">
+                            <span><?php echo __('Escolher empresa') ?></span>
+                        </button>
+                    </a>
                 </div>
-                <br>
-                <br>
-                <a href="<?= $block->getUrl('moloni/settings/edit/invoicing/0/', ['company_id' => $company['company_id']]); ?>">
-                    <button class="scalable primary">
-                        <span><?php echo __('Escolher empresa') ?></span>
-                    </button>
-                </a>
-            </div>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php endif ?>
     </div>
 </section>

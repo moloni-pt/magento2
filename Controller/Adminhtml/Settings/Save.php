@@ -28,21 +28,24 @@ class Save extends Settings
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirectInterface->redirect($this->response, $this->moloni->redirectTo);
             return false;
         }
 
         $page = $this->initAction();
-        $settingsFormData = $this->getRequest()->getParam('general');
+        $settingsFormData = $this->requestInterface->getParam('general');
+
         if (is_array($settingsFormData)) {
             $settings = [];
-            $settings = array_merge($settings, $this->getRequest()->getParam('general'));
-            $settings = array_merge($settings, $this->getRequest()->getParam('products'));
-            $settings = array_merge($settings, $this->getRequest()->getParam('orders'));
-            $settings = array_merge($settings, $this->getRequest()->getParam('sync'));
+            $settings[] = $this->requestInterface->getParam('general');
+            $settings[] = $this->requestInterface->getParam('products');
+            $settings[] = $this->requestInterface->getParam('orders');
+            $settings[] = $this->requestInterface->getParam('sync');
             $companyId = $this->moloni->session->companyId;
 
-            foreach ($settings as $label => $value) {
+            $group = array_merge(...$settings);
+
+            foreach ($group as $label => $value) {
                 $this->moloni->settingsRepository->saveSetting($companyId, $label, $value);
             }
 
@@ -51,7 +54,7 @@ class Save extends Settings
             $this->messageManager->addErrorMessage(__("Houve um erro ao guardar alterações"));
         }
 
-        $this->_redirect('*/*/edit/invoicing/0');
+        $this->redirectInterface->redirect($this->response, 'moloni/settings/edit/invoicing/0');
 
         return $page;
     }

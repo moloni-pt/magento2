@@ -15,7 +15,7 @@ class SyncButton extends Edit implements ButtonProviderInterface
      *
      * @return array
      */
-    public function getButtonData()
+    public function getButtonData(): array
     {
         $message = __('As alterações efectuadas serão perdidas, deseja continuar?');
         $syncUrl = $this->getUrl('moloni/sync/product', ['id' => $this->getProductId()]);

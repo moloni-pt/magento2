@@ -2,8 +2,10 @@
 
 namespace Invoicing\Moloni\Block\Adminhtml\Order\View\Tab;
 
-class Documents extends \Magento\Framework\View\Element\Text\ListText implements
-    \Magento\Backend\Block\Widget\Tab\TabInterface
+use Magento\Backend\Block\Widget\Tab\TabInterface;
+use Magento\Framework\View\Element\Text\ListText;
+
+class Documents extends ListText implements TabInterface
 {
     /**
      * {@inheritdoc}

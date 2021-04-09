@@ -7,13 +7,13 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
 class Countries
 {
 
-    private $store = [];
-    private $moloni;
+    private array $store = [];
+    private Moloni $moloni;
 
     /**
      * Countries constructor.
@@ -34,18 +34,18 @@ class Countries
             return $this->store[__FUNCTION__];
         }
 
-        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
+        $values = ["company_id" => ($company_id ?: $this->moloni->session->companyId)];
         $result = $this->moloni->execute("countries/getAll", $values);
         if (is_array($result) && isset($result[0]['country_id'])) {
             $this->store[__FUNCTION__] = $result;
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Não tem acesso à informação dos países"),
-                __(print_r($result, true)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Não tem acesso à informação dos países"),
+            __(print_r($result, true)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 }

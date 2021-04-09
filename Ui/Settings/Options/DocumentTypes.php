@@ -2,7 +2,6 @@
 
 namespace Invoicing\Moloni\Ui\Settings\Options;
 
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\Data\OptionSourceInterface;
 
 class DocumentTypes implements OptionSourceInterface

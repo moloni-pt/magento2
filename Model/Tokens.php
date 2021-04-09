@@ -21,9 +21,9 @@
 
 namespace Invoicing\Moloni\Model;
 
-use Magento\Framework\Model\AbstractModel;
-use Magento\Framework\DataObject\IdentityInterface;
 use Invoicing\Moloni\Api\Data\TokensInterface;
+use Magento\Framework\DataObject\IdentityInterface;
+use Magento\Framework\Model\AbstractModel;
 
 class Tokens extends AbstractModel implements
     IdentityInterface,
@@ -36,6 +36,7 @@ class Tokens extends AbstractModel implements
     public $eventPrefix = 'moloni_tokens';
     public $tokensRow;
 
+    /** @noinspection MagicMethodsValidityInspection */
     public function _construct()
     {
         $this->_init(ResourceModel\Tokens::class);

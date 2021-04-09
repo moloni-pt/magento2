@@ -29,10 +29,10 @@ class Index extends Home
     {
         $page = $this->initAction();
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirect->redirect($this->response, $this->moloni->redirectTo);
             return false;
         }
-        // $this->_redirect("*/ajax/documents");
+
         return $page;
     }
 }

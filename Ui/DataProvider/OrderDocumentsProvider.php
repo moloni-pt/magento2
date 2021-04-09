@@ -9,13 +9,13 @@
 namespace Invoicing\Moloni\Ui\DataProvider;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Framework\App\Request\Http;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\ReportingInterface;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 class OrderDocumentsProvider extends DataProvider
 {

@@ -30,13 +30,11 @@ class OrdersStatuses implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $result = $this->getStatusOptions();
-        return $result;
+        return $this->getStatusOptions();
     }
 
     public function getStatusOptions()
     {
-        $options = $this->statusCollectionFactory->create()->toOptionArray();
-        return $options;
+        return $this->statusCollectionFactory->create()->toOptionArray();
     }
 }

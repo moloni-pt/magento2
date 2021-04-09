@@ -10,8 +10,8 @@ use Magento\Framework\App\RequestInterface;
 
 class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider
 {
-    public $loadedData;
-    private $moloni;
+    public array $loadedData = [];
+    private Moloni $moloni;
 
     public function __construct(
         string $name,
@@ -40,9 +40,9 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
         );
     }
 
-    public function getData()
+    public function getData(): array
     {
-        if (isset($this->loadedData)) {
+        if (!empty($this->loadedData)) {
             return $this->loadedData;
         }
 
@@ -90,5 +90,4 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
 
         return $this->loadedData;
     }
-
 }

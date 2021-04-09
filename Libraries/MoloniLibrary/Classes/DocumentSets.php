@@ -7,12 +7,12 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 
 class DocumentSets
 {
 
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * Companies constructor.
@@ -29,17 +29,17 @@ class DocumentSets
      */
     public function getAll($company_id = false)
     {
-        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
+        $values = ["company_id" => ($company_id ?: $this->moloni->session->companyId)];
         $result = $this->moloni->execute("documentSets/getAll", $values);
         if (is_array($result) && isset($result[0]['document_set_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Não tem acesso à informação das séries"),
-                __(print_r($result, true)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Não tem acesso à informação das séries"),
+            __(print_r($result, true)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 }

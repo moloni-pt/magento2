@@ -28,15 +28,15 @@ class Remove extends Documents
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirect->redirect($this->context->getResponse(), $this->moloni->redirectTo);
             return false;
         }
 
-        $orderId = $this->getRequest()->getParam('order_id');
+        $orderId = $this->request->getParam('order_id');
 
         if (!$orderId) {
             $this->messageManager->addErrorMessage(__("Encomenda não encontrada."));
-            $this->_redirect('moloni/home/index');
+            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
             return false;
         }
 
@@ -53,12 +53,12 @@ class Remove extends Documents
             $this->documentsRepository->save($newDocument);
         } catch (\Exception $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
-            $this->_redirect('moloni/home/index');
+            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
             return false;
         }
 
         $this->messageManager->addSuccessMessage(__("O documento não irá ser gerado no Moloni."));
-        $this->_redirect('moloni/home/index');
+        $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
         return false;
     }
 }

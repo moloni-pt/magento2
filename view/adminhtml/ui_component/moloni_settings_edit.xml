@@ -20,7 +20,7 @@
             </item>
             <item name="save" xsi:type="array">
                 <item name="name" xsi:type="string">save</item>
-                <item name="label" xsi:type="string" translate="true">Guardar Alterações</item>
+                <item name="label" xsi:type="string" translate="true">Guardar</item>
                 <item name="class" xsi:type="string">primary</item>
             </item>
         </item>

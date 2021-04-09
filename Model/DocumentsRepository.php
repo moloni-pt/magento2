@@ -21,39 +21,42 @@
 
 namespace Invoicing\Moloni\Model;
 
+use Exception;
+use Invoicing\Moloni\Api\Data\DocumentsInterface;
+use Invoicing\Moloni\Api\DocumentsRepositoryInterface;
+use Invoicing\Moloni\Model\ResourceModel\Documents as ObjectResourceModel;
+use Invoicing\Moloni\Model\ResourceModel\Documents\CollectionFactory;
+use Magento\Framework\Api\AbstractExtensibleObject;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResults;
+use Magento\Framework\Api\SearchResultsFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsFactory;
-
-use Invoicing\Moloni\Api\DocumentsRepositoryInterface;
-use Invoicing\Moloni\Model\ResourceModel\Documents as ObjectResourceModel;
-use Invoicing\Moloni\Model\ResourceModel\Documents\CollectionFactory;
-use Invoicing\Moloni\Api\Data\DocumentsInterface;
+use Magento\Framework\Model\AbstractModel;
 use Psr\Log\LoggerInterface;
 
 class DocumentsRepository implements DocumentsRepositoryInterface
 {
-    public $objectFactory;
-    public $objectResourceModel;
-    public $collectionFactory;
-    public $searchResultsFactory;
-    public $searchCriteriaBuilder;
-    public $logger;
+    public DocumentsFactory $objectFactory;
+    public ObjectResourceModel $objectResourceModel;
+    public CollectionFactory $collectionFactory;
+    public SearchResultsFactory $searchResultsFactory;
+    public SearchCriteriaBuilder $searchCriteriaBuilder;
+    public LoggerInterface $logger;
 
     /**
      * @var SortOrder SortOrder
      */
-    private $sortOrder;
+    private SortOrder $sortOrder;
 
     /**
      * @var SortOrderBuilder ortOrderBuilder
      */
-    private $sortOrderBuilder;
+    private SortOrderBuilder $sortOrderBuilder;
 
     public function __construct(
         ObjectResourceModel $objectResourceModel,
@@ -79,37 +82,34 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     /**
      * @return Documents
      */
-    public function create()
+    public function create(): Documents
     {
         return $this->objectFactory->create();
     }
 
     /**
-     * @param DocumentsInterface $document
-     * @return DocumentsInterface
+     * @param DocumentsInterface|AbstractModel $model
+     * @return int
      */
-    public function save(DocumentsInterface $document)
+    public function save($model): int
     {
-        $this->documentsResults = false;
         try {
-            $this->objectResourceModel->save($document);
-        } catch (AlreadyExistsException $e) {
-            $this->logger->critical($e->getMessage());
-        } catch (\Exception $e) {
+            $this->objectResourceModel->save($model);
+        } catch (AlreadyExistsException | Exception $e) {
             $this->logger->critical($e->getMessage());
         }
-        return $document->getId();
+
+        return $model->getId();
     }
 
+
     /**
-     * @param $documentId
-     * @return \Invoicing\Moloni\Api\Data\DocumentsInterface int
-     * @throws NoSuchEntityException
+     * @inheritdoc
      */
-    public function getById($documentId)
+    public function getById($id): DocumentsInterface
     {
         $object = $this->objectFactory->create();
-        $this->objectResourceModel->load($object, $documentId);
+        $this->objectResourceModel->load($object, $id);
 
         if (!$object->getId()) {
             throw new NoSuchEntityException(__('Moloni Document Not Found'));
@@ -120,9 +120,9 @@ class DocumentsRepository implements DocumentsRepositoryInterface
 
     /**
      * @param $orderId
-     * @return DocumentsInterface[]|\Magento\Framework\Api\AbstractExtensibleObject[]
+     * @return DocumentsInterface[]|AbstractExtensibleObject[]
      */
-    public function getByOrderId($orderId)
+    public function getByOrderId($orderId): array
     {
         $sortOrder = $this->sortOrderBuilder
             ->setField("document_id")
@@ -138,26 +138,24 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     }
 
     /**
-     * @param DocumentsInterface $option
-     * @return bool
+     * @inheritdoc
      * @throws CouldNotDeleteException
      */
-    public function delete(DocumentsInterface $option)
+    public function delete($model): bool
     {
         try {
-            $this->objectResourceModel->delete($option);
-        } catch (\Exception $exception) {
+            $this->objectResourceModel->delete($model);
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__($exception->getMessage()));
         }
         return true;
     }
 
     /**
-     * @param int $id
-     * @return bool
-     * @throws \Exception
+     * @inheritdoc
+     * @throws CouldNotDeleteException
      */
-    public function deleteById($id)
+    public function deleteById($id): bool
     {
         try {
             return $this->delete($this->getById($id));
@@ -169,11 +167,8 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function getList(SearchCriteriaInterface $criteria)
+    public function getList(SearchCriteriaInterface $criteria): SearchResults
     {
-        /**
-         * @var $searchResults \Magento\Framework\Api\SearchResults
-         */
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
         $collection = $this->collectionFactory->create();
@@ -192,7 +187,6 @@ class DocumentsRepository implements DocumentsRepositoryInterface
         $searchResults->setTotalCount($collection->getSize());
         $sortOrders = $criteria->getSortOrders();
         if ($sortOrders) {
-            /** @var SortOrder $sortOrder */
             foreach ($sortOrders as $sortOrder) {
                 $collection->addOrder(
                     $sortOrder->getField(),

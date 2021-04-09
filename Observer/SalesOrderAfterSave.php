@@ -21,9 +21,9 @@
 
 namespace Invoicing\Moloni\Observer;
 
-use \Invoicing\Moloni\Logger\DocumentsLogger;
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as MoloniDocumentsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Logger\DocumentsLogger;
 use Invoicing\Moloni\Model\DocumentsRepository;
 
 class SalesOrderAfterSave implements \Magento\Framework\Event\ObserverInterface
@@ -32,22 +32,22 @@ class SalesOrderAfterSave implements \Magento\Framework\Event\ObserverInterface
     /**
      * @var DocumentsLogger
      */
-    protected $logger;
+    protected DocumentsLogger $logger;
 
     /**
      * @var Moloni
      */
-    protected $moloni;
+    protected Moloni $moloni;
 
     /**
      * @var MoloniDocumentsFactory
      */
-    protected $moloniDocumentsFactory;
+    protected MoloniDocumentsFactory $moloniDocumentsFactory;
 
     /**
      * @var DocumentsRepository
      */
-    protected $documentsRepository;
+    protected DocumentsRepository $documentsRepository;
 
     public function __construct(
         Moloni $moloni,
@@ -69,6 +69,7 @@ class SalesOrderAfterSave implements \Magento\Framework\Event\ObserverInterface
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return SalesOrderAfterSave
+     * @throws \JsonException
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

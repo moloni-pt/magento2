@@ -10,20 +10,28 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies;
 use Invoicing\Moloni\Api\MoloniApiSessionRepositoryInterface;
 use Invoicing\Moloni\Model\TokensRepository;
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\Stdlib\DateTime;
 
 class ApiSession implements MoloniApiSessionRepositoryInterface
 {
     const API_URL = 'https://api.moloni.pt/v1/';
 
-    private $dateTime;
-    private $curl;
-    private $errors;
-    private $tokens;
-    private $dataPersistor;
-    public $accessToken = null;
-    public $companyId = null;
+    private DateTime $dateTime;
+    private Curl $curl;
+    private ApiErrors $errors;
+    private TokensRepository $tokens;
+    private DataPersistorInterface $dataPersistor;
+
+    /**
+     * @var null|string
+     */
+    public ?string $accessToken = null;
+
+    /**
+     * @var int|null
+     */
+    public ?int $companyId = null;
 
     /**
      * Override the parent constructor.
@@ -39,7 +47,8 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
         DataPersistorInterface $dataPersistant,
         DateTime $dateTime,
         Curl $curl
-    ) {
+    )
+    {
         $this->errors = $errors;
         $this->tokens = $tokens;
         $this->dataPersistor = $dataPersistant;
@@ -48,10 +57,10 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
     }
 
     /**
-     * @param $code
+     * @param string $code
      * @return bool
      */
-    public function isValidAuthorizationCode($code)
+    public function isValidAuthorizationCode($code): bool
     {
         $tokens = $this->tokens->getTokens();
         if ($tokens && $tokens->getDeveloperId()) {
@@ -89,7 +98,7 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
         return false;
     }
 
-    public function isValidSession()
+    public function isValidSession(): bool
     {
         if ($this->handleSessionRefresh()) {
             $tokens = $this->tokens->getTokens();
@@ -109,7 +118,7 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
     /**
      * @return bool
      */
-    private function handleSessionRefresh()
+    private function handleSessionRefresh(): bool
     {
         $tokens = $this->tokens->getTokens();
         if ($tokens && $tokens->getAccessToken()) {

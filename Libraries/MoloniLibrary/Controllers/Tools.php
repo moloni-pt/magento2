@@ -7,7 +7,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 class Tools
 {
 
-    private $moloni;
+    private Moloni $moloni;
 
     public function __construct(Moloni $moloni)
     {
@@ -18,7 +18,7 @@ class Tools
      * Regex expression to validate a Portuguese Zip Code
      * @var string
      */
-    private $regexZip = "/[0-9]{4}\-[0-9]{3}/";
+    private string $regexZip = "/[0-9]{4}\-[0-9]{3}/";
 
 
     /**
@@ -28,7 +28,7 @@ class Tools
      * @param int $chars
      * @return int
      */
-    public function getCountryIdByISO($iso, $chars = 2)
+    public function getCountryIdByISO($iso, $chars = 2): int
     {
         $countryId = 1;
 
@@ -51,7 +51,7 @@ class Tools
      * @param string $vatNumber
      * @return bool
      */
-    public function validateVat($vatNumber)
+    public function validateVat(string $vatNumber): bool
     {
         if (preg_match('/^[123456789]\d{8}$/', $vatNumber)) {
             $sum = 0;
@@ -82,7 +82,7 @@ class Tools
      * @param string $input
      * @return string
      */
-    public function zipCheck($input)
+    public function zipCheck(string $input): string
     {
         $zip = trim(str_replace(" ", "", $input));
         $zip = preg_replace("/[^0-9]/", "", $zip);
@@ -121,6 +121,4 @@ class Tools
 
         return preg_match($this->regexZip, $zip) ? $zip : '1000-100';
     }
-
-
 }

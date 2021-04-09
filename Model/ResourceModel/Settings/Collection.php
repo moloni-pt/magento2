@@ -7,6 +7,7 @@
 
 namespace Invoicing\Moloni\Model\ResourceModel\Settings;
 
+use Invoicing\Moloni\Model\ResourceModel\Settings;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 class Collection extends AbstractCollection
@@ -22,10 +23,13 @@ class Collection extends AbstractCollection
     /**
      * Define resource model
      *
+     * @noinspection MagicMethodsValidityInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     *
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('Invoicing\Moloni\Model\Settings', 'Invoicing\Moloni\Model\ResourceModel\Settings');
+        $this->_init(\Invoicing\Moloni\Model\Settings::class, Settings::class);
     }
 }

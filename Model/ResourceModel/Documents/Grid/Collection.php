@@ -1,10 +1,12 @@
 <?php
+
 namespace Invoicing\Moloni\Model\ResourceModel\Documents\Grid;
 
-use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
+use Invoicing\Moloni\Model\ResourceModel\Documents;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
 use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
 use Psr\Log\LoggerInterface as Logger;
 
 class Collection extends SearchResult
@@ -26,8 +28,9 @@ class Collection extends SearchResult
         FetchStrategy $fetchStrategy,
         EventManager $eventManager,
         $mainTable = 'moloni_documents',
-        $resourceModel = \Invoicing\Moloni\Model\ResourceModel\Documents::class
-    ) {
+        $resourceModel = Documents::class
+    )
+    {
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel);
     }
 }
