@@ -7,7 +7,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class ProductsTaxes implements OptionSourceInterface
 {
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * DocumentSets constructor.
@@ -21,8 +21,9 @@ class ProductsTaxes implements OptionSourceInterface
     /**
      * Retrieve options array.
      * @return array
+     * @throws \JsonException
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $result = [];
 

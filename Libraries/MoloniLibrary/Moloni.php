@@ -21,6 +21,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\Documents;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSets;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnits;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnitsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\PaymentMethods;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\PaymentMethodsFactory;
@@ -52,7 +53,8 @@ use Magento\Framework\HTTP\Client\Curl;
  * @property DocumentSets $documentSets
  * @property ProductsCategories $productsCategories
  * @property ProductsTaxes $taxes
- * @property ProductsTaxExemptions $exemptions
+ * @property ProductsTaxExemptions $taxExemptions
+ * @property MeasurementUnits $measurementUnits
  */
 class Moloni implements MoloniApiRepositoryInterface
 {

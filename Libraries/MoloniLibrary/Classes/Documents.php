@@ -152,7 +152,13 @@ class Documents
             $documentId;
     }
 
-    public function getDownloadUrl($values, $companyId = false): bool
+    /**
+     * @param $values
+     * @param false $companyId
+     * @return false|string
+     * @throws JsonException
+     */
+    public function getDownloadUrl($values, $companyId = false)
     {
         $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("documents/getPdfLink", $values);

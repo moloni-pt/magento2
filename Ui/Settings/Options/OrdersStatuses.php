@@ -8,8 +8,8 @@ use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 
 class OrdersStatuses implements OptionSourceInterface
 {
-    private $moloni;
-    private $statusCollectionFactory;
+    private Moloni $moloni;
+    private CollectionFactory $statusCollectionFactory;
 
     /**
      * DocumentSets constructor.
@@ -19,7 +19,8 @@ class OrdersStatuses implements OptionSourceInterface
     public function __construct(
         CollectionFactory $statusCollectionFactory,
         Moloni $moloni
-    ) {
+    )
+    {
         $this->statusCollectionFactory = $statusCollectionFactory;
         $this->moloni = $moloni;
     }
@@ -28,12 +29,12 @@ class OrdersStatuses implements OptionSourceInterface
      * Retrieve options array.
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         return $this->getStatusOptions();
     }
 
-    public function getStatusOptions()
+    public function getStatusOptions(): array
     {
         return $this->statusCollectionFactory->create()->toOptionArray();
     }

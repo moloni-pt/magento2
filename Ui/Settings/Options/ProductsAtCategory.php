@@ -11,7 +11,7 @@ class ProductsAtCategory implements OptionSourceInterface
      * Retrieve options array.
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $result = [];
         $result[] = ['label' => __('Mercadorias'), 'value' => 'M'];

@@ -9,25 +9,29 @@
 namespace Invoicing\Moloni\Ui\DataProvider;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\ReportingInterface;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Ui\DataProvider\AddFieldToCollectionInterface;
+use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 
 class OrderDocumentsProvider extends DataProvider
 {
     /**
-     * @var \Magento\Ui\DataProvider\AddFieldToCollectionInterface[]
+     * @var AddFieldToCollectionInterface[]
      */
-    protected $addFieldStrategies;
+    protected array $addFieldStrategies;
 
     /**
-     * @var \Magento\Ui\DataProvider\AddFilterToCollectionInterface[]
+     * @var AddFilterToCollectionInterface[]
      */
-    protected $addFilterStrategies;
+    protected array $addFilterStrategies;
 
     /**
      * @var Http
@@ -37,12 +41,12 @@ class OrderDocumentsProvider extends DataProvider
     /**
      * @var OrderRepositoryInterface
      */
-    protected $orderRepository;
+    protected OrderRepositoryInterface $orderRepository;
 
     /**
      * @var Moloni
      */
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * OrderDocumentsProvider constructor.
@@ -60,9 +64,9 @@ class OrderDocumentsProvider extends DataProvider
      * @param array $data
      */
     public function __construct(
-        $name,
-        $primaryFieldName,
-        $requestFieldName,
+        string $name,
+        string $primaryFieldName,
+        string $requestFieldName,
         ReportingInterface $reporting,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         RequestInterface $request,
@@ -77,13 +81,23 @@ class OrderDocumentsProvider extends DataProvider
         $this->moloni = $moloni;
         $this->orderRepository = $orderRepository;
         $this->data = $data;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $reporting, $searchCriteriaBuilder, $request, $filterBuilder, $meta, $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $reporting,
+            $searchCriteriaBuilder,
+            $request,
+            $filterBuilder,
+            $meta,
+            $data
+        );
     }
 
     /**
-     * @return \Magento\Sales\Api\Data\OrderInterface
+     * @return OrderInterface
      */
-    public function getOrder()
+    public function getOrder(): OrderInterface
     {
         $orderId = $this->request->getParam("order_id");
         return $this->orderRepository->get($orderId);
@@ -91,8 +105,9 @@ class OrderDocumentsProvider extends DataProvider
 
     /***
      * @return array
+     * @throws \JsonException
      */
-    public function getData()
+    public function getData(): array
     {
 
         $documentsList = [];
@@ -107,19 +122,25 @@ class OrderDocumentsProvider extends DataProvider
                     foreach ($documentsList as &$document) {
                         $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
                         $document['document_type_name'] = $currentDocumentType->documentTypeName;
-                        $document['document_set'] = $currentDocumentType->documentTypeName . ' ' . $document['document_set_name'] . '/' . $document['number'];
+                        $document['document_set'] =
+                            $currentDocumentType->documentTypeName . ' ' .
+                            $document['document_set_name'] . '/' . $document['number'];
+
                         $document['document_date'] = date("Y-m-d", strtotime($document['date']));
-                        $document['net_value'] = $document['net_value'] . '€';
+                        $document['net_value'] .= '€';
                         $document['download_url'] = '';
 
-                        if ($document['status'] == 1) {
+                        if ((int)$document['status'] === 1) {
                             $document['status_name'] = __("Fechado");
                             $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
-                            $documentDownloadUrl = $currentDocumentType->getDownloadUrl(['document_id' => $document['document_id']]);
+                            $documentDownloadUrl = $currentDocumentType->getDownloadUrl(
+                                ['document_id' => $document['document_id']]
+                            );
+
                             if ($documentDownloadUrl) {
                                 $document['download_url'] = $documentDownloadUrl;
                             }
-                        } elseif ($document['status'] == 0) {
+                        } elseif ((int)$document['status'] === 0) {
                             $document['status_name'] = __("Rascunho");
                             $document['view_url'] = $currentDocumentType->getEditUrl($document['document_id']);
                         } else {
@@ -129,7 +150,6 @@ class OrderDocumentsProvider extends DataProvider
                     }
                 }
             }
-
         }
 
         return [
@@ -146,7 +166,7 @@ class OrderDocumentsProvider extends DataProvider
     {
     }
 
-    public function addFilter(\Magento\Framework\Api\Filter $filter)
+    public function addFilter(Filter $filter)
     {
     }
 }

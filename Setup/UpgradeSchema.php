@@ -18,25 +18,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Setup;
 
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use Magento\Framework\Setup\SetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
 
+    /**
+     * @var SchemaSetupInterface|SetupInterface
+     */
     private $installer;
-    private $tables = [
+
+    private array $tables = [
         "moloni_tokens",
         "moloni_settings",
         "moloni_documents"
     ];
 
-    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
+    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context): void
     {
         if (version_compare($context->getVersion(), "1.3.0", "<")) {
             $this->installer = $setup;
@@ -64,10 +70,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 Table::TYPE_INTEGER,
                 null,
                 [
-                'identity' => true,
-                'nullable' => false,
-                'primary' => true,
-                'unsigned' => true,
+                    'identity' => true,
+                    'nullable' => false,
+                    'primary' => true,
+                    'unsigned' => true,
                 ],
                 'Tokens combination id'
             )->addColumn(
@@ -134,10 +140,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 Table::TYPE_INTEGER,
                 null,
                 [
-                'identity' => true,
-                'nullable' => false,
-                'primary' => true,
-                'unsigned' => true,
+                    'identity' => true,
+                    'nullable' => false,
+                    'primary' => true,
+                    'unsigned' => true,
                 ],
                 'Tokens combination id'
             )->addColumn(
@@ -180,10 +186,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 Table::TYPE_INTEGER,
                 null,
                 [
-                'identity' => true,
-                'nullable' => false,
-                'primary' => true,
-                'unsigned' => true,
+                    'identity' => true,
+                    'nullable' => false,
+                    'primary' => true,
+                    'unsigned' => true,
                 ],
                 'Document Id'
             )->addColumn(
@@ -273,10 +279,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->installer->getTable('moloni_documents'),
             $this->installer->getIdxName(
                 $this->installer->getTable('moloni_documents'),
-                ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
+                [
+                    'document_id', 'company_id', 'store_id', 'order_id',
+                    'order_total', 'invoice_id', 'invoice_total',
+                    'invoice_status', 'invoice_date', 'invoice_type', 'metadata'
+                ],
                 AdapterInterface::INDEX_TYPE_FULLTEXT
             ),
-            ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
+            [
+                'document_id', 'company_id', 'store_id', 'order_id',
+                'order_total', 'invoice_id', 'invoice_total', 'invoice_status',
+                'invoice_date', 'invoice_type', 'metadata'
+            ],
             AdapterInterface::INDEX_TYPE_FULLTEXT
         );
     }

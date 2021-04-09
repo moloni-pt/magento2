@@ -7,7 +7,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class ProductsMeasurementUnits implements OptionSourceInterface
 {
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * DocumentSets constructor.
@@ -21,8 +21,9 @@ class ProductsMeasurementUnits implements OptionSourceInterface
     /**
      * Retrieve options array.
      * @return array
+     * @throws \JsonException
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $result = [];
 
@@ -36,7 +37,7 @@ class ProductsMeasurementUnits implements OptionSourceInterface
                     "label" => $measurementUnit['name'] . " (" . $measurementUnit['short_name'] . ")"
                 ];
 
-                if ($measurementUnit['name'] == 'Unidade') {
+                if ($measurementUnit['name'] === 'Unidade') {
                     array_unshift($result, $unit);
                     continue;
                 }
