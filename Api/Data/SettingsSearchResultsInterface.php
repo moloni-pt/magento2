@@ -13,13 +13,13 @@ use Magento\Framework\Api\SearchResultsInterface;
 interface SettingsSearchResultsInterface extends SearchResultsInterface
 {
     /**
-     * @return \Invoicing\Moloni\Api\Data\SettingsInterface[]
+     * @return SettingsInterface[]
      */
-    public function getItems();
+    public function getItems(): array;
 
     /**
-     * @param \Invoicing\Moloni\Api\Data\SettingsInterface[] $items
+     * @param SettingsInterface[] $items
      * @return $this
      */
-    public function setItems(array $items);
+    public function setItems(array $items): SettingsSearchResultsInterface;
 }

@@ -7,11 +7,12 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class DocumentSets implements OptionSourceInterface
 {
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * DocumentSets constructor.
-     * @param Moloni $moloni
+     *
+     * @param $moloni Moloni
      */
     public function __construct(Moloni $moloni)
     {
@@ -20,9 +21,10 @@ class DocumentSets implements OptionSourceInterface
 
     /**
      * Retrieve options array.
+     *
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $result = [];
 

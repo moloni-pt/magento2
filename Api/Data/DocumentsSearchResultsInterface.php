@@ -13,13 +13,13 @@ use Magento\Framework\Api\SearchResultsInterface;
 interface DocumentsSearchResultsInterface extends SearchResultsInterface
 {
     /**
-     * @return \Invoicing\Moloni\Api\Data\DocumentsInterface[]
+     * @return DocumentsInterface[]
      */
-    public function getItems();
+    public function getItems(): array;
 
     /**
-     * @param \Invoicing\Moloni\Api\Data\DocumentsInterface[] $items
+     * @param DocumentsInterface[] $items
      * @return $this
      */
-    public function setItems(array $items);
+    public function setItems(array $items): DocumentsSearchResultsInterface;
 }

@@ -25,8 +25,8 @@ interface MoloniApiSessionRepositoryInterface
 {
 
     /**
-     * @param String $code
+     * @param string $code
      * @return mixed
      */
-    public function isValidAuthorizationCode($code);
+    public function isValidAuthorizationCode(string $code);
 }

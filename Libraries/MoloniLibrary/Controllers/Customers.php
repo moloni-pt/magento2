@@ -8,14 +8,17 @@ use Magento\Sales\Api\Data\OrderInterface;
 class Customers
 {
 
+    /** @var bool|int */
     public $customerId = false;
+
+    /** @var bool|int */
     public $alternateAddressId = false;
 
     /**
      * Holds the default values
      * @var array
      */
-    private $defaults = [
+    private array $defaults = [
         'vat' => '999999990',
         'name' => 'Cliente',
         'country_id' => 1,
@@ -45,48 +48,48 @@ class Customers
      * Holds the values to be inserted/update
      * @var array
      */
-    private $customer = [];
+    private array $customer = [];
 
     /**
      * Hold an existing Moloni customer
      * @var array
      */
-    private $moloniCustomer = [];
+    private array $moloniCustomer = [];
 
     /**
      * Assign a countryId to a languageId (1, 2 or 3)
      * If the countryId is not defined it shoud be 2 (english)
      * @var array
      */
-    public $languageByCountry = [
+    public array $languageByCountry = [
         1 => 1 // Portugal > Portuguese
     ];
 
     /**
      * @var Moloni
      */
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * @var Tools
      */
-    private $tools;
+    private Tools $tools;
 
     public function __construct(
         Moloni $moloni,
         Tools $tools
-    )
-    {
+    ) {
         $this->moloni = $moloni;
         $this->tools = $tools;
     }
 
 
     /**
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param OrderInterface $order
      * @return $this
+     * @throws \JsonException
      */
-    public function setCustomerFromOrder(OrderInterface $order)
+    public function setCustomerFromOrder(OrderInterface $order): Customers
     {
         $billingAddress = $order->getBillingAddress();
         if ($billingAddress) {
@@ -141,7 +144,7 @@ class Customers
         return $this;
     }
 
-    private function parseCustomer()
+    private function parseCustomer(): bool
     {
         if (empty($this->customer['vat'])) {
             $this->customer['vat'] = '999999990';
@@ -165,19 +168,19 @@ class Customers
                     $this->moloniCustomer = $getCustomer[0];
                 }
             }
-        } else {
-            // Search for the customer by VAT
-            if (!empty($this->customer['vat'])) {
-                $getCustomer = $this->moloni->customers->getByVat(['vat' => $this->customer['vat']]);
-                if ($getCustomer && count($getCustomer) > 0) {
-                    $this->moloniCustomer = $getCustomer[0];
-                }
+        } elseif (!empty($this->customer['vat'])) {
+            $getCustomer = $this->moloni->customers->getByVat(['vat' => $this->customer['vat']]);
+            if ($getCustomer && count($getCustomer) > 0) {
+                $this->moloniCustomer = $getCustomer[0];
             }
         }
 
         return true;
     }
 
+    /**
+     * @throws \JsonException
+     */
     private function handleCustomer()
     {
         // Customer does not exist lets insert it
@@ -202,5 +205,4 @@ class Customers
             }
         }
     }
-
 }

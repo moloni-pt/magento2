@@ -30,7 +30,7 @@ class Company extends Home
     {
         $page = $this->initAction();
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirect->redirect($this->response, $this->moloni->redirectTo);
             return false;
         }
 
@@ -38,7 +38,7 @@ class Company extends Home
         if (!$companies) {
             $this->moloni->dropActiveSession();
             $this->messageManager->addErrorMessage($this->moloni->errors->getErrors('last')['message']);
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirect->redirect($this->response, $this->moloni->redirectTo);
             return false;
         }
 

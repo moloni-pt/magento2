@@ -2,8 +2,10 @@
 
 namespace Invoicing\Moloni\Ui\Component\Listing\Column;
 
+use Invoicing\Moloni\Api\Data\DocumentsInterface;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni as MoloniLibrary;
 use Invoicing\Moloni\Model\DocumentsRepository;
+use Magento\Framework\Api\AbstractExtensibleObject;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -16,12 +18,12 @@ class Moloni extends Column
     /**
      * @var UrlInterface
      */
-    private $urlBuilder;
+    private UrlInterface $urlBuilder;
 
     /**
      * @var DocumentsRepository
      */
-    private $documentsRepository;
+    private DocumentsRepository $documentsRepository;
 
     /**
      * @var Moloni
@@ -44,12 +46,15 @@ class Moloni extends Column
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
-    public function prepareDataSource(array $dataSource)
+    public function prepareDataSource(array $dataSource): array
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item['entity_id'])) {
-                    $item[$this->getData('name')] = $this->getOptions($item['entity_id']);
+                    try {
+                        $item[$this->getData('name')] = $this->getOptions($item['entity_id']);
+                    } catch (\JsonException $e) {
+                    }
                 }
             }
         }
@@ -60,22 +65,23 @@ class Moloni extends Column
     /**
      * @param int $orderId
      * @return array
+     * @throws \JsonException
      */
-    private function getOptions($orderId)
+    private function getOptions(int $orderId): array
     {
         $moloniLog = $this->hasMoloniLog($orderId);
         if (!$moloniLog) {
             return $this->getMoloniCreateObject($orderId);
-        } else {
-            return $this->getMoloniMoreActionsObject($moloniLog, $orderId);
         }
+
+        return $this->getMoloniMoreActionsObject($moloniLog, $orderId);
     }
 
     /**
      * @param int $orderId
-     * @return bool|\Invoicing\Moloni\Api\Data\DocumentsInterface[]|\Magento\Framework\Api\AbstractExtensibleObject[]
+     * @return bool|DocumentsInterface[]|AbstractExtensibleObject[]
      */
-    private function hasMoloniLog($orderId)
+    private function hasMoloniLog(int $orderId)
     {
         $hasDocument = $this->documentsRepository->getByOrderId($orderId);
         if (!$hasDocument) {
@@ -88,7 +94,7 @@ class Moloni extends Column
      * @param int $orderId
      * @return array
      */
-    private function getMoloniCreateObject($orderId)
+    private function getMoloniCreateObject(int $orderId): array
     {
         return [
             'create' => [
@@ -100,11 +106,12 @@ class Moloni extends Column
     }
 
     /**
-     * @param \Invoicing\Moloni\Api\Data\DocumentsInterface[]|\
-     * Magento\Framework\Api\AbstractExtensibleObject[] $moloniLog
+     * @param $moloniLog
+     * @param $orderId
      * @return array
+     * @throws \JsonException
      */
-    private function getMoloniMoreActionsObject($moloniLog, $orderId)
+    private function getMoloniMoreActionsObject($moloniLog, $orderId): array
     {
         $options = [];
         if (!$this->moloni->checkActiveSession()) {
@@ -115,7 +122,7 @@ class Moloni extends Column
         $moloniDocument = $this->moloni->documents->getOne(['document_id' => $documentId]);
         if ($moloniDocument) {
             $documentTypeId = $moloniDocument['document_type']['document_type_id'];
-            if ($moloniDocument['status'] == 1) {
+            if ((int)$moloniDocument['status'] === 1) {
                 $moloniDocument = $this->moloni->documents->setDocumentType($documentTypeId);
 
                 $options = [
@@ -138,7 +145,7 @@ class Moloni extends Column
                         'target' => '_BLANK'
                     ],
                 ];
-            } elseif ($moloniDocument['status'] == 0) {
+            } elseif ((int)$moloniDocument['status'] === 0) {
                 $moloniDocumentEditUrl = $this->moloni->documents->setDocumentType($documentTypeId)
                     ->getEditUrl($documentId);
 

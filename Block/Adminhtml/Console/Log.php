@@ -22,14 +22,14 @@
 namespace Invoicing\Moloni\Block\Adminhtml\Console;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\App\Request\DataPersistorInterface;
 
 class Log extends Template
 {
-    private $dataPersistor;
-    private $moloni;
+    private DataPersistorInterface $dataPersistor;
+    private Moloni $moloni;
 
     public function __construct(
         Context $context,

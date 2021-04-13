@@ -9,22 +9,40 @@
 namespace Invoicing\Moloni\Controller\Documents;
 
 use Magento\Framework\App\Action;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Response\RedirectInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Element\Html\Links;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Sales\Controller\AbstractController\OrderLoaderInterface;
 
-class View extends Action\Action
+class View implements ActionInterface
 {
-
     /**
-     * @var \Magento\Sales\Controller\AbstractController\OrderLoaderInterface
+     * @var OrderLoaderInterface
      */
-    protected $orderLoader;
-
+    protected OrderLoaderInterface $orderLoader;
 
     /**
      * @var PageFactory
      */
-    protected $resultPageFactory;
+    protected PageFactory $resultPageFactory;
+
+    /**
+     * @var RequestInterface
+     */
+    protected RequestInterface $requestInterface;
+    /**
+     * @var RedirectInterface
+     */
+    protected RedirectInterface $redirectInterface;
+
+    /**
+     * @var ResponseInterface
+     */
+    protected ResponseInterface $response;
 
     /**
      * @param Action\Context $context
@@ -38,27 +56,28 @@ class View extends Action\Action
     )
     {
         $this->orderLoader = $orderLoader;
-
         $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context);
+
+        $this->response = $context->getResponse();
+        $this->requestInterface = $context->getRequest();
+        $this->redirectInterface = $context->getRedirect();
     }
 
     /**
      * Order view page
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
-    public function execute()
+    public function execute(): ResultInterface
     {
-        $result = $this->orderLoader->load($this->_request);
-        if ($result instanceof \Magento\Framework\Controller\ResultInterface) {
+        $result = $this->orderLoader->load($this->requestInterface);
+        if ($result instanceof ResultInterface) {
             return $result;
         }
 
-        /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
 
-        /** @var \Magento\Framework\View\Element\Html\Links $navigationBlock */
+        /** @var Links $navigationBlock */
         $navigationBlock = $resultPage->getLayout()->getBlock('customer_account_navigation');
         if ($navigationBlock) {
             $navigationBlock->setActive('sales/order/history');

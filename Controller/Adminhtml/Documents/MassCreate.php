@@ -22,21 +22,63 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as MoloniDocumentsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Model\DocumentsRepository;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Result\PageFactory;
 
 class MassCreate extends Documents
 {
+    private array $data;
 
-    public function execute()
+    /**
+     * Documents constructor.
+     *
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param Moloni $moloni
+     * @param MoloniDocumentsFactory $moloniDocumentsFactory
+     * @param DocumentsRepository $documentsRepository
+     * @param UrlInterface $urlBuilder
+     * @param array $data
+     */
+    public function __construct(
+        Context $context,
+        PageFactory $resultPageFactory,
+        Moloni $moloni,
+        MoloniDocumentsFactory $moloniDocumentsFactory,
+        DocumentsRepository $documentsRepository,
+        UrlInterface $urlBuilder,
+        array $data = []
+    )
+    {
+        /** @noinspection UnusedConstructorDependenciesInspection */
+        $this->data = $data;
+
+        parent::__construct(
+            $context,
+            $resultPageFactory,
+            $moloni,
+            $moloniDocumentsFactory,
+            $documentsRepository,
+            $urlBuilder
+        );
+    }
+
+    public function execute(): bool
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirect->redirect($this->context->getResponse(), $this->moloni->redirectTo);
             return false;
         }
 
-        $selectedOrders = $this->getRequest()->getParam('selected');
+        $selectedOrders = $this->request->getParam('selected');
+
         if (!is_array($selectedOrders) || empty($selectedOrders)) {
             $this->messageManager->addErrorMessage(__("Não foram seleccionadas encomendas"));
-            $this->_redirect('moloni/home/index');
+            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
             return false;
         }
 
@@ -50,7 +92,7 @@ class MassCreate extends Documents
             }
         }
 
-        $this->_redirect('moloni/home/index');
+        $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
         return true;
     }
 }

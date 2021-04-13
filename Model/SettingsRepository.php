@@ -21,29 +21,34 @@
 
 namespace Invoicing\Moloni\Model;
 
+use Exception;
+use Invoicing\Moloni\Api\Data\SettingsInterface;
+use Invoicing\Moloni\Api\Data\TokensInterface;
+use Invoicing\Moloni\Api\SettingsRepositoryInterface;
+use Invoicing\Moloni\Model\ResourceModel\Settings as ObjectResourceModel;
+use Invoicing\Moloni\Model\ResourceModel\Settings\CollectionFactory;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Api\SearchResultsInterfaceFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsInterfaceFactory;
-
-use Invoicing\Moloni\Api\SettingsRepositoryInterface;
-use Invoicing\Moloni\Model\ResourceModel\Settings as ObjectResourceModel;
-use Invoicing\Moloni\Model\ResourceModel\Settings\CollectionFactory;
-use Invoicing\Moloni\Api\Data\SettingsInterface;
+use Magento\Framework\Model\AbstractModel;
+use Psr\Log\LoggerInterface;
 
 class SettingsRepository implements SettingsRepositoryInterface
 {
-    public $objectFactory;
-    public $objectResourceModel;
-    public $collectionFactory;
-    public $searchResultsFactory;
-    public $searchCriteriaBuilder;
-    public $logger;
+    public SettingsFactory $objectFactory;
+    public ObjectResourceModel $objectResourceModel;
+    public CollectionFactory $collectionFactory;
+    public SearchResultsInterfaceFactory $searchResultsFactory;
+    public SearchCriteriaBuilder $searchCriteriaBuilder;
+    public LoggerInterface $logger;
 
-    private $settingsResults = false;
+    private array $settingsResults = [];
 
     /**
      * SettingsRepository constructor.
@@ -52,7 +57,7 @@ class SettingsRepository implements SettingsRepositoryInterface
      * @param CollectionFactory $collectionFactory
      * @param SearchResultsInterfaceFactory $searchResultsFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ObjectResourceModel $objectResourceModel,
@@ -60,8 +65,9 @@ class SettingsRepository implements SettingsRepositoryInterface
         CollectionFactory $collectionFactory,
         SearchResultsInterfaceFactory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Psr\Log\LoggerInterface $logger
-    ) {
+        LoggerInterface $logger
+    )
+    {
         $this->objectFactory = $objectFactory;
         $this->objectResourceModel = $objectResourceModel;
         $this->collectionFactory = $collectionFactory;
@@ -71,23 +77,28 @@ class SettingsRepository implements SettingsRepositoryInterface
     }
 
     /**
-     * @param SettingsInterface $setting
-     * @return int
+     * @inheritdoc
      */
-    public function save(SettingsInterface $setting)
+    public function save($model): int
     {
-        $this->settingsResults = false;
+        $this->settingsResults = [];
         try {
-            $this->objectResourceModel->save($setting);
-        } catch (AlreadyExistsException $e) {
-            $this->logger->critical($e->getMessage());
-        } catch (\Exception $e) {
+            $this->objectResourceModel->save($model);
+        } catch (AlreadyExistsException | Exception $e) {
             $this->logger->critical($e->getMessage());
         }
-        return $setting->getId();
+
+        return $model->getId();
     }
 
-    public function saveSetting($companyId, $label, $value)
+    /**
+     * @param $companyId int
+     * @param $label string
+     * @param $value int|string|array
+     *
+     * @return SettingsInterface|TokensInterface|Settings|ExtensibleDataInterface
+     */
+    public function saveSetting(int $companyId, string $label, $value)
     {
         $obj = $this->getByCompanyLabel($companyId, $label);
 
@@ -98,24 +109,22 @@ class SettingsRepository implements SettingsRepositoryInterface
         $obj->setCompanyId($companyId);
         $obj->setStoreId(0);
         $obj->setLabel($label);
-        $obj->setValue(($value == 'required') ? '' : $value);
+        $obj->setValue(($value === 'required') ? '' : $value);
+
 
         $this->save($obj);
-
         return $obj;
     }
 
     /**
-     * @param $optionId
-     * @return \Invoicing\Moloni\Api\Data\SettingsInterface int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @inheritdoc
      */
-    public function getById($optionId)
+    public function getById($id): AbstractModel
     {
         $object = $this->objectFactory->create();
-        $this->objectResourceModel->load($object, $optionId);
+        $this->objectResourceModel->load($object, $id);
 
-        if (!$object->getId()) {
+        if (!$object || !$object->getId()) {
             throw new NoSuchEntityException(__('Setting not found'));
         }
 
@@ -123,26 +132,24 @@ class SettingsRepository implements SettingsRepositoryInterface
     }
 
     /**
-     * @param SettingsInterface $option
-     * @return bool
+     * @inheritdoc
      * @throws CouldNotDeleteException
      */
-    public function delete(SettingsInterface $option)
+    public function delete($model): bool
     {
         try {
-            $this->objectResourceModel->delete($option);
-        } catch (\Exception $exception) {
+            $this->objectResourceModel->delete($model);
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__($exception->getMessage()));
         }
         return true;
     }
 
     /**
-     * @param $id
-     * @return bool
-     * @throws \Exception
+     * @inheritdoc
+     * @throws CouldNotDeleteException
      */
-    public function deleteById($id)
+    public function deleteById($id): bool
     {
         try {
             return $this->delete($this->getById($id));
@@ -160,31 +167,39 @@ class SettingsRepository implements SettingsRepositoryInterface
     }
 
     /**
-     * @param $companyId
+     * @param $companyId int
+     *
      * @return bool|array
      */
-    public function getSettingsByCompany($companyId)
+    public function getSettingsByCompany(int $companyId)
     {
-        if (!$this->settingsResults[$companyId]) {
-            $filter = $this->searchCriteriaBuilder->addFilter("company_id", $companyId)->create();
-            $list = $this->getList($filter);
+        if (is_array($this->settingsResults)) {
+            if (!isset($this->settingsResults[$companyId])) {
+                $filter = $this->searchCriteriaBuilder->addFilter("company_id", $companyId)->create();
+                $list = $this->getList($filter);
 
-            if ($list->getTotalCount() > 0) {
-                foreach ($list->getItems() as $option) {
-                    $this->settingsResults[$companyId][$option['label']] = $option['value'];
+                if ($list->getTotalCount() > 0) {
+                    foreach ($list->getItems() as $option) {
+                        $this->settingsResults[$companyId][$option['label']] = $option['value'];
+                    }
+
+                    return $this->settingsResults[$companyId];
                 }
-            } else {
+
                 return false;
             }
+
+            return $this->settingsResults[$companyId];
         }
 
-        return $this->settingsResults[$companyId];
+        return false;
     }
 
     /**
      * @param $companyId
      * @param $label
-     * @return \Invoicing\Moloni\Api\Data\SettingsInterface|\Magento\Framework\Model\AbstractModel
+     * @return SettingsInterface
+     * @throws NoSuchEntityException
      */
     public function getByCompanyLabel($companyId, $label)
     {
@@ -197,50 +212,43 @@ class SettingsRepository implements SettingsRepositoryInterface
         $list = $this->getList($_filter);
 
         if ($list->getTotalCount() > 0) {
-            return $list->getItems()[0];
-        } else {
-            return $this->objectFactory->create();
+            $id = (int)$list->getItems()[0]['option_id'];
+            return $this->getById($id);
         }
+
+        return $this->objectFactory->create();
     }
 
     /**
      * @inheritdoc
      */
-    public function getList(SearchCriteriaInterface $criteria)
+    public function getList(SearchCriteriaInterface $criteria): SearchResultsInterface
     {
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
-        $collection = $this->collectionFactory->create();
+        $collection = $this->objectFactory->create()->getCollection();
         foreach ($criteria->getFilterGroups() as $filterGroup) {
-            $fields = [];
-            $conditions = [];
             foreach ($filterGroup->getFilters() as $filter) {
-                $condition = $filter->getConditionType() ? $filter->getConditionType() : 'eq';
-                $fields[] = $filter->getField();
-                $conditions[] = [$condition => $filter->getValue()];
-            }
-            if ($fields) {
-                $collection->addFieldToFilter($fields, $conditions);
+                $condition = $filter->getConditionType() ?: 'eq';
+                $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
             }
         }
+
         $searchResults->setTotalCount($collection->getSize());
-        $sortOrders = $criteria->getSortOrders();
-        if ($sortOrders) {
-            /** @var SortOrder $sortOrder */
-            foreach ($sortOrders as $sortOrder) {
+        $sortOrdersData = $criteria->getSortOrders();
+        if ($sortOrdersData) {
+            foreach ($sortOrdersData as $sortOrder) {
                 $collection->addOrder(
                     $sortOrder->getField(),
                     ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
                 );
             }
         }
+
         $collection->setCurPage($criteria->getCurrentPage());
         $collection->setPageSize($criteria->getPageSize());
-        $objects = [];
-        foreach ($collection as $objectModel) {
-            $objects[] = $objectModel;
-        }
-        $searchResults->setItems($objects);
+        $searchResults->setItems($collection->getData());
+
         return $searchResults;
     }
 }

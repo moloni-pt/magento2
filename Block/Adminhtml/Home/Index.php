@@ -22,14 +22,18 @@
 namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Model\DocumentsRepository;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 
-use Invoicing\Moloni\Model\DocumentsRepository;
-
 class Index extends Template
 {
-    private $moloni;
+    private Moloni $moloni;
+
+    /**
+     * @var DocumentsRepository
+     */
+    private DocumentsRepository $documents;
 
     public function __construct(
         Context $context,
@@ -41,10 +45,4 @@ class Index extends Template
         $this->documents = $documents;
         parent::__construct($context);
     }
-
-    public function getAvailableDocuments()
-    {
-
-    }
-
 }

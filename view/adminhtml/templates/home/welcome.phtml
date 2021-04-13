@@ -1,65 +1,67 @@
-<form id="form-validate" action="<?php echo $block->getUrl('moloni/home/welcome') ?>" method="post"> 
-    <div class='login-form'>
-        <?php echo $block->getBlockHtml('formkey') ?>
+<?php if (isset($block)): ?>
+    <form id="form-validate" action="<?php echo $block->getUrl('moloni/home/welcome') ?>" method="post">
+        <div class='login-form'>
+            <?php echo $block->getBlockHtml('formkey') ?>
 
-        <div class='panel-left'>
-            <fieldset class="fieldset">
-                <legend>
-                    <?php echo __('Bem vindo ao moloni') ?>
-                    <?php
-                    if ($block->getMessages()) {
-                        foreach ($block->getMessages() as $message) {
-                            echo "<br><div class='message-" . $message['type'] . "'>" . $message['message'] . "</div>";
+            <div class='panel-left'>
+                <fieldset class="fieldset">
+                    <legend>
+                        <?php echo __('Bem vindo ao moloni') ?>
+                        <?php
+                        if ($block->getMessages()) {
+                            foreach ($block->getMessages() as $message) {
+                                echo "<br><div class='message-" . $message['type'] . "'>" . $message['message'] . "</div>";
+                            }
                         }
-                    }
-                    ?>
-                </legend>
+                        ?>
+                    </legend>
 
-                <div class="field title required">
-                    <label class="label" for="developer_id"><span><?php echo __('Developer Id') ?></span></label>
-                    <div class="control">
-                        <input data-validate="{required:true}" id="developer_id" name="developer_id" type="text"/>
+                    <div class="field title required">
+                        <label class="label" for="developer_id"><span><?php echo __('Developer Id') ?></span></label>
+                        <div class="control">
+                            <input data-validate="{required:true}" id="developer_id" name="developer_id" type="text"/>
+                        </div>
                     </div>
-                </div>
 
-                <div class="field title required">
-                    <label class="label" for="secret_token"><span><?php echo __('Secret Key') ?></span></label>
-                    <div class="control">
-                        <input id="secret_token" type="text" name="secret_token" data-validate="{required:true}"/>
-                    </div>               
-                </div>
-
-                <div class="field title">
-                    <label class="label" for="redirect_uri"><span><?php echo __('Redirect URI') ?></span></label>
-                    <div class="control">
-                        <input id="redirect_uri" name="redirect_uri" readonly
-                               type="text" value="<?php echo $block->getUrl('moloni/home/welcome') ?>"/>
-                    </div>               
-                </div>
-
-            </fieldset>
-            <div>
-                <a href='https://plugins.moloni.com/magento' target='_BLANK'>
-                    <div class="button-style action-default scalable apply">
-                        <span><?php echo __('Instructions') ?></span>
+                    <div class="field title required">
+                        <label class="label" for="secret_token"><span><?php echo __('Secret Key') ?></span></label>
+                        <div class="control">
+                            <input id="secret_token" type="text" name="secret_token" data-validate="{required:true}"/>
+                        </div>
                     </div>
-                </a>
 
-                <button type="submit" class="action save primary">
-                    <span><?php echo __('Authorize Aplication') ?></span>
-                </button>
+                    <div class="field title">
+                        <label class="label" for="redirect_uri"><span><?php echo __('Redirect URI') ?></span></label>
+                        <div class="control">
+                            <input id="redirect_uri" name="redirect_uri" readonly
+                                   type="text" value="<?php echo $block->getUrl('moloni/home/welcome') ?>"/>
+                        </div>
+                    </div>
+
+                </fieldset>
+                <div>
+                    <a href='https://plugins.moloni.com/magento' target='_BLANK'>
+                        <div class="button-style action-default scalable apply">
+                            <span><?php echo __('Instructions') ?></span>
+                        </div>
+                    </a>
+
+                    <button type="submit" class="action save primary">
+                        <span><?php echo __('Authorize Aplication') ?></span>
+                    </button>
+                </div>
+
+
             </div>
-
-
+            <div class='panel-right'>
+                <img src='<?php echo $this->getViewFileUrl('Invoicing_Moloni::images/banner_login_1.jpg'); ?>'
+                     alt='<?php echo __('Moloni Sign Up'); ?>'/>
+            </div>
         </div>
-        <div class='panel-right'>
-            <img src='<?php echo $this->getViewFileUrl('Invoicing_Moloni::images/banner_login_1.jpg'); ?>'
-                 alt='<?php echo __('Moloni Sign Up'); ?>'/>
-        </div>
-    </div>
-</form>
-<script>
-    require(['jquery', 'mage/mage', 'Invoicing_Moloni/js/datatables.min'], function($) {
-        $('#form-validate').mage('validation', {});
-    });
-</script>
+    </form>
+    <script>
+        require(['jquery', 'mage/mage', 'Invoicing_Moloni/js/datatables.min'], function($) {
+            $('#form-validate').mage('validation', {});
+        });
+    </script>
+<?php endif; ?>

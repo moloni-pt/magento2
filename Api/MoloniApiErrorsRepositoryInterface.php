@@ -33,7 +33,7 @@ interface MoloniApiErrorsRepositoryInterface
      * @param array|false $sent
      * @return false
      */
-    public function throwError($title, $message, $where, $received = false, $sent = false);
+    public function throwError(string $title, string $message, string $where, $received = false, $sent = false): bool;
 
     /**
      * @param $order

@@ -21,44 +21,47 @@
 
 namespace Invoicing\Moloni\Api;
 
-use Magento\Framework\Api\SearchCriteriaInterface;
 use Invoicing\Moloni\Api\Data\TokensInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractModel;
 
 interface TokensRepositoryInterface
 {
     /**
+     * @param AbstractModel $model
+     * @return int
      * @api
-     * @param TokensInterface $model
-     * @return \Invoicing\Moloni\Api\Data\TokensInterface
      */
-    public function save(TokensInterface $model);
+    public function save(AbstractModel $model): int;
 
     /**
+     * @param AbstractModel $model
+     * @return bool
      * @api
-     * @param TokensInterface $model
-     * @return \Invoicing\Moloni\Api\Data\TokensInterface
      */
-    public function delete(TokensInterface $model);
+    public function delete(AbstractModel $model): bool;
 
     /**
-     * @api
-     * @param \Invoicing\Moloni\Api\Data\TokensInterface $id
-     * @return void
-     */
-    public function deleteById($id);
-
-    /**
-     * @api
      * @param int $id
-     * @return \Invoicing\Moloni\Api\Data\TokensInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return bool
+     * @api
      */
-    public function getById($id);
+    public function deleteById(int $id): bool;
 
     /**
+     * @param int $id
+     * @return AbstractModel
+     * @throws NoSuchEntityException
      * @api
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $criteria
-     * @return \Invoicing\Moloni\Api\Data\TokensSearchResultsInterface
      */
-    public function getList(SearchCriteriaInterface $criteria);
+    public function getById(int $id): AbstractModel;
+
+    /**
+     * @param SearchCriteriaInterface $criteria
+     * @return SearchResultsInterface
+     * @api
+     */
+    public function getList(SearchCriteriaInterface $criteria): SearchResultsInterface;
 }

@@ -21,62 +21,64 @@
 
 namespace Invoicing\Moloni\Api\Data;
 
+use Magento\Framework\Model\AbstractModel;
+
 interface DocumentsInterface
 {
 
-    const ID = 'document_id';
-    const COMPANY_ID = 'company_id';
-    const STORE_ID = 'store_id';
-    const ORDER_ID = 'order_id';
-    const ORDER_TOTAL = 'order_total';
-    const INVOICE_ID = 'invoice_id';
-    const INVOICE_TOTAL = 'invoice_total';
-    const INVOICE_STATUS = 'invoice_status';
-    const INVOICE_TYPE = 'invoice_type';
-    const INVOICE_DATE = 'invoice_date';
-    const METADATA = 'metadata';
+    public const ID = 'document_id';
+    public const COMPANY_ID = 'company_id';
+    public const STORE_ID = 'store_id';
+    public const ORDER_ID = 'order_id';
+    public const ORDER_TOTAL = 'order_total';
+    public const INVOICE_ID = 'invoice_id';
+    public const INVOICE_TOTAL = 'invoice_total';
+    public const INVOICE_STATUS = 'invoice_status';
+    public const INVOICE_TYPE = 'invoice_type';
+    public const INVOICE_DATE = 'invoice_date';
+    public const METADATA = 'metadata';
 
     /**
      * @param int $companyId
-     * @return $this
+     * @return AbstractModel
      */
-    public function setCompanyId(int $companyId);
+    public function setCompanyId(int $companyId): AbstractModel;
 
     /**
      *
      * @param int $orderId
      */
-    public function setOrderId($orderId);
+    public function setOrderId(int $orderId);
 
     /**
      *
      * @param float $orderTotal
      */
-    public function setOrderTotal($orderTotal);
+    public function setOrderTotal(float $orderTotal);
 
     /**
      *
      * @param int $invoiceId
      */
-    public function setInvoiceId($invoiceId);
+    public function setInvoiceId(int $invoiceId);
 
     /**
      *
      * @param float $invoiceTotal
      */
-    public function setInvoiceTotal($invoiceTotal);
+    public function setInvoiceTotal(float $invoiceTotal);
 
     /**
      *
      * @param int $invoiceStatus
      */
-    public function setInvoiceStatus($invoiceStatus);
+    public function setInvoiceStatus(int $invoiceStatus);
 
     /**
      *
      * @param string $invoiceDate
      */
-    public function setInvoiceDate($invoiceDate);
+    public function setInvoiceDate(string $invoiceDate);
 
     /**
      *
@@ -87,5 +89,5 @@ interface DocumentsInterface
     /**
      * @return string|null
      */
-    public function getInvoiceDate();
+    public function getInvoiceDate(): ?string;
 }

@@ -32,6 +32,7 @@ class Documents extends AbstractDb
         parent::__construct($context);
     }
 
+    /** @noinspection MagicMethodsValidityInspection */
     public function _construct()
     {
         $this->_init('moloni_documents', 'document_id');

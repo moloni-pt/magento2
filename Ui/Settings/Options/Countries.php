@@ -7,7 +7,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class Countries implements OptionSourceInterface
 {
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * DocumentSets constructor.
@@ -22,7 +22,7 @@ class Countries implements OptionSourceInterface
      * Retrieve options array.
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $result = [];
 

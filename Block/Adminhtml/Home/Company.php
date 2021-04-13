@@ -28,7 +28,7 @@ use Magento\Framework\View\Element\Template\Context;
 class Company extends Template
 {
 
-    private $dataPersistor;
+    private DataPersistorInterface $dataPersistor;
 
     public function __construct(
         Context $context,
@@ -40,7 +40,10 @@ class Company extends Template
         parent::__construct($context);
     }
 
-    public function _prepareLayout()
+    /**
+     * @return Company
+     */
+    public function _prepareLayout(): Company
     {
         $this->pageConfig->getTitle()->set(__('Moloni - Select your company'));
         return parent::_prepareLayout();
@@ -48,7 +51,6 @@ class Company extends Template
 
     public function getCompanies()
     {
-        $companies = $this->dataPersistor->get('moloni_companies');
-        return $companies;
+        return $this->dataPersistor->get('moloni_companies');
     }
 }

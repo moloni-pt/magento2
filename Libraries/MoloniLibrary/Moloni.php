@@ -7,57 +7,84 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary;
 
+use Exception;
 use Invoicing\Moloni\Api\MoloniApiRepositoryInterface;
-use Magento\Framework\HTTP\Client\Curl;
-use Magento\Framework\App\RequestInterface;
-use Invoicing\Moloni\Model\TokensRepository;
-use Invoicing\Moloni\Model\SettingsRepository;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiSession;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
-use Magento\Framework\App\Request\DataPersistorInterface;
-
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\Companies;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CompaniesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\Countries;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CountriesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\Customers;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CustomersFactory;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsFactory;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsCategoriesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DeliveryMethods;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DeliveryMethodsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\Documents;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSets;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentSetsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DocumentsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnits;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\MeasurementUnitsFactory;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\DeliveryMethodsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\PaymentMethods;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\PaymentMethodsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\Products;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsCategories;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsCategoriesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxes;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxExemptions;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\ProductsTaxExemptionsFactory;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Classes\CountriesFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiErrors;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies\ApiSession;
+use Invoicing\Moloni\Model\SettingsRepository;
+use Invoicing\Moloni\Model\TokensRepository;
+use JsonException;
+use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\HTTP\Client\Curl;
 
+/**
+ * @property Documents $documents
+ * @property Companies $companies
+ * @property DeliveryMethods $deliveryMethods
+ * @property PaymentMethods $paymentMethods
+ * @property Products $products
+ * @property Customers $customers
+ * @property Countries $countries
+ * @property DocumentSets $documentSets
+ * @property ProductsCategories $productsCategories
+ * @property ProductsTaxes $taxes
+ * @property ProductsTaxExemptions $taxExemptions
+ * @property MeasurementUnits $measurementUnits
+ */
 class Moloni implements MoloniApiRepositoryInterface
 {
     public const API_URL = 'https://api.moloni.pt/v1/';
 
-    public $logs = [];
+    public array $logs = [];
     /**
      * @var ApiErrors
      */
-    public $errors;
-    public $curl;
-    public $tokensRepository;
-    public $settingsRepository;
+    public ApiErrors $errors;
+    public Curl $curl;
+    public TokensRepository $tokensRepository;
+    public SettingsRepository $settingsRepository;
 
-    public $request;
-    public $dataPersistor;
+    public RequestInterface $request;
+    public DataPersistorInterface $dataPersistor;
 
     /**
      * @var ApiSession
      */
-    public $session;
+    public ApiSession $session;
 
-    private $factories = [];
+    private array $factories;
 
-    public $redirectTo = null;
+    public string $redirectTo;
 
     /*
      * 'Required' means its not set and must be sent to the settings page
      */
-    public $settings = [
+    public array $settings = [
         'cae' => '',
         'debug_console' => '0',
 
@@ -150,32 +177,49 @@ class Moloni implements MoloniApiRepositoryInterface
         return $this->{$name};
     }
 
+    public function __set($name, $value)
+    {
+        $this->$name = $value;
+    }
+
+    public function __isset($name): bool
+    {
+        return isset($this->$name);
+    }
+
     /**
      * @return ApiSession
      */
-    public function getSession()
+    public function getSession(): ApiSession
     {
         return $this->session;
     }
 
-    public function checkActiveSession()
+    public function checkActiveSession(): bool
     {
         $activeTokens = $this->tokensRepository->getTokens();
         if (!empty($activeTokens->getAccessToken())) {
             $setCompanyId = $this->request->getParam('company_id', false);
             if ($setCompanyId && $setCompanyId > 0) {
-                $activeTokens->setCompanyId($setCompanyId)->save();
+                $activeTokens
+                    ->setCompanyId($setCompanyId)
+                    ->save();
             }
 
             if ($this->session->isValidSession()) {
                 if (empty($this->session->companyId) && $this->request->getActionName() !== 'company') {
                     $this->redirectTo = 'moloni/home/company/';
                     return false;
-                } else {
-                    $settings = $this->setSettings($this->session->companyId);
-                    $this->dataPersistor->set('moloni_settings', $settings);
-                    return true;
                 }
+
+                try {
+                    $settings = $this->setSettings($this->session->companyId);
+                } catch (JsonException $e) {
+                    $settings = [];
+                }
+
+                $this->dataPersistor->set('moloni_settings', $settings);
+                return true;
             }
         }
 
@@ -183,7 +227,7 @@ class Moloni implements MoloniApiRepositoryInterface
         return false;
     }
 
-    public function dropActiveSession()
+    public function dropActiveSession(): bool
     {
         $this->redirectTo = 'moloni/home/welcome/';
         $activeTokens = $this->tokensRepository->getTokens();
@@ -195,7 +239,7 @@ class Moloni implements MoloniApiRepositoryInterface
      * @param $authorizationCode
      * @return bool
      */
-    public function checkAuthorizationCode($authorizationCode)
+    public function checkAuthorizationCode($authorizationCode): bool
     {
         if ($this->session->isValidAuthorizationCode($authorizationCode)) {
             return true;
@@ -234,8 +278,8 @@ class Moloni implements MoloniApiRepositoryInterface
 
         if (!empty($rawResponse)) {
             try {
-                $response = json_decode($rawResponse, true);
-            } catch (\Exception $e) {
+                $response = json_decode($rawResponse, true, 512, JSON_THROW_ON_ERROR);
+            } catch (Exception $e) {
                 $response = [];
             }
         }
@@ -253,10 +297,10 @@ class Moloni implements MoloniApiRepositoryInterface
 
     /**
      * @param $companyId
-     * @param int $storeId
      * @return array
+     * @throws JsonException
      */
-    private function setSettings($companyId, $storeId = 0)
+    private function setSettings($companyId): array
     {
         if ($companyId) {
             $savedSettings = $this->settingsRepository->getSettingsByCompany($companyId);
@@ -271,13 +315,18 @@ class Moloni implements MoloniApiRepositoryInterface
                 foreach ($this->settings as $label => $option) {
                     if (!array_key_exists($label, $savedSettings)) {
                         $savedSettings[$label] = $option;
-                        $this->settingsRepository->saveSetting($companyId, $label, $option);
+                        // $this->settingsRepository->saveSetting($companyId, $label, $option);
                     }
                 }
             }
 
             if (isset($savedSettings['orders_statuses']) && !empty($savedSettings['orders_statuses'])) {
-                $savedSettings['orders_statuses'] = json_decode($savedSettings['orders_statuses'], true);
+                $savedSettings['orders_statuses'] = json_decode(
+                    $savedSettings['orders_statuses'],
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR
+                );
             } else {
                 $savedSettings['orders_statuses'] = [];
             }
@@ -287,6 +336,4 @@ class Moloni implements MoloniApiRepositoryInterface
 
         return $this->settings;
     }
-
-
 }

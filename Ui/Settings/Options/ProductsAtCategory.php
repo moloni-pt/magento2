@@ -2,7 +2,6 @@
 
 namespace Invoicing\Moloni\Ui\Settings\Options;
 
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Framework\Data\OptionSourceInterface;
 
 class ProductsAtCategory implements OptionSourceInterface
@@ -12,7 +11,7 @@ class ProductsAtCategory implements OptionSourceInterface
      * Retrieve options array.
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $result = [];
         $result[] = ['label' => __('Mercadorias'), 'value' => 'M'];

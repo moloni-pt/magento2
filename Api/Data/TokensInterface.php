@@ -21,17 +21,31 @@
 
 namespace Invoicing\Moloni\Api\Data;
 
+/**
+ * @method setDeveloperId(mixed $getParam)
+ * @method setRedirectUri(mixed $getParam)
+ * @method setSecretToken(mixed $getParam)
+ * @method getAccessToken()
+ * @method setCompanyId(mixed $getParam)
+ * @method setStoreId(mixed $getParam)
+ * @method setLabel(mixed $getParam)
+ * @method setValue(mixed $getParam)
+ * @method save()
+ * @method delete()
+ * @method getDeveloperId()
+ * @method getRedirectUri()
+ * @method getSecretToken()
+ */
 interface TokensInterface
 {
 
-    const ID = 'id';
-    const DEVELOPER_ID = 'developer_id';
-    const REDIRECT_URI = 'redirect_uri';
-    const ACCESS_TOKEN = 'access_token';
-    const SECRET_TOKEN = 'secret_token';
-    const REFRESH_TOKEN = 'refresh_token';
-    const COMPANY_ID = 'company_id';
-    const EXPIRE_DATE = 'expire_date';
-    const LOGIN_DATE = 'login_date';
-
+    public const ID = 'id';
+    public const DEVELOPER_ID = 'developer_id';
+    public const REDIRECT_URI = 'redirect_uri';
+    public const ACCESS_TOKEN = 'access_token';
+    public const SECRET_TOKEN = 'secret_token';
+    public const REFRESH_TOKEN = 'refresh_token';
+    public const COMPANY_ID = 'company_id';
+    public const EXPIRE_DATE = 'expire_date';
+    public const LOGIN_DATE = 'login_date';
 }

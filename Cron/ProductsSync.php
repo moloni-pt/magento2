@@ -2,9 +2,10 @@
 
 namespace Invoicing\Moloni\Cron;
 
-use \Invoicing\Moloni\Logger\SyncLogger;
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
+use Exception;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Logger\SyncLogger;
 
 class ProductsSync
 {
@@ -12,17 +13,17 @@ class ProductsSync
     /**
      * @var SyncLogger
      */
-    protected $logger;
+    protected SyncLogger $logger;
 
     /**
      * @var Moloni
      */
-    protected $moloni;
+    protected Moloni $moloni;
 
     /**
      * @var MoloniProductsFactory
      */
-    private $productsFactory;
+    private MoloniProductsFactory $productsFactory;
 
 
     public function __construct(
@@ -34,16 +35,14 @@ class ProductsSync
         $this->logger = $logger;
         $this->moloni = $moloni;
         $this->productsFactory = $productsFactory;
-
     }
 
     /**
      * Write to system.log
      *
      * @return void|boolean
-     * @throws \Exception
+     * @throws Exception
      */
-
     public function execute()
     {
 
@@ -84,10 +83,8 @@ class ProductsSync
 
             $companyId = $this->moloni->session->companyId;
             $this->moloni->settingsRepository->saveSetting($companyId, "cron_date", $currentDate);
-
         } else {
-            throw new \Exception('Moloni session not initiated');
+            throw new Exception('Moloni session not initiated');
         }
     }
-
 }

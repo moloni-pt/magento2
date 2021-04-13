@@ -18,28 +18,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Setup;
 
-use Magento\Framework\Setup\UpgradeSchemaInterface;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use Magento\Framework\Setup\SetupInterface;
+use Magento\Framework\Setup\UpgradeSchemaInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
 
+    /**
+     * @var SchemaSetupInterface|SetupInterface
+     */
     private $installer;
-    private $tables = [
+
+    private array $tables = [
         "moloni_tokens",
         "moloni_settings",
         "moloni_documents"
     ];
 
-    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
+    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context): void
     {
         if (version_compare($context->getVersion(), "1.3.0", "<")) {
             $this->installer = $setup;
             $this->installer->startSetup();
-            
+
             foreach ($this->tables as $table) {
                 if (!$this->installer->tableExists($table)) {
                     $className = str_replace(' ', '', ucwords(str_replace('_', ' ', $table)));
@@ -47,11 +55,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     $this->{"setIndex" . $className}();
                 }
             }
-            
+
             $this->installer->endSetup();
         }
     }
-    
+
     private function setTableMoloniTokens()
     {
         $this->installer->getConnection()->createTable(
@@ -59,69 +67,69 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $this->installer->getTable('moloni_tokens')
             )->addColumn(
                 'id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 null,
                 [
-                'identity' => true,
-                'nullable' => false,
-                'primary' => true,
-                'unsigned' => true,
+                    'identity' => true,
+                    'nullable' => false,
+                    'primary' => true,
+                    'unsigned' => true,
                 ],
                 'Tokens combination id'
             )->addColumn(
                 'developer_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Developer Id'
             )->addColumn(
                 'redirect_uri',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Redirect Uri'
             )->addColumn(
                 'secret_token',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Moloni Client Secret'
             )->addColumn(
                 'access_token',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Access Token'
             )->addColumn(
                 'refresh_token',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Refresh Token'
             )->addColumn(
                 'company_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Company Id'
             )->addColumn(
                 'login_date',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                Table::TYPE_TIMESTAMP,
                 null,
-                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
                 'Login date'
             )->addColumn(
                 'expire_date',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                Table::TYPE_TIMESTAMP,
                 null,
-                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
                 'Expire date'
             )->setComment('Used to store moloni session tokens - clean this table for a token reset')
         );
 
         return $table;
     }
-    
+
     private function setTableMoloniSettings()
     {
         $this->installer->getConnection()->createTable(
@@ -129,36 +137,36 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $this->installer->getTable('moloni_settings')
             )->addColumn(
                 'option_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 null,
                 [
-                'identity' => true,
-                'nullable' => false,
-                'primary' => true,
-                'unsigned' => true,
+                    'identity' => true,
+                    'nullable' => false,
+                    'primary' => true,
+                    'unsigned' => true,
                 ],
                 'Tokens combination id'
             )->addColumn(
                 'company_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Company Id'
             )->addColumn(
                 'store_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Store Id'
             )->addColumn(
                 'label',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Label'
             )->addColumn(
                 'value',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 255,
                 [],
                 'Value'
@@ -167,7 +175,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         return $table;
     }
-    
+
     private function setTableMoloniDocuments()
     {
         $this->installer->getConnection()->createTable(
@@ -175,72 +183,72 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $this->installer->getTable('moloni_documents')
             )->addColumn(
                 'document_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 null,
                 [
-                'identity' => true,
-                'nullable' => false,
-                'primary' => true,
-                'unsigned' => true,
+                    'identity' => true,
+                    'nullable' => false,
+                    'primary' => true,
+                    'unsigned' => true,
                 ],
                 'Document Id'
             )->addColumn(
                 'company_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Company Id'
             )->addColumn(
                 'store_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Store Id'
             )->addColumn(
                 'order_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Order Id'
             )->addColumn(
                 'order_total',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 25,
                 [],
                 'Total'
             )->addColumn(
                 'invoice_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 10,
                 [],
                 'Invoice Id'
             )->addColumn(
                 'invoice_total',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 25,
                 [],
                 'Invoice total'
             )->addColumn(
                 'invoice_status',
-                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                Table::TYPE_INTEGER,
                 1,
                 [],
                 'Invoice Status'
             )->addColumn(
                 'invoice_date',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                Table::TYPE_TIMESTAMP,
                 null,
-                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
                 'Invoice date'
             )->addColumn(
                 'invoice_type',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 25,
                 [],
                 'Invoice type'
             )->addColumn(
                 'metadata',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                Table::TYPE_TEXT,
                 '2M',
                 [],
                 'All json sent to moloni'
@@ -249,8 +257,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         return $table;
     }
-    
-    
+
+
     private function setIndexMoloniTokens()
     {
         $this->installer->getConnection()->addIndex(
@@ -258,10 +266,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->installer->getIdxName(
                 $this->installer->getTable('moloni_tokens'),
                 ['access_token', 'refresh_token'],
-                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+                AdapterInterface::INDEX_TYPE_FULLTEXT
             ),
             ['access_token', 'refresh_token'],
-            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+            AdapterInterface::INDEX_TYPE_FULLTEXT
         );
     }
 
@@ -271,14 +279,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->installer->getTable('moloni_documents'),
             $this->installer->getIdxName(
                 $this->installer->getTable('moloni_documents'),
-                ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
-                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+                [
+                    'document_id', 'company_id', 'store_id', 'order_id',
+                    'order_total', 'invoice_id', 'invoice_total',
+                    'invoice_status', 'invoice_date', 'invoice_type', 'metadata'
+                ],
+                AdapterInterface::INDEX_TYPE_FULLTEXT
             ),
-            ['document_id', 'company_id', 'store_id', 'order_id', 'order_total', 'invoice_id', 'invoice_total', 'invoice_status', 'invoice_date', 'invoice_type', 'metadata'],
-            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+            [
+                'document_id', 'company_id', 'store_id', 'order_id',
+                'order_total', 'invoice_id', 'invoice_total', 'invoice_status',
+                'invoice_date', 'invoice_type', 'metadata'
+            ],
+            AdapterInterface::INDEX_TYPE_FULLTEXT
         );
     }
-    
+
     private function setIndexMoloniSettings()
     {
         $this->installer->getConnection()->addIndex(
@@ -286,10 +302,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->installer->getIdxName(
                 $this->installer->getTable('moloni_settings'),
                 ['option_id', 'company_id', 'store_id', 'label', 'value'],
-                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+                AdapterInterface::INDEX_TYPE_FULLTEXT
             ),
             ['option_id', 'company_id', 'store_id', 'label', 'value'],
-            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
+            AdapterInterface::INDEX_TYPE_FULLTEXT
         );
     }
 }

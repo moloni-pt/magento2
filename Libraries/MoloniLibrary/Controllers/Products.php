@@ -7,7 +7,6 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Category as CategoryModel;
-use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -18,14 +17,21 @@ use Magento\Tax\Api\TaxCalculationInterface;
 class Products
 {
 
+    /**
+     * @var bool|int
+     */
     public $productId = false;
+
+    /**
+     * @var bool|int
+     */
     public $magentoId = 0;
 
     /**
      * Holds the default values of a product
      * @var array
      */
-    private $defaults = [
+    private array $defaults = [
         'category_id' => '',
         'type' => '1',
         'name' => 'Artigo Desconhecido',
@@ -43,41 +49,41 @@ class Products
     /**
      * @var Moloni
      */
-    private $moloni;
+    private Moloni $moloni;
 
     /**
      * @var Tools
      */
-    private $tools;
+    private Tools $tools;
 
     /**
      * @var ProductRepositoryInterface
      */
-    private $productRepository;
+    private ProductRepositoryInterface $productRepository;
 
     /**
      * @var CategoryCollectionFactory
      */
-    private $categoryCollectionFactory;
+    private CategoryCollectionFactory $categoryCollectionFactory;
 
 
     /**
      * @var TaxCalculationInterface
      */
-    private $taxHelper;
+    private TaxCalculationInterface $taxHelper;
 
     /**
      * @var bool
      */
-    public $productInserted = false;
+    public bool $productInserted = false;
 
     /** @var Item */
-    private $taxItem;
+    private Item $taxItem;
 
     /**
      * @var ProductsFactory
      */
-    private $products;
+    private ProductsFactory $products;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -101,8 +107,9 @@ class Products
     /**
      * @param OrderItemInterface $orderProduct
      * @return array
+     * @throws \JsonException
      */
-    public function setProductFromOrder($orderProduct): array
+    public function setProductFromOrder(OrderItemInterface $orderProduct): array
     {
         $productId = $orderProduct->getProductId();
 
@@ -144,7 +151,6 @@ class Products
         }
 
 
-
         $taxRate = $orderProduct->getTaxPercent();
         if ($taxRate > 0) {
             $product['taxes'][] = [
@@ -175,8 +181,9 @@ class Products
     /**
      * @param OrderInterface $order
      * @return array
+     * @throws \JsonException
      */
-    public function setShippingFromOrder($order): array
+    public function setShippingFromOrder(OrderInterface $order): array
     {
 
         $product = [];
@@ -236,14 +243,14 @@ class Products
      * @param int $productId
      * @return int|bool
      */
-    public function syncProductFromId($productId)
+    public function syncProductFromId(int $productId)
     {
         try {
             $product = $this->productRepository->getById($productId);
             $sku = $product->getSku();
 
             $moloniProduct = $this->moloni->products->getByReference(['reference' => $sku]);
-            if (!$moloniProduct[0]) {
+            if (!$moloniProduct || !$moloniProduct[0]) {
                 $productId = $this->createProductFromId($productId);
                 if ($productId > 0) {
                     return $productId;
@@ -251,7 +258,6 @@ class Products
             } else {
                 return $this->syncProductFromMoloni($moloniProduct[0]);
             }
-
         } catch (Exception $e) {
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
@@ -280,7 +286,6 @@ class Products
                 try {
                     $product->getExtensionAttributes()->getStockItem()->setQty($moloniProduct['stock']);
                     $product->getExtensionAttributes()->getStockItem()->setIsInStock(true);
-
                 } catch (Exception $exception) {
                     return false;
                 }
@@ -311,7 +316,6 @@ class Products
             $categories = $product->getCategoryIds();
             $categoryTree = $this->getCategoryTree($categories);
 
-
             if ($orderProduct) {
                 $moloniProduct['name'] = $orderProduct->getName();
                 $moloniProduct['reference'] = $orderProduct->getSku();
@@ -340,7 +344,6 @@ class Products
             $moloniProduct['stock'] = (float)$productStock;
             $moloniProduct['category_id'] = $this->createCategoryTree($categoryTree);
 
-
             if (!empty($this->moloni->settings['products_at_category'])) {
                 $moloniProduct['at_product_category'] = $this->moloni->settings['products_at_category'];
             }
@@ -361,7 +364,6 @@ class Products
 
                     foreach ($productOptions as $requiredChildrenIds) {
                         foreach ($requiredChildrenIds as $childrenId) {
-
                             $childProduct = $this->productRepository->getById($childrenId);
                             $childProductReference = $childProduct->getSku();
 
@@ -409,7 +411,6 @@ class Products
             $this->productInserted = true;
 
             return $insertedProduct['product_id'] ?: 0;
-
         } catch (Exception $e) {
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
@@ -421,7 +422,7 @@ class Products
      * @param OrderInterface $order
      * @return int
      */
-    private function createShippingFromOrder($order): int
+    private function createShippingFromOrder(OrderInterface $order): int
     {
         try {
             $moloniProduct['name'] = $order->getShippingDescription();
@@ -464,7 +465,6 @@ class Products
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
             $this->productInserted = true;
             return $insertedProduct['product_id'];
-
         } catch (Exception $e) {
             echo $e->getMessage();
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
@@ -473,6 +473,12 @@ class Products
         return 0;
     }
 
+    /**
+     * @param $categoryTree
+     * @param int $parentId
+     * @return bool|int
+     * @throws \JsonException
+     */
     private function createCategoryTree($categoryTree, $parentId = 0)
     {
         if (!empty($categoryTree) && is_array($categoryTree)) {
@@ -482,7 +488,7 @@ class Products
                 $moloniCategories = $this->moloni->productsCategories->getAll(['parent_id' => $parentId]);
                 if ($moloniCategories && is_array($moloniCategories)) {
                     foreach ($moloniCategories as $moloniCategory) {
-                        if (strcasecmp($moloniCategory['name'], $category['name']) == 0) {
+                        if (strcasecmp($moloniCategory['name'], $category['name']) === 0) {
                             $categoryId = $moloniCategory['category_id'];
                             break;
                         }
@@ -520,7 +526,6 @@ class Products
     {
 
         try {
-            /* @var $matchingNamesCollection Collection */
             $matchingNamesCollection = $this->categoryCollectionFactory->create();
 
             $matchingNamesCollection->addAttributeToSelect('path')
@@ -529,14 +534,13 @@ class Products
 
             $shownCategoriesIds = [];
 
-            /** @var \Magento\Catalog\Model\Category $category */
+            /** @var CategoryModel $category */
             foreach ($matchingNamesCollection as $category) {
                 foreach (explode('/', $category->getPath()) as $parentId) {
                     $shownCategoriesIds[$parentId] = 1;
                 }
             }
 
-            /* @var $collection Collection */
             $collection = $this->categoryCollectionFactory->create();
 
             $collection->addAttributeToFilter('entity_id', ['in' => array_keys($shownCategoriesIds)])
@@ -571,8 +575,9 @@ class Products
      * @param float $taxRate
      * @param bool $break
      * @return int
+     * @throws \JsonException
      */
-    private function getTaxIdFromRate($taxRate, $break = false): int
+    private function getTaxIdFromRate(float $taxRate, $break = false): int
     {
         $taxId = 0;
         $taxDefaultId = 0;
@@ -606,12 +611,13 @@ class Products
     /**
      * @param array $moloniProduct
      * @param int $taxId
+     * @throws \JsonException
      */
-    private function parseProductTaxes(&$moloniProduct, $taxId = 0): void
+    private function parseProductTaxes(array &$moloniProduct, $taxId = 0): void
     {
         if (!empty($moloniProduct) && $taxId > 0) {
-
-            $price = (isset($moloniProduct['price_with_taxes']) && (float)$moloniProduct['price_with_taxes'] > 0) ? $moloniProduct['price_with_taxes'] : $moloniProduct['price'];
+            $price = (isset($moloniProduct['price_with_taxes']) && (float)$moloniProduct['price_with_taxes'] > 0)
+                ? $moloniProduct['price_with_taxes'] : $moloniProduct['price'];
 
             $tax = 0;
             $moloniTaxes = $this->moloni->taxes->getAll();
@@ -639,5 +645,4 @@ class Products
             }
         }
     }
-
 }

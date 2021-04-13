@@ -24,10 +24,9 @@ namespace Invoicing\Moloni\Api\Data;
 interface SettingsInterface
 {
 
-    const ID = 'option_id';
-    const COMPANY_ID = 'company_id';
-    const STORE_ID = 'store_id';
-    const LABEL = 'label';
-    const VALUE = 'value';
-
+    public const ID = 'option_id';
+    public const COMPANY_ID = 'company_id';
+    public const STORE_ID = 'store_id';
+    public const LABEL = 'label';
+    public const VALUE = 'value';
 }

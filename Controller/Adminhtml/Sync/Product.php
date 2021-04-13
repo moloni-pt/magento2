@@ -2,10 +2,10 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Sync;
 
+use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\AbstractAction;
 use Magento\Backend\App\Action\Context;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
 
 class Product extends AbstractAction
 {
@@ -63,8 +63,8 @@ class Product extends AbstractAction
             }
         } else {
             $this->messageManager->addErrorMessage(
-                __('Erro ao actualizar o artigo ') .
-                $this->moloni->errors->getErrors('first')['title']
+                __('Erro ao actualizar o artigo: ') .
+                $this->moloni->errors->getErrors('first')['message']
             );
         }
         $this->_redirect('catalog/product/edit', ['id' => $productId]);

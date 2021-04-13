@@ -32,6 +32,12 @@ class Settings extends AbstractDb
         parent::__construct($context);
     }
 
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     *
+     * @return void
+     */
     public function _construct()
     {
         $this->_init('moloni_settings', 'option_id');

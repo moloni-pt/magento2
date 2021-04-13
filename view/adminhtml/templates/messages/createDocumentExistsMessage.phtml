@@ -1,7 +1,8 @@
 <?php
+if (isset($block)) {
+    $message = ' A encomenda já foi gerada a ';
+    $message .= $block->getData('invoice_date');
+    $message .= "<br> \n\r<a href=\"%1\">Clique aqui para gerar novamente o documento</a>.";
 
-$message = ' A encomenda já foi gerada a ';
-$message .= $block->getData('invoice_date');
-$message .= "<br> \n\r<a href=\"%1\">Clique aqui para gerar novamente o documento</a>.";
-
-echo $block->escapeHtml(__($message, $block->getData('create_url')), ['a', 'br']);
+    echo $block->escapeHtml(__($message, $block->getData('create_url')), ['a', 'br']);
+}

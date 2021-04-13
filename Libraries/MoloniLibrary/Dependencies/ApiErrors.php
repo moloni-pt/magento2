@@ -9,14 +9,14 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies;
 
 class ApiErrors
 {
-    private $error_log = [];
+    private array $error_log = [];
 
-    public function hasError()
+    public function hasError(): bool
     {
         return !empty($this->error_log);
     }
 
-    public function throwError($title, $message, $where, $received = false, $sent = false)
+    public function throwError($title, $message, $where, $received = false, $sent = false): bool
     {
         if (is_array($message)) {
             foreach ($message as $msg) {
@@ -36,8 +36,7 @@ class ApiErrors
                 case "first":
                     return $this->error_log[0];
                 case "last":
-                    $aux = end($this->error_log);
-                    return $aux;
+                    return end($this->error_log);
                 case "all":
                 default:
                     return $this->error_log;
@@ -47,12 +46,12 @@ class ApiErrors
         }
     }
 
-    public function clearErrors()
+    public function clearErrors(): void
     {
         $this->error_log = [];
     }
 
-    private function logError($title, $message, $where, $received = false, $sent = false)
+    private function logError($title, $message, $where, $received = false, $sent = false): void
     {
         $this->error_log[] = [
             "title" => $title,
@@ -65,7 +64,7 @@ class ApiErrors
         ];
     }
 
-    private function translateMessage($string)
+    private function translateMessage($string): string
     {
         switch ($string) {
             case "1 name":
@@ -97,6 +96,11 @@ class ApiErrors
                 $string = "Um dos artigos não tem uma categoria definida.";
                 break;
         }
+
+        if (strpos($string, '1 exemption_reason')) {
+            $string = "Um dos artigos requer uma razão de isenção";
+        }
+
         return $string;
     }
 }

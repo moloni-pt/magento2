@@ -21,15 +21,18 @@
 
 namespace Invoicing\Moloni\Block\Adminhtml\Home;
 
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\App\Request\DataPersistorInterface;
 
 class Welcome extends Template
 {
 
+    /**
+     * @var bool|array
+     */
     public $messages = false;
-    public $dataPersistor;
+    public DataPersistorInterface $dataPersistor;
 
     public function __construct(Context $context, DataPersistorInterface $dataPersistor)
     {
@@ -37,7 +40,7 @@ class Welcome extends Template
         parent::__construct($context);
     }
 
-    public function _prepareLayout()
+    public function _prepareLayout(): Welcome
     {
         $this->pageConfig->getTitle()->set(__('Moloni - Login Page'));
         return parent::_prepareLayout();

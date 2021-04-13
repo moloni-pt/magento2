@@ -9,13 +9,12 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
 use Psr\Log\LoggerInterface as Logger;
 
-
 class Collection extends SearchResult
 {
     /**
      * @var Moloni $Moloni
      */
-    private $moloni;
+    private Moloni $moloni;
 
     public function __construct(
         Moloni $moloni,
@@ -25,8 +24,7 @@ class Collection extends SearchResult
         EventManager $eventManager,
         $mainTable = 'sales_order',
         $resourceModel = \Magento\Sales\Model\ResourceModel\Order::class
-    )
-    {
+    ) {
         $this->moloni = $moloni;
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel);
     }
@@ -78,7 +76,6 @@ class Collection extends SearchResult
         if ($this->moloni->settings['orders_since']) {
             $sinceDate = date("Y-m-d h:i:s", strtotime($this->moloni->settings['orders_since']));
             $this->addFieldToFilter('grid.created_at', ['gteq' => $sinceDate]);
-
         }
 
         if (is_array($this->moloni->settings['orders_statuses']) &&
@@ -89,7 +86,7 @@ class Collection extends SearchResult
         return $this;
     }
 
-    public function getTotalCount()
+    public function getTotalCount(): int
     {
         return $this->getSize();
     }

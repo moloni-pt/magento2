@@ -10,11 +10,10 @@ class Edit extends Settings
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->_redirect($this->moloni->redirectTo);
+            $this->redirectInterface->redirect($this->response, $this->moloni->redirectTo);
             return false;
         }
 
-        $page = $this->initAction();
-        return $page;
+        return $this->initAction();
     }
 }

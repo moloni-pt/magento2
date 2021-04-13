@@ -7,17 +7,17 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
-use \Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 
 class Documents
 {
-
-    private $moloni;
-    private $store = [];
-    public $documentTypeId = 1;
-    public $documentTypeName = "Fatura";
-    public $documentTypeClass = "invoices";
-    public $documentTypeClassMoloni = "Faturas";
+    private Moloni $moloni;
+    private array $store = [];
+    public int $documentTypeId = 1;
+    public string $documentTypeName = "Fatura";
+    public string $documentTypeClass = "invoices";
+    public string $documentTypeClassMoloni = "Faturas";
 
 
     /**
@@ -33,7 +33,7 @@ class Documents
      * @param bool|string $documentType
      * @return $this
      */
-    public function setDocumentType($documentType = false)
+    public function setDocumentType($documentType = false): Documents
     {
         if (!$documentType) {
             $documentType = $this->moloni->settings['document_type'];
@@ -134,64 +134,67 @@ class Documents
      * @param int $documentId
      * @return string
      */
-    public function getEditUrl($documentId)
+    public function getEditUrl(int $documentId): string
     {
         $company = $this->moloni->companies->getOne();
-        $url = "https://www.moloni.pt/" . $company['slug'] . "/" . $this->documentTypeClassMoloni . "/showUpdate/" .
+        return "https://www.moloni.pt/" . $company['slug'] . "/" . $this->documentTypeClassMoloni . "/showUpdate/" .
             $documentId;
-
-        return $url;
     }
 
     /**
      * @param int $documentId
      * @return string
      */
-    public function getViewUrl($documentId)
+    public function getViewUrl(int $documentId): string
     {
         $company = $this->moloni->companies->getOne();
-        $url = "https://www.moloni.pt/" . $company['slug'] . "/" . $this->documentTypeClassMoloni . "/showDetail/" .
+        return "https://www.moloni.pt/" . $company['slug'] . "/" . $this->documentTypeClassMoloni . "/showDetail/" .
             $documentId;
-
-        return $url;
     }
 
+    /**
+     * @param $values
+     * @param false $companyId
+     * @return false|string
+     * @throws JsonException
+     */
     public function getDownloadUrl($values, $companyId = false)
     {
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("documents/getPdfLink", $values);
         if (is_array($result) && isset($result['url'])) {
             return $result['url'];
-        } else {
-            $this->moloni->errors->throwError(
-                __("Falhou a obter o documento para download " . $values['document_id']),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Falhou a obter o documento para download " . $values['document_id']),
+            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
     /**
      * @param array $values
      * @param bool|int $companyId
      * @return bool|mixed
+     * @throws JsonException
      */
     public function getAll($values = [], $companyId = false)
     {
-        $values["company_id"] = $companyId ? $companyId : $this->moloni->session->companyId;
+        $values["company_id"] = $companyId ?: $this->moloni->session->companyId;
 
         $result = $this->moloni->execute($this->documentTypeClass . "/getAll", $values);
         if (is_array($result) && isset($result[0]['document_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Não tem acesso à informação dos documentos"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Não tem acesso à informação dos documentos"),
+            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
     public function getOne($values, $companyId = false)
@@ -204,53 +207,58 @@ class Documents
             return $this->store[$values['document_id']];
         }
 
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("documents/getOne", $values);
 
         $this->store[$values['document_id']] = $result;
 
         if (is_array($result) && isset($result['document_id'])) {
             return $result;
-        } else {
+        }
+
+        try {
             $this->moloni->errors->throwError(
                 __("Não tem acesso à informação do documento com id " . $values['document_id']),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
+                __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
                 __CLASS__ . "/" . __FUNCTION__
             );
-            return false;
+        } catch (JsonException $e) {
         }
+        return false;
     }
 
     /**
      * @param array $values
      * @param bool|int $companyId
      * @return bool|array
+     * @throws JsonException
      */
-    public function insert($values, $companyId = false)
+    public function insert(array $values, $companyId = false)
     {
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute($this->documentTypeClass . "/insert", $values);
 
         if (is_array($result) && isset($result['document_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Erro ao inserir o documento: " . $this->getErrorMessage($result)),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Erro ao inserir o documento: " . $this->getErrorMessage($result)),
+            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 
     /**
      * @param array $values
      * @param bool|int $companyId
      * @return bool|array
+     * @throws JsonException
      */
-    public function update($values, $companyId = false)
+    public function update(array $values, $companyId = false)
     {
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute($this->documentTypeClass . "/update", $values);
 
         if (is_array($result) && isset($result['document_id'])) {
@@ -259,7 +267,7 @@ class Documents
 
         $this->moloni->errors->throwError(
             __("Erro ao fechar o documento: " . $this->getErrorMessage($result)),
-            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -278,7 +286,7 @@ class Documents
         return $message;
     }
 
-    private function searchErrorMessage($result)
+    private function searchErrorMessage($result): string
     {
         if (isset($result['description'])) {
             return $result['description'];
@@ -286,11 +294,7 @@ class Documents
 
         if (is_array($result)) {
             foreach ($result as $item) {
-                if (isset($item['description'])) {
-                    return $item['description'];
-                } else {
-                    return $this->searchErrorMessage($item);
-                }
+                return $item['description'] ?? $this->searchErrorMessage($item);
             }
         }
 

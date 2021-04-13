@@ -21,26 +21,30 @@
 
 namespace Invoicing\Moloni\Model;
 
-use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\DataObject\IdentityInterface;
-use Invoicing\Moloni\Api\Data\SettingsInterface;
+use Magento\Framework\Model\AbstractModel;
 
-class Settings extends AbstractModel implements
-    IdentityInterface,
-    SettingsInterface
+class Settings extends AbstractModel implements IdentityInterface
 {
 
-    const CACHE_TAG = 'moloni_settings';
+    public const CACHE_TAG = 'moloni_settings';
 
-    public $cacheTag = 'moloni_settings';
-    public $eventPrefix = 'moloni_settings';
+    public string $cacheTag = 'moloni_settings';
+    public string $eventPrefix = 'moloni_settings';
 
+    /**
+     * @noinspection MagicMethodsValidityInspection
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     */
     public function _construct()
     {
         $this->_init(ResourceModel\Settings::class);
     }
 
-    public function getIdentities()
+    /**
+     * @return string[]
+     */
+    public function getIdentities(): array
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }

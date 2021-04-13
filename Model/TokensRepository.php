@@ -21,26 +21,38 @@
 
 namespace Invoicing\Moloni\Model;
 
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SortOrder;
-use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsInterfaceFactory;
-
+use Exception;
+use Invoicing\Moloni\Api\Data\TokensInterface;
 use Invoicing\Moloni\Api\TokensRepositoryInterface;
 use Invoicing\Moloni\Model\ResourceModel\Tokens as ObjectResourceModel;
 use Invoicing\Moloni\Model\ResourceModel\Tokens\CollectionFactory;
-use Invoicing\Moloni\Api\Data\TokensInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Api\SearchResultsInterfaceFactory;
+use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractModel;
 
+
+/**
+ * Class TokensRepository
+ * @package Invoicing\Moloni\Model
+ *
+ */
 class TokensRepository implements TokensRepositoryInterface
 {
-    public $objectFactory;
-    public $objectResourceModel;
-    public $collectionFactory;
-    public $searchResultsFactory;
-    public $searchCriteriaBuilder;
+    public TokensFactory $objectFactory;
+    public ObjectResourceModel $objectResourceModel;
+    public CollectionFactory $collectionFactory;
+    public SearchResultsInterfaceFactory $searchResultsFactory;
+    public SearchCriteriaBuilder $searchCriteriaBuilder;
 
+    /**
+     * @var mixed
+     */
     private $tokensRow;
 
     public function __construct(
@@ -49,7 +61,8 @@ class TokensRepository implements TokensRepositoryInterface
         CollectionFactory $collectionFactory,
         SearchResultsInterfaceFactory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder
-    ) {
+    )
+    {
         $this->objectFactory = $objectFactory;
         $this->objectResourceModel = $objectResourceModel;
         $this->collectionFactory = $collectionFactory;
@@ -58,25 +71,23 @@ class TokensRepository implements TokensRepositoryInterface
     }
 
     /**
-     * @param \Invoicing\Moloni\Api\Data\TokensInterface $tokens
+     * @param TokensInterface|AbstractModel $model
      * @return int
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     * @throws AlreadyExistsException
      */
-    public function save(TokensInterface $tokens)
+    public function save($model): int
     {
-        $this->objectResourceModel->save($tokens);
-        return $tokens->getId();
+        $this->objectResourceModel->save($model);
+        return $model->getId();
     }
 
     /**
-     * @param $tokenId
-     * @return \Invoicing\Moloni\Api\Data\TokensInterface int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @inheritdoc
      */
-    public function getById($tokenId)
+    public function getById($id): AbstractModel
     {
         $tokens = $this->objectFactory->create();
-        $this->objectResourceModel->load($tokens, $tokenId);
+        $this->objectResourceModel->load($tokens, $id);
 
         if (!$tokens->getId()) {
             throw new NoSuchEntityException(__('Tokens do not exist'));
@@ -86,26 +97,24 @@ class TokensRepository implements TokensRepositoryInterface
     }
 
     /**
-     * @param TokensInterface $tokens
-     * @return bool
+     * @inheritdoc
      * @throws CouldNotDeleteException
      */
-    public function delete(TokensInterface $tokens)
+    public function delete($model): bool
     {
         try {
-            $this->objectResourceModel->delete($tokens);
-        } catch (\Exception $exception) {
+            $this->objectResourceModel->delete($model);
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__($exception->getMessage()));
         }
         return true;
     }
 
     /**
-     * @param $id
-     * @return bool
-     * @throws \Exception
+     * @inheritdoc
+     * @throws CouldNotDeleteException
      */
-    public function deleteById($id)
+    public function deleteById($id): bool
     {
         try {
             return $this->delete($this->getById($id));
@@ -114,14 +123,13 @@ class TokensRepository implements TokensRepositoryInterface
         }
     }
 
-    /**
-     * @return TokensInterface
-     */
-    public function getTokens()
+    public function getTokens(): Tokens
     {
 
         if (empty($this->tokensRow)) {
-            $_filter = $this->searchCriteriaBuilder->setPageSize("1")->create();
+            $_filter = $this->searchCriteriaBuilder
+                ->setPageSize("1")
+                ->create();
             $list = $this->getList($_filter);
 
             if ($list->getTotalCount() > 0) {
@@ -137,7 +145,7 @@ class TokensRepository implements TokensRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function getList(SearchCriteriaInterface $criteria)
+    public function getList(SearchCriteriaInterface $criteria): SearchResultsInterface
     {
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
@@ -154,10 +162,10 @@ class TokensRepository implements TokensRepositoryInterface
                 $collection->addFieldToFilter($fields, $conditions);
             }
         }
+
         $searchResults->setTotalCount($collection->getSize());
         $sortOrders = $criteria->getSortOrders();
         if ($sortOrders) {
-            /** @var SortOrder $sortOrder */
             foreach ($sortOrders as $sortOrder) {
                 $collection->addOrder(
                     $sortOrder->getField(),
@@ -165,12 +173,14 @@ class TokensRepository implements TokensRepositoryInterface
                 );
             }
         }
+
         $collection->setCurPage($criteria->getCurrentPage());
         $collection->setPageSize($criteria->getPageSize());
         $objects = [];
         foreach ($collection as $objectModel) {
             $objects[] = $objectModel;
         }
+
         $searchResults->setItems($objects);
         return $searchResults;
     }

@@ -13,13 +13,13 @@ use Magento\Framework\Api\SearchResultsInterface;
 interface TokensSearchResultsInterface extends SearchResultsInterface
 {
     /**
-     * @return \Invoicing\Moloni\Api\Data\TokensInterface[]
+     * @return TokensInterface[]
      */
-    public function getItems();
+    public function getItems(): array;
 
     /**
-     * @param \Invoicing\Moloni\Api\Data\TokensInterface[] $items
+     * @param TokensInterface[] $items
      * @return $this
      */
-    public function setItems(array $items);
+    public function setItems(array $items): TokensSearchResultsInterface;
 }

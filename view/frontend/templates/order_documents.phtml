@@ -1,5 +1,5 @@
 <div class="order-details-items documents">
-    <?php $orderDocuments = $block->getOrderDocuments(); ?>
+    <?php $orderDocuments = isset($block) ? $block->getOrderDocuments() : []; ?>
     <?php if (is_array($orderDocuments) && !empty($orderDocuments)) : ?>
         <div class="order-items table-wrapper table-order-items documents">
             <table class="data table table-order-items documents">

@@ -18,35 +18,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
-class Index extends \Magento\Backend\App\Action
+use Invoicing\Moloni\Controller\Adminhtml\Documents;
+use Magento\Framework\Controller\ResultInterface;
+
+class Index extends Documents
 {
-
-    protected $resultPageFactory;
-
-    /**
-     * Constructor
-     *
-     * @param \Magento\Backend\App\Action\Context  $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
-    ) {
-    
-        $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context);
-    }
-
     /**
      * Execute view action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        return $this->resultPageFactory->create();
+        return $this->resultFactory->create();
     }
 }
