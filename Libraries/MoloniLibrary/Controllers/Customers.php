@@ -3,6 +3,7 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 use Magento\Sales\Api\Data\OrderInterface;
 
 class Customers
@@ -87,7 +88,7 @@ class Customers
     /**
      * @param OrderInterface $order
      * @return $this
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function setCustomerFromOrder(OrderInterface $order): Customers
     {
@@ -179,7 +180,7 @@ class Customers
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function handleCustomer()
     {

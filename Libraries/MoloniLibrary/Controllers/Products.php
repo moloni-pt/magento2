@@ -4,6 +4,7 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 
 use Exception;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Category as CategoryModel;
@@ -107,7 +108,7 @@ class Products
     /**
      * @param OrderItemInterface $orderProduct
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function setProductFromOrder(OrderItemInterface $orderProduct): array
     {
@@ -181,7 +182,7 @@ class Products
     /**
      * @param OrderInterface $order
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function setShippingFromOrder(OrderInterface $order): array
     {
@@ -477,7 +478,7 @@ class Products
      * @param $categoryTree
      * @param int $parentId
      * @return bool|int
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function createCategoryTree($categoryTree, $parentId = 0)
     {
@@ -575,7 +576,7 @@ class Products
      * @param float $taxRate
      * @param bool $break
      * @return int
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getTaxIdFromRate(float $taxRate, $break = false): int
     {
@@ -611,7 +612,7 @@ class Products
     /**
      * @param array $moloniProduct
      * @param int $taxId
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function parseProductTaxes(array &$moloniProduct, $taxId = 0): void
     {

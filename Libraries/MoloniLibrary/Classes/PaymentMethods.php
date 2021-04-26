@@ -8,6 +8,7 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 
 class PaymentMethods
 {
@@ -27,7 +28,7 @@ class PaymentMethods
     /**
      * @param bool $company_id
      * @return bool|mixed
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getAll($company_id = false)
     {
@@ -54,7 +55,7 @@ class PaymentMethods
      * @param array $values [code => payment method code; name => payment method name]
      * @param bool|int $companyId
      * @return bool|array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function insert(array $values, $companyId = false)
     {

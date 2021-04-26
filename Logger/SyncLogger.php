@@ -2,6 +2,8 @@
 
 namespace Invoicing\Moloni\Logger;
 
-class SyncLogger extends \Monolog\Logger
+use Monolog\Logger;
+
+class SyncLogger extends Logger
 {
 }

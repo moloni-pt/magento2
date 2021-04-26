@@ -8,6 +8,7 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 
 class ProductsCategories
 {
@@ -28,7 +29,7 @@ class ProductsCategories
      * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=204
      * @param int|bool $companyId
      * @return bool|mixed
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getAll(array $values, $companyId = false)
     {

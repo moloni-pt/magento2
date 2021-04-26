@@ -25,8 +25,12 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as Mol
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Logger\DocumentsLogger;
 use Invoicing\Moloni\Model\DocumentsRepository;
+use JsonException;
+use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Model\AbstractModel;
 
-class SalesOrderAfterSave implements \Magento\Framework\Event\ObserverInterface
+class SalesOrderAfterSave implements ObserverInterface
 {
 
     /**
@@ -67,18 +71,18 @@ class SalesOrderAfterSave implements \Magento\Framework\Event\ObserverInterface
     /**
      * Execute observer
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return SalesOrderAfterSave
-     * @throws \JsonException
+     * @throws JsonException
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         /**
-         * @var $order \Magento\Framework\Model\AbstractModel
+         * @var $order AbstractModel
          */
         $order = $observer->getEvent()->getOrder();
 
-        if ($order instanceof \Magento\Framework\Model\AbstractModel) {
+        if ($order instanceof AbstractModel) {
             if ($this->moloni->checkActiveSession()) {
                 if ($this->moloni->settings['document_auto'] &&
                     in_array($order->getState(), $this->moloni->settings['orders_statuses'])

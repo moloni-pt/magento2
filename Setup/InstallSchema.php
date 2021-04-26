@@ -27,6 +27,7 @@ use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\SetupInterface;
+use Zend_Db_Exception;
 
 class InstallSchema implements InstallSchemaInterface
 {
@@ -133,7 +134,7 @@ class InstallSchema implements InstallSchemaInterface
 
     /**
      * @return Table
-     * @throws \Zend_Db_Exception
+     * @throws Zend_Db_Exception
      */
     private function setTableMoloniSettings()
     {
@@ -183,7 +184,7 @@ class InstallSchema implements InstallSchemaInterface
 
     /**
      * @return Table
-     * @throws \Zend_Db_Exception
+     * @throws Zend_Db_Exception
      */
     private function setTableMoloniDocuments()
     {

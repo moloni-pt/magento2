@@ -22,6 +22,7 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
+use JsonException;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 
@@ -30,7 +31,7 @@ class Create extends Documents
 
     /**
      * @return bool|ResponseInterface|ResultInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function execute()
     {
