@@ -236,6 +236,7 @@ class Products
         } else {
             $product['product_id'] = $this->createShippingFromOrder($order);
         }
+
         return $product;
     }
 
@@ -464,10 +465,12 @@ class Products
 
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
-            $this->productInserted = true;
-            return $insertedProduct['product_id'];
+
+            if (isset($insertedProduct['product_id'])) {
+                $this->productInserted = true;
+                return $insertedProduct['product_id'];
+            }
         } catch (Exception $e) {
-            echo $e->getMessage();
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
 

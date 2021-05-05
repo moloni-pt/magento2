@@ -165,6 +165,7 @@ class Products
             __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
+
         return false;
     }
 
