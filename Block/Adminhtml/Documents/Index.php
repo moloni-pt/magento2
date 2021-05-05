@@ -20,7 +20,9 @@
  */
 namespace Invoicing\Moloni\Block\Adminhtml\Documents;
 
-class Index extends \Magento\Framework\View\Element\Template
+use Magento\Framework\View\Element\Template;
+
+class Index extends Template
 {
 
 }

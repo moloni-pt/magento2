@@ -2,9 +2,10 @@
 
 namespace Invoicing\Moloni\Logger;
 
+use Magento\Framework\Logger\Handler\Base;
 use Monolog\Logger;
 
-class SyncLoggerHandler extends \Magento\Framework\Logger\Handler\Base
+class SyncLoggerHandler extends Base
 {
     /**
      * Logging level

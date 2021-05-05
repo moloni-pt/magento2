@@ -21,6 +21,7 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
+use Exception;
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as MoloniDocumentsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
@@ -97,7 +98,7 @@ class MassRemove extends Documents
 
                 $this->messageManager->addSuccessMessage(__("O documento %1 não irá ser gerado no Moloni.", $orderId));
 
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->messageManager->addErrorMessage($exception->getMessage());
                 $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
                 return false;

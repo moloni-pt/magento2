@@ -6,6 +6,8 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as Molo
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\AbstractAction;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 class Product extends AbstractAction
 {
@@ -35,7 +37,7 @@ class Product extends AbstractAction
     }
 
     /**
-     * @return bool|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     * @return bool|ResponseInterface|ResultInterface
      */
     public function execute()
     {

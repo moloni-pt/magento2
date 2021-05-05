@@ -8,6 +8,7 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 
 class DeliveryMethods
 {
@@ -27,7 +28,7 @@ class DeliveryMethods
     /**
      * @param bool $company_id
      * @return bool|mixed
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getAll($company_id = false)
     {

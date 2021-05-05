@@ -2,6 +2,8 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 
+use Magento\Framework\ObjectManagerInterface;
+
 /**
  * Factory class for @see \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Products
  */
@@ -10,7 +12,7 @@ class ProductsFactory
     /**
      * Object Manager instance
      *
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager = null;
 
@@ -24,11 +26,11 @@ class ProductsFactory
     /**
      * Factory constructor
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      * @param string $instanceName
      */
     public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager,
+        ObjectManagerInterface $objectManager,
         $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Products'
     )
     {
@@ -40,7 +42,7 @@ class ProductsFactory
      * Create class instance with specified parameters
      *
      * @param array $data
-     * @return \Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\Products
+     * @return Products
      */
     public function create(array $data = [])
     {

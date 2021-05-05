@@ -3,6 +3,7 @@
 namespace Invoicing\Moloni\Ui\Settings\Options;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 use Magento\Framework\Data\OptionSourceInterface;
 
 class ProductsMeasurementUnits implements OptionSourceInterface
@@ -21,7 +22,7 @@ class ProductsMeasurementUnits implements OptionSourceInterface
     /**
      * Retrieve options array.
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function toOptionArray(): array
     {

@@ -4,6 +4,7 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Controllers;
 
 use Exception;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Category as CategoryModel;
@@ -107,7 +108,7 @@ class Products
     /**
      * @param OrderItemInterface $orderProduct
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function setProductFromOrder(OrderItemInterface $orderProduct): array
     {
@@ -181,7 +182,7 @@ class Products
     /**
      * @param OrderInterface $order
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function setShippingFromOrder(OrderInterface $order): array
     {
@@ -235,6 +236,7 @@ class Products
         } else {
             $product['product_id'] = $this->createShippingFromOrder($order);
         }
+
         return $product;
     }
 
@@ -463,10 +465,12 @@ class Products
 
             $moloniProduct = array_merge($this->defaults, $moloniProduct);
             $insertedProduct = $this->moloni->products->insert($moloniProduct);
-            $this->productInserted = true;
-            return $insertedProduct['product_id'];
+
+            if (isset($insertedProduct['product_id'])) {
+                $this->productInserted = true;
+                return $insertedProduct['product_id'];
+            }
         } catch (Exception $e) {
-            echo $e->getMessage();
             $this->moloni->errors->throwError($e->getMessage(), $e->getMessage(), __FUNCTION__);
         }
 
@@ -477,7 +481,7 @@ class Products
      * @param $categoryTree
      * @param int $parentId
      * @return bool|int
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function createCategoryTree($categoryTree, $parentId = 0)
     {
@@ -575,7 +579,7 @@ class Products
      * @param float $taxRate
      * @param bool $break
      * @return int
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getTaxIdFromRate(float $taxRate, $break = false): int
     {
@@ -611,7 +615,7 @@ class Products
     /**
      * @param array $moloniProduct
      * @param int $taxId
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function parseProductTaxes(array &$moloniProduct, $taxId = 0): void
     {

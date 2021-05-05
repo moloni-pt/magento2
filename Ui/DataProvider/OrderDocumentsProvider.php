@@ -9,6 +9,7 @@
 namespace Invoicing\Moloni\Ui\DataProvider;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\ReportingInterface;
@@ -105,7 +106,7 @@ class OrderDocumentsProvider extends DataProvider
 
     /***
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getData(): array
     {

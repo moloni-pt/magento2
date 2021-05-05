@@ -25,16 +25,29 @@ use Invoicing\Moloni\Api\Data\TokensInterface;
 use Magento\Framework\DataObject\IdentityInterface;
 use Magento\Framework\Model\AbstractModel;
 
+/**
+ * @method  setDeveloperId(mixed $getParam)
+ * @method  setRedirectUri(mixed $getParam)
+ * @method  setSecretToken(mixed $getParam)
+ * @method  getAccessToken()
+ * @method  setCompanyId(mixed $getParam)
+ * @method  setStoreId(mixed $getParam)
+ * @method  setLabel(mixed $getParam)
+ * @method  setValue(mixed $getParam)
+ * @method  getDeveloperId()
+ * @method  getRedirectUri()
+ * @method  getSecretToken()
+ */
 class Tokens extends AbstractModel implements
     IdentityInterface,
     TokensInterface
 {
 
-    const CACHE_TAG = 'moloni_tokens';
+    public const CACHE_TAG = 'moloni_tokens';
 
-    public $cacheTag = 'moloni_tokens';
-    public $eventPrefix = 'moloni_tokens';
-    public $tokensRow;
+    public string $cacheTag = 'moloni_tokens';
+    public string $eventPrefix = 'moloni_tokens';
+    public array $tokensRow = [];
 
     /** @noinspection MagicMethodsValidityInspection */
     public function _construct()
@@ -42,7 +55,7 @@ class Tokens extends AbstractModel implements
         $this->_init(ResourceModel\Tokens::class);
     }
 
-    public function getIdentities()
+    public function getIdentities(): array
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }

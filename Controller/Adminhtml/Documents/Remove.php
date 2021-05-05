@@ -21,6 +21,7 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
+use Exception;
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 class Remove extends Documents
@@ -51,7 +52,7 @@ class Remove extends Documents
             $newDocument->setInvoiceDate(date('Y-m-d H:s:i'));
             $newDocument->setInvoiceType('Anulada');
             $this->documentsRepository->save($newDocument);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
             $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
             return false;

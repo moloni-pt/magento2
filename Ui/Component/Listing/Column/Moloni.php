@@ -5,6 +5,7 @@ namespace Invoicing\Moloni\Ui\Component\Listing\Column;
 use Invoicing\Moloni\Api\Data\DocumentsInterface;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni as MoloniLibrary;
 use Invoicing\Moloni\Model\DocumentsRepository;
+use JsonException;
 use Magento\Framework\Api\AbstractExtensibleObject;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -53,7 +54,7 @@ class Moloni extends Column
                 if (isset($item['entity_id'])) {
                     try {
                         $item[$this->getData('name')] = $this->getOptions($item['entity_id']);
-                    } catch (\JsonException $e) {
+                    } catch (JsonException $e) {
                     }
                 }
             }
@@ -65,7 +66,7 @@ class Moloni extends Column
     /**
      * @param int $orderId
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getOptions(int $orderId): array
     {
@@ -109,7 +110,7 @@ class Moloni extends Column
      * @param $moloniLog
      * @param $orderId
      * @return array
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getMoloniMoreActionsObject($moloniLog, $orderId): array
     {
