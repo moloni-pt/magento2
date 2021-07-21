@@ -23,7 +23,7 @@ class SyncButton extends Edit implements ButtonProviderInterface
         return [
             'id' => 'moloni_sync_product',
             'label' => __('Sincronizar Moloni'),
-            'on_click' => "confirmSetLocation('{$message}', '{$syncUrl}')",
+            'on_click' => "confirmSetLocation('$message', '$syncUrl')",
             'class' => 'delete',
             'sort_order' => 0
         ];

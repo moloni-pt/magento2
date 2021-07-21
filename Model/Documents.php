@@ -30,10 +30,10 @@ class Documents extends AbstractModel implements
     DocumentsInterface
 {
 
-    const CACHE_TAG = 'moloni_documents';
+    public const CACHE_TAG = 'moloni_documents';
 
-    public string $cacheTag = 'moloni_documents';
-    public string $eventPrefix = 'moloni_documents';
+    public $cacheTag = 'moloni_documents';
+    public $eventPrefix = 'moloni_documents';
 
     /**
      * Initialize resource model
@@ -46,7 +46,10 @@ class Documents extends AbstractModel implements
         $this->_init(ResourceModel\Settings::class);
     }
 
-    public function getIdentities()
+    /**
+     * @return string[]
+     */
+    public function getIdentities(): array
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }
@@ -123,9 +126,6 @@ class Documents extends AbstractModel implements
         return $this->setData(self::METADATA, $metadata);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function setInvoiceType($invoiceType): AbstractModel
     {
         return $this->setData(self::INVOICE_TYPE, $invoiceType);

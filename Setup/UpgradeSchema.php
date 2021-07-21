@@ -36,7 +36,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private $installer;
 
-    private array $tables = [
+    private $tables = [
         "moloni_tokens",
         "moloni_settings",
         "moloni_documents"

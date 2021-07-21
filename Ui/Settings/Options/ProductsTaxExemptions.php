@@ -8,7 +8,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class ProductsTaxExemptions implements OptionSourceInterface
 {
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * DocumentSets constructor.

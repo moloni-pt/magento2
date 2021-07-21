@@ -19,7 +19,7 @@ class Customers
      * Holds the default values
      * @var array
      */
-    private array $defaults = [
+    private $defaults = [
         'vat' => '999999990',
         'name' => 'Cliente',
         'country_id' => 1,
@@ -49,37 +49,38 @@ class Customers
      * Holds the values to be inserted/update
      * @var array
      */
-    private array $customer = [];
+    private $customer = [];
 
     /**
      * Hold an existing Moloni customer
      * @var array
      */
-    private array $moloniCustomer = [];
+    private $moloniCustomer = [];
 
     /**
      * Assign a countryId to a languageId (1, 2 or 3)
      * If the countryId is not defined it shoud be 2 (english)
      * @var array
      */
-    public array $languageByCountry = [
+    public $languageByCountry = [
         1 => 1 // Portugal > Portuguese
     ];
 
     /**
      * @var Moloni
      */
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * @var Tools
      */
-    private Tools $tools;
+    private $tools;
 
     public function __construct(
         Moloni $moloni,
         Tools $tools
-    ) {
+    )
+    {
         $this->moloni = $moloni;
         $this->tools = $tools;
     }
@@ -152,7 +153,7 @@ class Customers
         }
 
         // If the country is Portugal validate the vat Number and the Zip Code
-        if ($this->customer['country_id'] == 1) {
+        if ((int)$this->customer['country_id'] === 1) {
             $this->customer['zip_code'] = $this->tools->zipCheck($this->customer['zip_code']);
             $this->customer['vat'] = str_replace(' ', '', $this->customer['vat']);
             if (!$this->tools->validateVat($this->customer['vat'])) {
@@ -162,7 +163,7 @@ class Customers
 
         // Lets check if the customer already exists
         // If the vat is 999 999 990 we check if it exists by email
-        if ($this->customer['vat'] == '999999990') {
+        if ((string)$this->customer['vat'] === '999999990') {
             if (!empty($this->customer['email'])) {
                 $getCustomer = $this->moloni->customers->getByEmail(['email' => $this->customer['email']]);
                 if ($getCustomer && count($getCustomer) > 0) {

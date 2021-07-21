@@ -24,30 +24,30 @@ abstract class Settings implements ActionInterface
 {
 
     public const ADMIN_RESOURCE = 'Invoicing_Moloni::settings';
-    protected Moloni $moloni;
-    protected ManagerInterface $messageManager;
-    protected Context $context;
-    protected PageFactory $resultFactory;
+    protected $moloni;
+    protected $messageManager;
+    protected $context;
+    protected $resultFactory;
 
     /**
      * @var RequestInterface
      */
-    protected RequestInterface $requestInterface;
+    protected $requestInterface;
 
     /**
      * @var RedirectInterface
      */
-    protected RedirectInterface $redirectInterface;
+    protected $redirectInterface;
 
     /**
      * @var RedirectFactory
      */
-    protected RedirectFactory $redirectFactory;
+    protected $redirectFactory;
 
     /**
      * @var ResponseInterface
      */
-    protected ResponseInterface $response;
+    protected $response;
 
     /**
      * Settings constructor.

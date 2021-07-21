@@ -28,8 +28,8 @@ use Magento\Framework\View\Element\Template\Context;
 
 class Log extends Template
 {
-    private DataPersistorInterface $dataPersistor;
-    private Moloni $moloni;
+    private $dataPersistor;
+    private $moloni;
 
     public function __construct(
         Context $context,

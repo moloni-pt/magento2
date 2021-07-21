@@ -36,7 +36,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class MassRemove extends Documents
 {
-    private array $data;
+    private $data;
 
     /**
      * Documents constructor.
@@ -80,7 +80,6 @@ class MassRemove extends Documents
      *
      * @return ResultInterface|ResponseInterface
      *
-     * @throws \JsonException
      */
     public function execute()
     {

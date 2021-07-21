@@ -13,8 +13,8 @@ use JsonException;
 class Products
 {
 
-    private Moloni $moloni;
-    private array $store = [];
+    private $moloni;
+    private $store = [];
 
     /**
      * Customers constructor.
@@ -30,7 +30,6 @@ class Products
      * @param $companyId int|bool
      *
      * @return bool|array
-     * @throws JsonException
      */
     public function getAll($companyId = false)
     {
@@ -42,7 +41,7 @@ class Products
 
         $this->moloni->errors->throwError(
             __("Erro ao aceder aos artigos"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -86,7 +85,6 @@ class Products
      * @param $companyId int|bool
      *
      * @return array|false
-     * @throws JsonException
      */
     public function getModifiedSince(array $values, $companyId = false)
     {
@@ -98,7 +96,7 @@ class Products
 
         $this->moloni->errors->throwError(
             __("Erro ao aceder aos artigos"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return [];
@@ -109,7 +107,6 @@ class Products
      * @param $companyId int|bool
      *
      * @return bool|mixed
-     * @throws JsonException
      */
     public function getByReference(array $values, $companyId = false)
     {
@@ -137,7 +134,7 @@ class Products
 
         $this->moloni->errors->throwError(
             __("Erro ao aceder aos artigos"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -148,7 +145,6 @@ class Products
      * @param int|bool $companyId int|bool
      *
      * @return bool|array
-     * @throws JsonException
      */
     public function insert(array $values, $companyId = false)
     {
@@ -162,7 +158,7 @@ class Products
 
         $this->moloni->errors->throwError(
             __("Erro ao inserir o artigo: " . $values['reference']),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
 
@@ -174,7 +170,6 @@ class Products
      * @param int|bool $companyId int|bool
      *
      * @return bool|array
-     * @throws JsonException
      */
     public function update(array $values, $companyId = false)
     {
@@ -188,7 +183,7 @@ class Products
 
         $this->moloni->errors->throwError(
             __("Houve um erro ao actualziar o cliente"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;

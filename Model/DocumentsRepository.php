@@ -41,22 +41,22 @@ use Psr\Log\LoggerInterface;
 
 class DocumentsRepository implements DocumentsRepositoryInterface
 {
-    public DocumentsFactory $objectFactory;
-    public ObjectResourceModel $objectResourceModel;
-    public CollectionFactory $collectionFactory;
-    public SearchResultsFactory $searchResultsFactory;
-    public SearchCriteriaBuilder $searchCriteriaBuilder;
-    public LoggerInterface $logger;
+    public $objectFactory;
+    public $objectResourceModel;
+    public $collectionFactory;
+    public $searchResultsFactory;
+    public $searchCriteriaBuilder;
+    public $logger;
 
     /**
      * @var SortOrder SortOrder
      */
-    private SortOrder $sortOrder;
+    private $sortOrder;
 
     /**
      * @var SortOrderBuilder ortOrderBuilder
      */
-    private SortOrderBuilder $sortOrderBuilder;
+    private $sortOrderBuilder;
 
     public function __construct(
         ObjectResourceModel $objectResourceModel,
@@ -176,7 +176,7 @@ class DocumentsRepository implements DocumentsRepositoryInterface
             $fields = [];
             $conditions = [];
             foreach ($filterGroup->getFilters() as $filter) {
-                $condition = $filter->getConditionType() ? $filter->getConditionType() : 'eq';
+                $condition = $filter->getConditionType() ?: 'eq';
                 $fields[] = $filter->getField();
                 $conditions[] = [$condition => $filter->getValue()];
             }

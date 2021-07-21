@@ -16,7 +16,7 @@ class Collection extends SearchResult
     /**
      * @var Moloni $Moloni
      */
-    private Moloni $moloni;
+    private $moloni;
 
     public function __construct(
         Moloni $moloni,

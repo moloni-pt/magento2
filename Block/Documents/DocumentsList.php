@@ -3,6 +3,7 @@
 namespace Invoicing\Moloni\Block\Documents;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
+use JsonException;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -14,12 +15,12 @@ class DocumentsList extends Template
     /**
      * @var OrderRepositoryInterface
      */
-    protected OrderRepositoryInterface $orderRepository;
+    protected $orderRepository;
 
     /**
      * @var Moloni
      */
-    protected Moloni $moloni;
+    protected $moloni;
 
     /**
      * DocumentsList constructor.
@@ -50,7 +51,7 @@ class DocumentsList extends Template
     /**
      * @return array
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getOrderDocuments(): array
     {

@@ -7,7 +7,7 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class Countries implements OptionSourceInterface
 {
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * DocumentSets constructor.

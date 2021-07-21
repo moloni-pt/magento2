@@ -10,12 +10,12 @@ use Magento\Framework\Controller\Result\JsonFactory;
 
 class Documents extends Action
 {
-    private JsonFactory $jsonFactory;
+    private $jsonFactory;
 
     /**
      * @var Moloni
      */
-    protected Moloni $moloni;
+    protected $moloni;
 
     /**
      * Documents constructor.

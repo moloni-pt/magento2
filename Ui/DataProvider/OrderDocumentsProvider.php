@@ -27,12 +27,12 @@ class OrderDocumentsProvider extends DataProvider
     /**
      * @var AddFieldToCollectionInterface[]
      */
-    protected array $addFieldStrategies;
+    protected $addFieldStrategies;
 
     /**
      * @var AddFilterToCollectionInterface[]
      */
-    protected array $addFilterStrategies;
+    protected $addFilterStrategies;
 
     /**
      * @var Http
@@ -42,12 +42,12 @@ class OrderDocumentsProvider extends DataProvider
     /**
      * @var OrderRepositoryInterface
      */
-    protected OrderRepositoryInterface $orderRepository;
+    protected $orderRepository;
 
     /**
      * @var Moloni
      */
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * OrderDocumentsProvider constructor.
@@ -113,41 +113,39 @@ class OrderDocumentsProvider extends DataProvider
 
         $documentsList = [];
         $incrementId = $this->getOrder()->getIncrementId();
-        if (!empty($incrementId)) {
-            if ($this->moloni->checkActiveSession()) {
-                $moloniDocuments = $this->moloni->documents->setDocumentType('documents');
-                $documentsListSearch = $moloniDocuments->getAll(['your_reference' => $incrementId]);
+        if (!empty($incrementId) && $this->moloni->checkActiveSession()) {
+            $moloniDocuments = $this->moloni->documents->setDocumentType('documents');
+            $documentsListSearch = $moloniDocuments->getAll(['your_reference' => $incrementId]);
 
-                if (is_array($documentsListSearch)) {
-                    $documentsList = $documentsListSearch;
-                    foreach ($documentsList as &$document) {
-                        $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
-                        $document['document_type_name'] = $currentDocumentType->documentTypeName;
-                        $document['document_set'] =
-                            $currentDocumentType->documentTypeName . ' ' .
-                            $document['document_set_name'] . '/' . $document['number'];
+            if (is_array($documentsListSearch)) {
+                $documentsList = $documentsListSearch;
+                foreach ($documentsList as &$document) {
+                    $currentDocumentType = $moloniDocuments->setDocumentType($document['document_type_id']);
+                    $document['document_type_name'] = $currentDocumentType->documentTypeName;
+                    $document['document_set'] =
+                        $currentDocumentType->documentTypeName . ' ' .
+                        $document['document_set_name'] . '/' . $document['number'];
 
-                        $document['document_date'] = date("Y-m-d", strtotime($document['date']));
-                        $document['net_value'] .= '€';
-                        $document['download_url'] = '';
+                    $document['document_date'] = date("Y-m-d", strtotime($document['date']));
+                    $document['net_value'] .= '€';
+                    $document['download_url'] = '';
 
-                        if ((int)$document['status'] === 1) {
-                            $document['status_name'] = __("Fechado");
-                            $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
-                            $documentDownloadUrl = $currentDocumentType->getDownloadUrl(
-                                ['document_id' => $document['document_id']]
-                            );
+                    if ((int)$document['status'] === 1) {
+                        $document['status_name'] = __("Fechado");
+                        $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
+                        $documentDownloadUrl = $currentDocumentType->getDownloadUrl(
+                            ['document_id' => $document['document_id']]
+                        );
 
-                            if ($documentDownloadUrl) {
-                                $document['download_url'] = $documentDownloadUrl;
-                            }
-                        } elseif ((int)$document['status'] === 0) {
-                            $document['status_name'] = __("Rascunho");
-                            $document['view_url'] = $currentDocumentType->getEditUrl($document['document_id']);
-                        } else {
-                            $document['status_name'] = __("Anulado");
-                            $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
+                        if ($documentDownloadUrl) {
+                            $document['download_url'] = $documentDownloadUrl;
                         }
+                    } elseif ((int)$document['status'] === 0) {
+                        $document['status_name'] = __("Rascunho");
+                        $document['view_url'] = $currentDocumentType->getEditUrl($document['document_id']);
+                    } else {
+                        $document['status_name'] = __("Anulado");
+                        $document['view_url'] = $currentDocumentType->getViewUrl($document['document_id']);
                     }
                 }
             }

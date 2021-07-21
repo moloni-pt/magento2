@@ -13,19 +13,19 @@ use Magento\Sales\Block\Adminhtml\Order\View as OrderView;
 class Document
 {
     /** @var UrlInterface */
-    protected UrlInterface $urlBuilder;
+    protected $urlBuilder;
 
     /** @var AuthorizationInterface */
-    protected AuthorizationInterface $authorization;
+    protected $authorization;
 
     /**
      * @var DocumentsRepository
      */
-    private DocumentsRepository $documentsRepository;
+    private $documentsRepository;
     /**
      * @var MoloniLibrary
      */
-    protected MoloniLibrary $moloni;
+    protected $moloni;
 
     public function __construct(
         UrlInterface $urlBuilder,

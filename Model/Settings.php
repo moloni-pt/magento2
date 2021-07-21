@@ -29,8 +29,8 @@ class Settings extends AbstractModel implements IdentityInterface
 
     public const CACHE_TAG = 'moloni_settings';
 
-    public string $cacheTag = 'moloni_settings';
-    public string $eventPrefix = 'moloni_settings';
+    public $cacheTag = 'moloni_settings';
+    public $eventPrefix = 'moloni_settings';
 
     /**
      * @noinspection MagicMethodsValidityInspection

@@ -14,7 +14,7 @@
                             style="margin-right: 10px"
                             data-ui-id="addattribute-button">
                 <span>
-                    <?php echo $block->getData('button_text') ? $block->getData('button_text') : "Ver documento"; ?>
+                    <?php echo $block->getData('button_text') ?: "Ver documento"; ?>
                 </span>
                     </button>
                 </a>

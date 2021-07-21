@@ -12,7 +12,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 class DocumentSets
 {
 
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * Companies constructor.
@@ -24,8 +24,8 @@ class DocumentSets
     }
 
     /**
-     * @param bool $company_id
-     * @return bool|mixed
+     * @param bool|int $company_id
+     * @return array|false
      */
     public function getAll($company_id = false)
     {

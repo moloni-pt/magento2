@@ -7,6 +7,7 @@
 
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies;
 
+use Exception;
 use Invoicing\Moloni\Api\MoloniApiSessionRepositoryInterface;
 use Invoicing\Moloni\Model\TokensRepository;
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -15,23 +16,23 @@ use Magento\Framework\Stdlib\DateTime;
 
 class ApiSession implements MoloniApiSessionRepositoryInterface
 {
-    const API_URL = 'https://api.moloni.pt/v1/';
+    public const API_URL = 'https://api.moloni.pt/v1/';
 
-    private DateTime $dateTime;
-    private Curl $curl;
-    private ApiErrors $errors;
-    private TokensRepository $tokens;
-    private DataPersistorInterface $dataPersistor;
+    private $dateTime;
+    private $curl;
+    private $errors;
+    private $tokens;
+    private $dataPersistor;
 
     /**
      * @var null|string
      */
-    public ?string $accessToken = null;
+    public $accessToken;
 
     /**
      * @var int|null
      */
-    public ?int $companyId = null;
+    public $companyId;
 
     /**
      * Override the parent constructor.
@@ -59,8 +60,9 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
     /**
      * @param string $code
      * @return bool
+     * @throws Exception
      */
-    public function isValidAuthorizationCode($code): bool
+    public function isValidAuthorizationCode(string $code): bool
     {
         $tokens = $this->tokens->getTokens();
         if ($tokens && $tokens->getDeveloperId()) {
@@ -83,21 +85,24 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
                     $authorizationUrl,
                     $response
                 );
-            } else {
-                $tokens->setAccessToken($response->access_token);
-                $tokens->setRefreshToken($response->refresh_token);
-                $tokens->setExpireDate($this->dateTime->formatDate((time() + 3000), true));
-                $tokens->setLoginDate($this->dateTime->formatDate(true, true));
-
-                $tokens->save();
-
-                return true;
             }
+
+            $tokens->setAccessToken($response->access_token);
+            $tokens->setRefreshToken($response->refresh_token);
+            $tokens->setExpireDate($this->dateTime->formatDate((time() + 3000), true));
+            $tokens->setLoginDate($this->dateTime->formatDate(true, true));
+
+            $tokens->save();
+
+            return true;
         }
 
         return false;
     }
 
+    /**
+     * @throws Exception
+     */
     public function isValidSession(): bool
     {
         if ($this->handleSessionRefresh()) {
@@ -117,6 +122,7 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
 
     /**
      * @return bool
+     * @throws Exception
      */
     private function handleSessionRefresh(): bool
     {
@@ -137,29 +143,30 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
                         ),
                         'Refresh'
                     );
-                } else {
-                    if ($this->doRefresh()) {
-                        return true;
-                    } else {
-                        $tokens->delete();
-                        return false;
-                    }
                 }
-            } else {
-                return true;
+
+                if ($this->doRefresh()) {
+                    return true;
+                }
+
+                $tokens->delete();
+                return false;
             }
-        } else {
-            return false;
+
+            return true;
         }
+
+        return false;
     }
 
     /**
      * @return bool
+     * @throws Exception
      */
-    private function doRefresh()
+    private function doRefresh(): bool
     {
         $tokens = $this->tokens->getTokens();
-        if (!empty($tokens) && $tokens->getRefreshToken()) {
+        if ($tokens && $tokens->getRefreshToken()) {
             $refreshUrl = self::API_URL;
             $refreshUrl .= 'grant/?grant_type=refresh_token&';
             $refreshUrl .= 'client_id=' . $tokens->getDeveloperId();
@@ -169,7 +176,7 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
             $this->curl->get($refreshUrl);
             $rawResponse = $this->curl->getBody();
 
-            $response = json_decode($rawResponse);
+            $response = json_decode($rawResponse, false);
 
             if (isset($response->error)) {
                 return $this->errors->throwError(
@@ -178,18 +185,18 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
                     $refreshUrl,
                     $response
                 );
-            } else {
-                $tokens->setAccessToken($response->access_token);
-                $tokens->setRefreshToken($response->refresh_token);
-                $tokens->setExpireDate($this->dateTime->formatDate((time() + 3000), true));
-                $tokens->setLoginDate($this->dateTime->formatDate(true, true));
-
-                $tokens->save();
-
-                return true;
             }
-        } else {
-            return false;
+
+            $tokens->setAccessToken($response->access_token);
+            $tokens->setRefreshToken($response->refresh_token);
+            $tokens->setExpireDate($this->dateTime->formatDate((time() + 3000), true));
+            $tokens->setLoginDate($this->dateTime->formatDate(true, true));
+
+            $tokens->save();
+
+            return true;
         }
+
+        return false;
     }
 }

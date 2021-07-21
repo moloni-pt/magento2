@@ -5,8 +5,6 @@ namespace Invoicing\Moloni\Ui\Component\Listing\Column;
 use Invoicing\Moloni\Api\Data\DocumentsInterface;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni as MoloniLibrary;
 use Invoicing\Moloni\Model\DocumentsRepository;
-use JsonException;
-use Magento\Framework\Api\AbstractExtensibleObject;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -19,12 +17,12 @@ class Moloni extends Column
     /**
      * @var UrlInterface
      */
-    private UrlInterface $urlBuilder;
+    private $urlBuilder;
 
     /**
      * @var DocumentsRepository
      */
-    private DocumentsRepository $documentsRepository;
+    private $documentsRepository;
 
     /**
      * @var Moloni
@@ -52,10 +50,8 @@ class Moloni extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item['entity_id'])) {
-                    try {
-                        $item[$this->getData('name')] = $this->getOptions($item['entity_id']);
-                    } catch (JsonException $e) {
-                    }
+                    $item[$this->getData('name')] = $this->getOptions($item['entity_id']);
+
                 }
             }
         }
@@ -66,7 +62,6 @@ class Moloni extends Column
     /**
      * @param int $orderId
      * @return array
-     * @throws JsonException
      */
     private function getOptions(int $orderId): array
     {
@@ -80,7 +75,7 @@ class Moloni extends Column
 
     /**
      * @param int $orderId
-     * @return bool|DocumentsInterface[]|AbstractExtensibleObject[]
+     * @return bool|DocumentsInterface[]
      */
     private function hasMoloniLog(int $orderId)
     {
@@ -110,7 +105,6 @@ class Moloni extends Column
      * @param $moloniLog
      * @param $orderId
      * @return array
-     * @throws JsonException
      */
     private function getMoloniMoreActionsObject($moloniLog, $orderId): array
     {

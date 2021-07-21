@@ -25,7 +25,7 @@ class Collection extends AbstractCollection
      * @return void
      * @noinspection MagicMethodsValidityInspection
      */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->_init('Invoicing\Moloni\Model\Documents', 'Invoicing\Moloni\Model\ResourceModel\Documents');
     }

@@ -13,8 +13,8 @@ use JsonException;
 class ProductsCategories
 {
 
-    private Moloni $moloni;
-    private array $store = [];
+    private $moloni;
+    private $store = [];
 
     /**
      * Customers constructor.
@@ -29,7 +29,6 @@ class ProductsCategories
      * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=204
      * @param int|bool $companyId
      * @return bool|mixed
-     * @throws JsonException
      */
     public function getAll(array $values, $companyId = false)
     {
@@ -58,7 +57,7 @@ class ProductsCategories
 
         $this->moloni->errors->throwError(
             __("Erro ao obter todas as categorias"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -77,18 +76,18 @@ class ProductsCategories
 
         unset($this->store[$values['parent_id']]);
 
-        $values['company_id'] = ($companyId ? $companyId : $this->moloni->session->companyId);
+        $values['company_id'] = ($companyId ?: $this->moloni->session->companyId);
         $result = $this->moloni->execute("productCategories/insert", $values);
 
         if (is_array($result) && isset($result['category_id'])) {
             return $result;
-        } else {
-            $this->moloni->errors->throwError(
-                __("Houve um erro ao inserir a categoria"),
-                __(json_encode($result, JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-            return false;
         }
+
+        $this->moloni->errors->throwError(
+            __("Houve um erro ao inserir a categoria"),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+        return false;
     }
 }

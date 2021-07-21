@@ -13,7 +13,7 @@ use JsonException;
 class MeasurementUnits
 {
 
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * Companies constructor.
@@ -25,9 +25,8 @@ class MeasurementUnits
     }
 
     /**
-     * @param bool $company_id
-     * @return bool|mixed
-     * @throws JsonException
+     * @param bool|int $company_id
+     * @return array|false
      */
     public function getAll($company_id = false)
     {
@@ -39,7 +38,7 @@ class MeasurementUnits
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação das unidades de medida"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;

@@ -36,22 +36,22 @@ class SalesOrderAfterSave implements ObserverInterface
     /**
      * @var DocumentsLogger
      */
-    protected DocumentsLogger $logger;
+    protected $logger;
 
     /**
      * @var Moloni
      */
-    protected Moloni $moloni;
+    protected $moloni;
 
     /**
      * @var MoloniDocumentsFactory
      */
-    protected MoloniDocumentsFactory $moloniDocumentsFactory;
+    protected $moloniDocumentsFactory;
 
     /**
      * @var DocumentsRepository
      */
-    protected DocumentsRepository $documentsRepository;
+    protected $documentsRepository;
 
     public function __construct(
         Moloni $moloni,

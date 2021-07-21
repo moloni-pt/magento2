@@ -22,44 +22,44 @@ abstract class Home implements ActionInterface
 
     public const ADMIN_RESOURCE = 'Invoicing_Moloni::home';
 
-    protected Moloni $moloni;
-    protected TokensRepository $tokensRepository;
-    protected DataPersistor $dataPersistor;
+    protected $moloni;
+    protected $tokensRepository;
+    protected $dataPersistor;
 
     /**
      * @var RedirectInterface
      */
-    protected RedirectInterface $redirect;
+    protected $redirect;
 
     /**
      * @var RequestInterface
      */
-    protected RequestInterface $request;
+    protected $request;
 
     /**
      * @var RedirectFactory
      */
-    protected RedirectFactory $redirectFactory;
+    protected $redirectFactory;
 
     /**
      * @var ManagerInterface
      */
-    protected ManagerInterface $messageManager;
+    protected $messageManager;
 
     /**
      * @var PageFactory
      */
-    protected PageFactory $resultFactory;
+    protected $resultFactory;
 
     /**
      * @var Context
      */
-    protected Context $context;
+    protected $context;
 
     /**
      * @var ResponseInterface
      */
-    protected ResponseInterface $response;
+    protected $response;
 
     public function __construct(
         Context $context,

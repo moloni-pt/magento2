@@ -12,8 +12,8 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 class Countries
 {
 
-    private array $store = [];
-    private Moloni $moloni;
+    private $store = [];
+    private $moloni;
 
     /**
      * Countries constructor.
@@ -25,7 +25,7 @@ class Countries
     }
 
     /**
-     * @param bool $company_id
+     * @param bool|int $company_id
      * @return bool|mixed
      */
     public function getAll($company_id = false)

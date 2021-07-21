@@ -23,18 +23,18 @@ class Documents
      * @var Moloni
      * Moloni library with tokens and settings
      */
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * @var Tools
      * Tools for validation and creating valid info
      */
-    private Tools $tools;
+    private $tools;
 
     /**
      * @var OrderRepositoryInterface
      */
-    private OrderRepositoryInterface $orderRepository;
+    private $orderRepository;
 
     /**
      * @var OrderInterface Order interface
@@ -45,28 +45,28 @@ class Documents
      * @var array
      * Document array to be inserted
      */
-    private array $document = [];
+    private $document = [];
 
     /**
      * @var array
      * Array from companies/getOne endpoint
      */
-    private array $company = [];
+    private $company = [];
 
     /**
      * @var StoreManagerInterface
      */
-    private StoreManagerInterface $storeManager;
+    private $storeManager;
 
     /**
      * @var CurrencyFactory
      */
-    private CurrencyFactory $currencyFactory;
+    private $currencyFactory;
 
     /**
      * @var Customers
      */
-    private Customers $customers;
+    private $customers;
 
     /**
      * @var Products
@@ -76,18 +76,18 @@ class Documents
     /**
      * @var ManagerInterface
      */
-    private ManagerInterface $messageManager;
+    private $messageManager;
 
 
     /**
      * @var DocumentsRepository
      */
-    private DocumentsRepository $documentsRepository;
+    private $documentsRepository;
 
     /**
      * @var array[]
      */
-    private array $messages = [];
+    private $messages = [];
 
     /**
      * Companies constructor.
@@ -170,7 +170,6 @@ class Documents
      * Id of a Magento order
      * @return array|boolean
      * Return array with [valid => 1] or with errors
-     *
      * @throws JsonException
      */
     public function createDocumentFromOrderId(int $orderId)
@@ -526,8 +525,6 @@ class Documents
     /**
      * @param int $documentId
      * @param int $orderId
-     *
-     * @throws JsonException
      */
     private function setDocumentHasCreated(int $documentId, int $orderId): void
     {
@@ -543,7 +540,7 @@ class Documents
         $newDocument->setInvoiceDate(date('Y-m-d H:s:i'));
         $newDocument->setInvoiceType($insertedDocument['document_type']['saft_code']);
         $newDocument->setCompanyid($this->moloni->getSession()->companyId);
-        $newDocument->setMetadata(json_encode($this->document, JSON_THROW_ON_ERROR));
+        $newDocument->setMetadata(json_encode($this->document));
 
         $this->documentsRepository->save($newDocument);
     }

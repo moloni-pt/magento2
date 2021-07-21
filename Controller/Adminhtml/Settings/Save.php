@@ -31,6 +31,8 @@ class Save extends Settings
      * Execute action based on request and return result
      *
      * @return ResultInterface|ResponseInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute()
     {

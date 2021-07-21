@@ -12,8 +12,8 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 class Companies
 {
 
-    private Moloni $moloni;
-    private array $store = [];
+    private $moloni;
+    private $store = [];
 
     /**
      * Companies constructor.
@@ -25,7 +25,7 @@ class Companies
     }
 
     /**
-     * @param bool $company_id
+     * @param bool|int $company_id
      * @return bool|mixed
      */
     public function getOne($company_id = false)
@@ -34,7 +34,7 @@ class Companies
             return $this->store[__FUNCTION__];
         }
 
-        $values = ["company_id" => ($company_id ? $company_id : $this->moloni->session->companyId)];
+        $values = ["company_id" => ($company_id ?: $this->moloni->session->companyId)];
         $result = $this->moloni->execute("companies/getOne", $values);
         if (is_array($result) && isset($result['company_id'])) {
             $this->store[__FUNCTION__] = $result;
@@ -50,7 +50,7 @@ class Companies
     }
 
     /**
-     * @return bool|mixed
+     * @return array|bool
      */
     public function getAll()
     {

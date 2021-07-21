@@ -32,7 +32,7 @@ class Products
      * Holds the default values of a product
      * @var array
      */
-    private array $defaults = [
+    private $defaults = [
         'category_id' => '',
         'type' => '1',
         'name' => 'Artigo Desconhecido',
@@ -50,41 +50,41 @@ class Products
     /**
      * @var Moloni
      */
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * @var Tools
      */
-    private Tools $tools;
+    private $tools;
 
     /**
      * @var ProductRepositoryInterface
      */
-    private ProductRepositoryInterface $productRepository;
+    private $productRepository;
 
     /**
      * @var CategoryCollectionFactory
      */
-    private CategoryCollectionFactory $categoryCollectionFactory;
+    private $categoryCollectionFactory;
 
 
     /**
      * @var TaxCalculationInterface
      */
-    private TaxCalculationInterface $taxHelper;
+    private $taxHelper;
 
     /**
      * @var bool
      */
-    public bool $productInserted = false;
+    public $productInserted = false;
 
     /** @var Item */
-    private Item $taxItem;
+    private $taxItem;
 
     /**
      * @var ProductsFactory
      */
-    private ProductsFactory $products;
+    private $products;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -343,7 +343,7 @@ class Products
             }
 
             $productStock = $product->getExtensionAttributes()->getStockItem()->getQty();
-            $moloniProduct['stock'] = (float)$productStock;
+            $moloniProduct['stock'] = $productStock;
             $moloniProduct['category_id'] = $this->createCategoryTree($categoryTree);
 
             if (!empty($this->moloni->settings['products_at_category'])) {
@@ -374,11 +374,7 @@ class Products
                                 'exact' => true
                             ]);
 
-                            if (!isset($moloniProductExists[0]['product_id'])) {
-                                $moloniChildProductId = $this->products->create()->createProductFromId($childProduct);
-                            } else {
-                                $moloniChildProductId = $moloniProductExists[0]['product_id'];
-                            }
+                            $moloniChildProductId = $moloniProductExists[0]['product_id'] ?? $this->products->create()->createProductFromId($childProduct);
 
                             /** @todo Validar a quantidade por defeito de cada artigo */
                             $moloniProduct['child_products'][] = [
@@ -581,18 +577,18 @@ class Products
      * @return int
      * @throws JsonException
      */
-    private function getTaxIdFromRate(float $taxRate, $break = false): int
+    private function getTaxIdFromRate(float $taxRate, bool $break = false): int
     {
         $taxId = 0;
         $taxDefaultId = 0;
         $taxes = $this->moloni->taxes->getAll();
         if ($taxes && is_array($taxes)) {
             foreach ($taxes as $tax) {
-                if ($tax['active_by_default'] == 1) {
+                if ((int)$tax['active_by_default'] === 1) {
                     $taxDefaultId = $tax['tax_id'];
                 }
 
-                if ($tax['value'] == $taxRate) {
+                if ((int)$tax['value'] == $taxRate) {
                     $taxId = $tax['tax_id'];
                     if ($tax['name'] === 'IVA Normal') {
                         return $taxId;
@@ -601,11 +597,11 @@ class Products
             }
         }
 
-        if ($taxId == 0) {
+        if ((int)$taxId === 0) {
             $taxId = $taxDefaultId;
         }
 
-        if ($taxId == 0 && !$break) {
+        if ((int)$taxId === 0 && !$break) {
             $taxId = $this->getTaxIdFromRate(23, true);
         }
 
@@ -617,7 +613,7 @@ class Products
      * @param int $taxId
      * @throws JsonException
      */
-    private function parseProductTaxes(array &$moloniProduct, $taxId = 0): void
+    private function parseProductTaxes(array &$moloniProduct, int $taxId = 0): void
     {
         if (!empty($moloniProduct) && $taxId > 0) {
             $price = (isset($moloniProduct['price_with_taxes']) && (float)$moloniProduct['price_with_taxes'] > 0)

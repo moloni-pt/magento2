@@ -8,13 +8,12 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use JsonException;
 
 class DeliveryMethods
 {
 
-    private Moloni $moloni;
-    private array $store = [];
+    private $moloni;
+    private $store = [];
 
     /**
      * Companies constructor.
@@ -26,9 +25,8 @@ class DeliveryMethods
     }
 
     /**
-     * @param bool $company_id
+     * @param bool|int $company_id
      * @return bool|mixed
-     * @throws JsonException
      */
     public function getAll($company_id = false)
     {
@@ -46,7 +44,7 @@ class DeliveryMethods
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação das dos métodos de pagamento"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -69,7 +67,7 @@ class DeliveryMethods
 
         $this->moloni->errors->throwError(
             __("Houve um erro ao inserir o método de entrega"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;

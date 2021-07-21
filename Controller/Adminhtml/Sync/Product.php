@@ -23,52 +23,52 @@ class Product implements ActionInterface
     /**
      * @var Context
      */
-    protected Context $context;
+    protected $context;
 
     /**
      * @var Moloni
      */
-    protected Moloni $moloni;
+    protected $moloni;
 
     /**
      * @var PageFactory
      */
-    protected PageFactory $resultFactory;
+    protected $resultFactory;
 
     /**
      * @var RedirectFactory
      */
-    protected RedirectFactory $redirectFactory;
+    protected $redirectFactory;
 
     /**
      * @var MoloniProductsFactory
      */
-    private MoloniProductsFactory $productsFactory;
+    private $productsFactory;
 
     /**
      * @var ManagerInterface
      */
-    protected ManagerInterface $messageManager;
+    protected $messageManager;
 
     /**
      * @var RequestInterface
      */
-    protected RequestInterface $requestInterface;
+    protected $requestInterface;
 
     /**
      * @var RedirectInterface
      */
-    protected RedirectInterface $redirectInterface;
+    protected $redirectInterface;
 
     /**
      * @var ResponseInterface
      */
-    protected ResponseInterface $response;
+    protected $response;
 
     /**
      * @var HttpInterface
      */
-    protected HttpInterface $http;
+    protected $http;
 
     /**
      * Product constructor.

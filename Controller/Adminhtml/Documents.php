@@ -25,52 +25,52 @@ abstract class Documents implements ActionInterface
     /**
      * @var Moloni
      */
-    protected Moloni $moloni;
+    protected $moloni;
 
     /**
      * @var MoloniDocumentsFactory
      */
-    protected MoloniDocumentsFactory $moloniDocumentsFactory;
+    protected $moloniDocumentsFactory;
 
     /**
      * @var DocumentsRepository
      */
-    protected DocumentsRepository $documentsRepository;
+    protected $documentsRepository;
 
     /**
      * @var PageFactory
      */
-    protected PageFactory $resultFactory;
+    protected $resultFactory;
 
     /**
      * @var RedirectFactory
      */
-    protected RedirectFactory $redirectFactory;
+    protected $redirectFactory;
 
     /**
      * @var Context
      */
-    protected Context $context;
+    protected $context;
 
     /**
      * @var UrlInterface
      */
-    protected UrlInterface $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * @var RedirectInterface
      */
-    protected RedirectInterface $redirect;
+    protected $redirect;
 
     /**
      * @var RequestInterface
      */
-    protected RequestInterface $request;
+    protected $request;
 
     /**
      * @var ManagerInterface
      */
-    protected ManagerInterface $messageManager;
+    protected $messageManager;
 
 
     /**
@@ -108,9 +108,9 @@ abstract class Documents implements ActionInterface
     }
 
     /**
-     * @return ResultInterface|ResponseInterface
+     * @return ResultInterface
      */
-    protected function initAction()
+    protected function initAction(): ResultInterface
     {
         $resultPage = $this->resultFactory->create();
 

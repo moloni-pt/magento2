@@ -12,7 +12,7 @@ class CreateAction extends Column
     /**
      * @var UrlInterface
      */
-    protected UrlInterface $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * Constructor

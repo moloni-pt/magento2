@@ -8,8 +8,8 @@ use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory;
 
 class OrdersStatuses implements OptionSourceInterface
 {
-    private Moloni $moloni;
-    private CollectionFactory $statusCollectionFactory;
+    private $moloni;
+    private $statusCollectionFactory;
 
     /**
      * DocumentSets constructor.

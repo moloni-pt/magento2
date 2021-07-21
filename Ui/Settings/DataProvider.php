@@ -10,8 +10,8 @@ use Magento\Framework\App\RequestInterface;
 
 class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider
 {
-    public array $loadedData = [];
-    private Moloni $moloni;
+    public $loadedData = [];
+    private $moloni;
 
     public function __construct(
         string $name,

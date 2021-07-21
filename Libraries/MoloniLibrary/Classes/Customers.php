@@ -8,13 +8,12 @@
 namespace Invoicing\Moloni\Libraries\MoloniLibrary\Classes;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use JsonException;
 
 class Customers
 {
 
-    private Moloni $moloni;
-    private array $store = [];
+    private $moloni;
+    private $store = [];
 
     /**
      * Customers constructor.
@@ -27,8 +26,7 @@ class Customers
 
     /**
      * @param int|bool $companyId
-     * @return bool|mixed
-     * @throws JsonException
+     * @return array|false
      */
     public function getAll($companyId = false)
     {
@@ -40,7 +38,7 @@ class Customers
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação dos clientes"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -50,7 +48,6 @@ class Customers
      * @param array $values
      * @param int|bool $companyId
      * @return bool|mixed
-     * @throws JsonException
      */
     public function getByEmail(array $values, $companyId = false)
     {
@@ -78,7 +75,7 @@ class Customers
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação dos clientes"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -87,8 +84,7 @@ class Customers
     /**
      * @param array $values
      * @param int|bool $companyId
-     * @return bool|mixed
-     * @throws JsonException
+     * @return array|false
      */
     public function getByVat(array $values, $companyId = false)
     {
@@ -106,7 +102,7 @@ class Customers
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação dos clientes"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -115,7 +111,6 @@ class Customers
     /**
      * @param int|bool $companyId
      * @return bool|string
-     * @throws JsonException
      */
     public function getNextNumber($companyId = false)
     {
@@ -127,7 +122,7 @@ class Customers
 
         $this->moloni->errors->throwError(
             __("Houve um erro ao obter o próximo número de cliente"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -137,7 +132,6 @@ class Customers
      * @param array $values https://www.moloni.pt/dev/index.php?action=getApiDocDetail&id=204
      * @param int|bool $companyId
      * @return bool|array
-     * @throws JsonException
      */
     public function insert(array $values, $companyId = false)
     {
@@ -151,7 +145,7 @@ class Customers
 
         $this->moloni->errors->throwError(
             __("Houve um erro ao inserir o cliente"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -173,7 +167,7 @@ class Customers
 
         $this->moloni->errors->throwError(
             __("Houve um erro ao atualizar o cliente"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;

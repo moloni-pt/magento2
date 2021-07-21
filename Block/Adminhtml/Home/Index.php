@@ -28,12 +28,12 @@ use Magento\Framework\View\Element\Template\Context;
 
 class Index extends Template
 {
-    private Moloni $moloni;
+    private $moloni;
 
     /**
      * @var DocumentsRepository
      */
-    private DocumentsRepository $documents;
+    private $documents;
 
     public function __construct(
         Context $context,

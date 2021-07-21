@@ -28,7 +28,7 @@ use Magento\Framework\View\Element\Template\Context;
 class Company extends Template
 {
 
-    private DataPersistorInterface $dataPersistor;
+    private $dataPersistor;
 
     public function __construct(
         Context $context,

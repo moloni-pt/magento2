@@ -32,7 +32,7 @@ use Zend_Db_Exception;
 class InstallSchema implements InstallSchemaInterface
 {
 
-    private array $tables = [
+    private $tables = [
         "moloni_tokens",
         "moloni_settings",
         "moloni_documents",

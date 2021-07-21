@@ -25,6 +25,7 @@ use Invoicing\Moloni\Controller\Adminhtml\Documents;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as MoloniDocumentsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Model\DocumentsRepository;
+use JsonException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\RedirectFactory;
@@ -35,7 +36,7 @@ use Magento\Framework\View\Result\PageFactory;
 
 class MassCreate extends Documents
 {
-    private array $data;
+    private $data;
 
     /**
      * Documents constructor.
@@ -79,7 +80,7 @@ class MassCreate extends Documents
      *
      * @return ResultInterface|ResponseInterface
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function execute()
     {

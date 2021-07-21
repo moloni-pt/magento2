@@ -13,17 +13,17 @@ class ProductsSync
     /**
      * @var SyncLogger
      */
-    protected SyncLogger $logger;
+    protected $logger;
 
     /**
      * @var Moloni
      */
-    protected Moloni $moloni;
+    protected $moloni;
 
     /**
      * @var MoloniProductsFactory
      */
-    private MoloniProductsFactory $productsFactory;
+    private $productsFactory;
 
 
     public function __construct(
@@ -40,10 +40,10 @@ class ProductsSync
     /**
      * Write to system.log
      *
-     * @return void|boolean
+     * @return void
      * @throws Exception
      */
-    public function execute()
+    public function execute(): void
     {
 
         if ($this->moloni->checkActiveSession()) {

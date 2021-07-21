@@ -40,6 +40,7 @@ use Invoicing\Moloni\Model\TokensRepository;
 use JsonException;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\HTTP\Client\Curl;
 
 /**
@@ -60,31 +61,31 @@ class Moloni implements MoloniApiRepositoryInterface
 {
     public const API_URL = 'https://api.moloni.pt/v1/';
 
-    public array $logs = [];
+    public $logs = [];
     /**
      * @var ApiErrors
      */
-    public ApiErrors $errors;
-    public Curl $curl;
-    public TokensRepository $tokensRepository;
-    public SettingsRepository $settingsRepository;
+    public $errors;
+    public $curl;
+    public $tokensRepository;
+    public $settingsRepository;
 
-    public RequestInterface $request;
-    public DataPersistorInterface $dataPersistor;
+    public $request;
+    public $dataPersistor;
 
     /**
      * @var ApiSession
      */
-    public ApiSession $session;
+    public $session;
 
-    private array $factories;
+    private $factories;
 
-    public string $redirectTo;
+    public $redirectTo;
 
     /*
      * 'Required' means its not set and must be sent to the settings page
      */
-    public array $settings = [
+    public $settings = [
         'cae' => '',
         'debug_console' => '0',
 
@@ -238,6 +239,9 @@ class Moloni implements MoloniApiRepositoryInterface
     /**
      * @param $authorizationCode
      * @return bool
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function checkAuthorizationCode($authorizationCode): bool
     {
@@ -278,7 +282,7 @@ class Moloni implements MoloniApiRepositoryInterface
 
         if (!empty($rawResponse)) {
             try {
-                $response = json_decode($rawResponse, true, 512, JSON_THROW_ON_ERROR);
+                $response = json_decode($rawResponse, true);
             } catch (Exception $e) {
                 $response = [];
             }
@@ -298,7 +302,7 @@ class Moloni implements MoloniApiRepositoryInterface
     /**
      * @param $companyId
      * @return array
-     * @throws JsonException
+     * @throws NoSuchEntityException
      */
     private function setSettings($companyId): array
     {
@@ -321,12 +325,7 @@ class Moloni implements MoloniApiRepositoryInterface
             }
 
             if (isset($savedSettings['orders_statuses']) && !empty($savedSettings['orders_statuses'])) {
-                $savedSettings['orders_statuses'] = json_decode(
-                    $savedSettings['orders_statuses'],
-                    true,
-                    512,
-                    JSON_THROW_ON_ERROR
-                );
+                $savedSettings['orders_statuses'] = json_decode($savedSettings['orders_statuses'], true);
             } else {
                 $savedSettings['orders_statuses'] = [];
             }

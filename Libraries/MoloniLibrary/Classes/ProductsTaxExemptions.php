@@ -13,8 +13,8 @@ use JsonException;
 class ProductsTaxExemptions
 {
 
-    private array $store = [];
-    private Moloni $moloni;
+    private $store = [];
+    private $moloni;
 
     /**
      * ProductsTaxes constructor.
@@ -26,9 +26,8 @@ class ProductsTaxExemptions
     }
 
     /**
-     * @param bool $company_id
+     * @param bool|int $company_id
      * @return bool|mixed
-     * @throws JsonException
      */
     public function getAll($company_id = false)
     {
@@ -45,7 +44,7 @@ class ProductsTaxExemptions
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação das razões de isenção"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;

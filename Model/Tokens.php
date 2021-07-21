@@ -37,6 +37,7 @@ use Magento\Framework\Model\AbstractModel;
  * @method  getDeveloperId()
  * @method  getRedirectUri()
  * @method  getSecretToken()
+ * @method  getRefreshToken()
  */
 class Tokens extends AbstractModel implements
     IdentityInterface,
@@ -45,9 +46,9 @@ class Tokens extends AbstractModel implements
 
     public const CACHE_TAG = 'moloni_tokens';
 
-    public string $cacheTag = 'moloni_tokens';
-    public string $eventPrefix = 'moloni_tokens';
-    public array $tokensRow = [];
+    public $cacheTag = 'moloni_tokens';
+    public $eventPrefix = 'moloni_tokens';
+    public $tokensRow = [];
 
     /** @noinspection MagicMethodsValidityInspection */
     public function _construct()

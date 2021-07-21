@@ -22,12 +22,9 @@
 namespace Invoicing\Moloni\Model;
 
 use Exception;
-use Invoicing\Moloni\Api\Data\SettingsInterface;
-use Invoicing\Moloni\Api\Data\TokensInterface;
 use Invoicing\Moloni\Api\SettingsRepositoryInterface;
 use Invoicing\Moloni\Model\ResourceModel\Settings as ObjectResourceModel;
 use Invoicing\Moloni\Model\ResourceModel\Settings\CollectionFactory;
-use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
@@ -41,14 +38,14 @@ use Psr\Log\LoggerInterface;
 
 class SettingsRepository implements SettingsRepositoryInterface
 {
-    public SettingsFactory $objectFactory;
-    public ObjectResourceModel $objectResourceModel;
-    public CollectionFactory $collectionFactory;
-    public SearchResultsInterfaceFactory $searchResultsFactory;
-    public SearchCriteriaBuilder $searchCriteriaBuilder;
-    public LoggerInterface $logger;
+    public $objectFactory;
+    public $objectResourceModel;
+    public $collectionFactory;
+    public $searchResultsFactory;
+    public $searchCriteriaBuilder;
+    public $logger;
 
-    private array $settingsResults = [];
+    private $settingsResults = [];
 
     /**
      * SettingsRepository constructor.
@@ -96,7 +93,8 @@ class SettingsRepository implements SettingsRepositoryInterface
      * @param $label string
      * @param $value int|string|array
      *
-     * @return SettingsInterface|TokensInterface|Settings|ExtensibleDataInterface
+     * @return AbstractModel|Settings
+     * @throws NoSuchEntityException
      */
     public function saveSetting(int $companyId, string $label, $value)
     {
@@ -159,7 +157,7 @@ class SettingsRepository implements SettingsRepositoryInterface
     }
 
     /**
-     * @return mixed
+     * @return Settings
      */
     public function newOption()
     {
@@ -198,7 +196,7 @@ class SettingsRepository implements SettingsRepositoryInterface
     /**
      * @param $companyId
      * @param $label
-     * @return SettingsInterface
+     * @return Settings
      * @throws NoSuchEntityException
      */
     public function getByCompanyLabel($companyId, $label)

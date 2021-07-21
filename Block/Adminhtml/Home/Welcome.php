@@ -33,8 +33,8 @@ class Welcome extends Template
      */
     public $messages = false;
 
-    public DataPersistorInterface $dataPersistor;
-    public Context $context;
+    public $dataPersistor;
+    public $context;
 
     public function __construct(Context $context, DataPersistorInterface $dataPersistor)
     {

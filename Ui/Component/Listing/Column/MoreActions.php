@@ -19,7 +19,7 @@ class MoreActions extends Column
     /**
      * @var UrlInterface
      */
-    protected UrlInterface $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * Constructor

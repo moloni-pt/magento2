@@ -9,7 +9,7 @@ namespace Invoicing\Moloni\Libraries\MoloniLibrary\Dependencies;
 
 class ApiErrors
 {
-    private array $error_log = [];
+    private $error_log = [];
 
     public function hasError(): bool
     {

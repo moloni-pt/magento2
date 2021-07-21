@@ -7,7 +7,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 class Tools
 {
 
-    private Moloni $moloni;
+    private $moloni;
 
     public function __construct(Moloni $moloni)
     {
@@ -18,7 +18,7 @@ class Tools
      * Regex expression to validate a Portuguese Zip Code
      * @var string
      */
-    private string $regexZip = "/[0-9]{4}\-[0-9]{3}/";
+    private $regexZip = "/[0-9]{4}\-[0-9]{3}/";
 
 
     /**
@@ -28,7 +28,7 @@ class Tools
      * @param int $chars
      * @return int
      */
-    public function getCountryIdByISO($iso, $chars = 2): int
+    public function getCountryIdByISO($iso, int $chars = 2): int
     {
         $countryId = 1;
 
@@ -36,7 +36,7 @@ class Tools
         if ($countries && is_array($countries)) {
             $countryISO = mb_strtoupper($iso);
             foreach ($countries as $country) {
-                if ($chars == 2 && $countryISO == mb_strtoupper($country['iso_3166_1'])) {
+                if ($chars === 2 && $countryISO === mb_strtoupper($country['iso_3166_1'])) {
                     $countryId = $country['country_id'];
                     break;
                 }
@@ -59,13 +59,11 @@ class Tools
                 $sum += $vatNumber[$i] * (10 - ($i + 1));
             }
 
-            if ($vatNumber[8] == 0) {
-                if (($sum % 11) != 0) {
-                    $sum += 10;
-                }
+            if (((int)$vatNumber[8] === 0) && ($sum % 11) !== 0) {
+                $sum += 10;
             }
 
-            if (($sum % 11) != 0) {
+            if (($sum % 11) !== 0) {
                 return false;
             }
         } else {
@@ -87,35 +85,35 @@ class Tools
         $zip = trim(str_replace(" ", "", $input));
         $zip = preg_replace("/[^0-9]/", "", $zip);
 
-        if (strlen($zip) == 7) {
+        if (strlen($zip) === 7) {
             $zip = $zip[0] . $zip[1] . $zip[2] . $zip[3] . "-" . $zip[4] . $zip[5] . $zip[6];
         }
 
-        if (strlen($zip) == 6) {
+        if (strlen($zip) === 6) {
             $zip = $zip[0] . $zip[1] . $zip[2] . $zip[3] . "-" . $zip[4] . $zip[5] . "0";
         }
 
-        if (strlen($zip) == 5) {
+        if (strlen($zip) === 5) {
             $zip = $zip[0] . $zip[1] . $zip[2] . $zip[3] . "-" . $zip[4] . "00";
         }
 
-        if (strlen($zip) == 4) {
-            $zip = $zip . "-" . "000";
+        if (strlen($zip) === 4) {
+            $zip .= "-" . "000";
         }
 
-        if (strlen($zip) == 3) {
-            $zip = $zip . "0-" . "000";
+        if (strlen($zip) === 3) {
+            $zip .= "0-" . "000";
         }
 
-        if (strlen($zip) == 2) {
-            $zip = $zip . "00-" . "000";
+        if (strlen($zip) === 2) {
+            $zip .= "00-" . "000";
         }
 
-        if (strlen($zip) == 1) {
-            $zip = $zip . "000-" . "000";
+        if (strlen($zip) === 1) {
+            $zip .= "000-" . "000";
         }
 
-        if (strlen($zip) == 0) {
+        if ($zip === '') {
             $zip = "1000-100";
         }
 

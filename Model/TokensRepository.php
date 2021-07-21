@@ -44,11 +44,11 @@ use Magento\Framework\Model\AbstractModel;
  */
 class TokensRepository implements TokensRepositoryInterface
 {
-    public TokensFactory $objectFactory;
-    public ObjectResourceModel $objectResourceModel;
-    public CollectionFactory $collectionFactory;
-    public SearchResultsInterfaceFactory $searchResultsFactory;
-    public SearchCriteriaBuilder $searchCriteriaBuilder;
+    public $objectFactory;
+    public $objectResourceModel;
+    public $collectionFactory;
+    public $searchResultsFactory;
+    public $searchCriteriaBuilder;
 
     /**
      * @var mixed
@@ -154,7 +154,7 @@ class TokensRepository implements TokensRepositoryInterface
             $fields = [];
             $conditions = [];
             foreach ($filterGroup->getFilters() as $filter) {
-                $condition = $filter->getConditionType() ? $filter->getConditionType() : 'eq';
+                $condition = $filter->getConditionType() ?: 'eq';
                 $fields[] = $filter->getField();
                 $conditions[] = [$condition => $filter->getValue()];
             }

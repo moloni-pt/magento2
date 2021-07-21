@@ -23,26 +23,26 @@ class View implements ActionInterface
     /**
      * @var OrderLoaderInterface
      */
-    protected OrderLoaderInterface $orderLoader;
+    protected $orderLoader;
 
     /**
      * @var PageFactory
      */
-    protected PageFactory $resultPageFactory;
+    protected $resultPageFactory;
 
     /**
      * @var RequestInterface
      */
-    protected RequestInterface $requestInterface;
+    protected $requestInterface;
     /**
      * @var RedirectInterface
      */
-    protected RedirectInterface $redirectInterface;
+    protected $redirectInterface;
 
     /**
      * @var ResponseInterface
      */
-    protected ResponseInterface $response;
+    protected $response;
 
     /**
      * @param Action\Context $context

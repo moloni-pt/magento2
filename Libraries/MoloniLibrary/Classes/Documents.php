@@ -12,12 +12,12 @@ use JsonException;
 
 class Documents
 {
-    private Moloni $moloni;
-    private array $store = [];
-    public int $documentTypeId = 1;
-    public string $documentTypeName = "Fatura";
-    public string $documentTypeClass = "invoices";
-    public string $documentTypeClassMoloni = "Faturas";
+    private $moloni;
+    private $store = [];
+    public $documentTypeId = 1;
+    public $documentTypeName = "Fatura";
+    public $documentTypeClass = "invoices";
+    public $documentTypeClassMoloni = "Faturas";
 
 
     /**
@@ -154,9 +154,8 @@ class Documents
 
     /**
      * @param $values
-     * @param false $companyId
+     * @param false|int $companyId
      * @return false|string
-     * @throws JsonException
      */
     public function getDownloadUrl($values, $companyId = false)
     {
@@ -168,7 +167,7 @@ class Documents
 
         $this->moloni->errors->throwError(
             __("Falhou a obter o documento para download " . $values['document_id']),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -177,10 +176,9 @@ class Documents
     /**
      * @param array $values
      * @param bool|int $companyId
-     * @return bool|mixed
-     * @throws JsonException
+     * @return array|false
      */
-    public function getAll($values = [], $companyId = false)
+    public function getAll(array $values = [], $companyId = false)
     {
         $values["company_id"] = $companyId ?: $this->moloni->session->companyId;
 
@@ -191,7 +189,7 @@ class Documents
 
         $this->moloni->errors->throwError(
             __("Não tem acesso à informação dos documentos"),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -216,14 +214,12 @@ class Documents
             return $result;
         }
 
-        try {
-            $this->moloni->errors->throwError(
-                __("Não tem acesso à informação do documento com id " . $values['document_id']),
-                __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
-                __CLASS__ . "/" . __FUNCTION__
-            );
-        } catch (JsonException $e) {
-        }
+        $this->moloni->errors->throwError(
+            __("Não tem acesso à informação do documento com id " . $values['document_id']),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
+            __CLASS__ . "/" . __FUNCTION__
+        );
+
         return false;
     }
 
@@ -231,7 +227,6 @@ class Documents
      * @param array $values
      * @param bool|int $companyId
      * @return bool|array
-     * @throws JsonException
      */
     public function insert(array $values, $companyId = false)
     {
@@ -244,7 +239,7 @@ class Documents
 
         $this->moloni->errors->throwError(
             __("Erro ao inserir o documento: " . $this->getErrorMessage($result)),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
@@ -254,7 +249,6 @@ class Documents
      * @param array $values
      * @param bool|int $companyId
      * @return bool|array
-     * @throws JsonException
      */
     public function update(array $values, $companyId = false)
     {
@@ -267,7 +261,7 @@ class Documents
 
         $this->moloni->errors->throwError(
             __("Erro ao fechar o documento: " . $this->getErrorMessage($result)),
-            __(json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT)),
+            __(json_encode($result, JSON_PRETTY_PRINT)),
             __CLASS__ . "/" . __FUNCTION__
         );
         return false;
