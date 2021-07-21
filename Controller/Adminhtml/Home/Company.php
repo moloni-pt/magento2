@@ -22,27 +22,31 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Invoicing\Moloni\Controller\Adminhtml\Home;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 class Company extends Home
 {
 
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     */
     public function execute()
     {
-        $page = $this->initAction();
         if (!$this->moloni->checkActiveSession()) {
-            $this->redirect->redirect($this->response, $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath($this->moloni->redirectTo);
         }
 
         $companies = $this->moloni->companies->getAll();
         if (!$companies) {
             $this->moloni->dropActiveSession();
             $this->messageManager->addErrorMessage($this->moloni->errors->getErrors('last')['message']);
-            $this->redirect->redirect($this->response, $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath($this->moloni->redirectTo);
         }
 
         $this->dataPersistor->set('moloni_companies', $companies);
-        return $page;
+        return $this->initAction();
     }
 }

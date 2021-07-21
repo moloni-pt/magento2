@@ -5,6 +5,7 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Ajax;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 
 class Documents extends Action
@@ -16,6 +17,13 @@ class Documents extends Action
      */
     protected Moloni $moloni;
 
+    /**
+     * Documents constructor.
+     *
+     * @param Context $context
+     * @param JsonFactory $jsonFactory
+     * @param Moloni $moloni
+     */
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,
@@ -28,7 +36,10 @@ class Documents extends Action
         $this->jsonFactory = $jsonFactory;
     }
 
-    public function execute()
+    /**
+     * @return Json
+     */
+    public function execute(): Json
     {
         $result = $this->jsonFactory->create();
         $response = [];

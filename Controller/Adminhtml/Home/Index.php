@@ -22,17 +22,22 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
 use Invoicing\Moloni\Controller\Adminhtml\Home;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 class Index extends Home
 {
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     */
     public function execute()
     {
-        $page = $this->initAction();
         if (!$this->moloni->checkActiveSession()) {
-            $this->redirect->redirect($this->response, $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath($this->moloni->redirectTo);
         }
 
-        return $page;
+        return $this->initAction();
     }
 }

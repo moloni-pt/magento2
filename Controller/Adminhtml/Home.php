@@ -10,8 +10,12 @@ use Magento\Framework\App\Request\DataPersistor;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
+
 
 abstract class Home implements ActionInterface
 {
@@ -31,6 +35,11 @@ abstract class Home implements ActionInterface
      * @var RequestInterface
      */
     protected RequestInterface $request;
+
+    /**
+     * @var RedirectFactory
+     */
+    protected RedirectFactory $redirectFactory;
 
     /**
      * @var ManagerInterface
@@ -57,11 +66,13 @@ abstract class Home implements ActionInterface
         PageFactory $resultPageFactory,
         DataPersistor $dataPersistor,
         TokensRepository $tokensRepository,
+        RedirectFactory $redirectFactory,
         Moloni $moloni
     )
     {
         $this->moloni = $moloni;
         $this->resultFactory = $resultPageFactory;
+        $this->redirectFactory = $redirectFactory;
         $this->dataPersistor = $dataPersistor;
         $this->tokensRepository = $tokensRepository;
 
@@ -72,6 +83,9 @@ abstract class Home implements ActionInterface
         $this->messageManager = $context->getMessageManager();
     }
 
+    /**
+     * @return Redirect|Page
+     */
     protected function initAction()
     {
         $resultPage = $this->resultFactory->create();
@@ -81,8 +95,7 @@ abstract class Home implements ActionInterface
 
         if (!$this->context->getAuth()->isLoggedIn()) {
             $adminUrl = $this->context->getUrl()->getUrl('admin');
-            $this->redirect->redirect($this->response, $adminUrl);
-            return false;
+            return $this->redirectFactory->create()->setUrl($adminUrl);
         }
 
         return $resultPage;

@@ -4,55 +4,122 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Sync;
 
 use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\ProductsFactory as MoloniProductsFactory;
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
-use Magento\Backend\App\AbstractAction;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Response\HttpInterface;
+use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\View\Result\PageFactory;
 
-class Product extends AbstractAction
+class Product implements ActionInterface
 {
 
-    const ADMIN_RESOURCE = 'Invoicing_Moloni::home';
+    public const ADMIN_RESOURCE = 'Invoicing_Moloni::home';
+
+    /**
+     * @var Context
+     */
+    protected Context $context;
 
     /**
      * @var Moloni
      */
-    protected $moloni;
+    protected Moloni $moloni;
+
+    /**
+     * @var PageFactory
+     */
+    protected PageFactory $resultFactory;
+
+    /**
+     * @var RedirectFactory
+     */
+    protected RedirectFactory $redirectFactory;
 
     /**
      * @var MoloniProductsFactory
      */
-    private $productsFactory;
+    private MoloniProductsFactory $productsFactory;
 
+    /**
+     * @var ManagerInterface
+     */
+    protected ManagerInterface $messageManager;
+
+    /**
+     * @var RequestInterface
+     */
+    protected RequestInterface $requestInterface;
+
+    /**
+     * @var RedirectInterface
+     */
+    protected RedirectInterface $redirectInterface;
+
+    /**
+     * @var ResponseInterface
+     */
+    protected ResponseInterface $response;
+
+    /**
+     * @var HttpInterface
+     */
+    protected HttpInterface $http;
+
+    /**
+     * Product constructor.
+     *
+     * @param Context $context
+     * @param Moloni $moloni
+     * @param MoloniProductsFactory $productsFactory
+     * @param RedirectFactory $redirectFactory
+     * @param ManagerInterface $messageManager
+     * @param PageFactory $resultFactory
+     */
     public function __construct(
         Context $context,
         Moloni $moloni,
-        MoloniProductsFactory $productsFactory
+        MoloniProductsFactory $productsFactory,
+        RedirectFactory $redirectFactory,
+        ManagerInterface $messageManager,
+        PageFactory $resultFactory
     )
     {
-        parent::__construct($context);
-
         $this->moloni = $moloni;
+        $this->context = $context;
         $this->productsFactory = $productsFactory;
+        $this->redirectFactory = $redirectFactory;
+        $this->messageManager = $messageManager;
+        $this->resultFactory = $resultFactory;
+
+        $this->response = $context->getResponse();
+        $this->requestInterface = $context->getRequest();
+        $this->redirectInterface = $context->getRedirect();
     }
 
+
     /**
-     * @return bool|ResponseInterface|ResultInterface
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
      */
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
             $this->messageManager->addErrorMessage(__('Erro com sessão Moloni'));
-            $this->_redirect('catalog/product/index');
-            return false;
+
+            return $this->redirectFactory->create()->setPath('catalog/product/index');
         }
 
-        $productId = $this->getRequest()->getParam('id');
+        $productId = $this->requestInterface->getParam('id');
 
         if (!$productId) {
             $this->messageManager->addErrorMessage(__('Id de artigo não encontrado'));
-            $this->_redirect('catalog/product/index');
-            return false;
+            return $this->redirectFactory->create()->setPath('catalog/product/index');
         }
 
         $syncProduct = $this->productsFactory->create();
@@ -69,7 +136,7 @@ class Product extends AbstractAction
                 $this->moloni->errors->getErrors('first')['message']
             );
         }
-        $this->_redirect('catalog/product/edit', ['id' => $productId]);
-        return true;
+
+        return $this->redirectFactory->create()->setPath('catalog/product/index', ['id' => $productId]);
     }
 }

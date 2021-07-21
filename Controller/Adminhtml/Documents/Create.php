@@ -22,7 +22,6 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
-use JsonException;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 
@@ -30,34 +29,34 @@ class Create extends Documents
 {
 
     /**
-     * @return bool|ResponseInterface|ResultInterface
-     * @throws JsonException
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     *
+     * @throws \JsonException
      */
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
             $this->redirect->redirect($this->context->getResponse(), $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath('moloni/home/index');
         }
 
         $orderId = $this->request->getParam('order_id');
 
         if (!$orderId) {
             $this->messageManager->addErrorMessage(__("Encomenda não encontrada."));
-            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-            return false;
+            return $this->redirectFactory->create()->setPath('moloni/home/index');
         }
 
         if ($this->documentExists($orderId)) {
-            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-            return false;
+            return $this->redirectFactory->create()->setPath('moloni/home/index');
         }
 
         $newDocument = $this->moloniDocumentsFactory->create();
         $newDocument->createDocumentFromOrderId($orderId);
         $newDocument->throwMessages();
 
-        $this->redirect->redirect($this->context->getResponse(), '*/home/index');
-        return true;
+        return $this->redirectFactory->create()->setPath('*/home/index');
     }
 }

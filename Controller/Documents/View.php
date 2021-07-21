@@ -64,11 +64,12 @@ class View implements ActionInterface
     }
 
     /**
-     * Order view page
+     * Execute action based on request and return result
      *
-     * @return ResultInterface
+     * @return ResultInterface|ResponseInterface
+     *
      */
-    public function execute(): ResultInterface
+    public function execute()
     {
         $result = $this->orderLoader->load($this->requestInterface);
         if ($result instanceof ResultInterface) {

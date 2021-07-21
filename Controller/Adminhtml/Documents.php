@@ -9,10 +9,13 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\RedirectInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlInterface;
-use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
+
 
 abstract class Documents implements ActionInterface
 {
@@ -38,6 +41,11 @@ abstract class Documents implements ActionInterface
      * @var PageFactory
      */
     protected PageFactory $resultFactory;
+
+    /**
+     * @var RedirectFactory
+     */
+    protected RedirectFactory $redirectFactory;
 
     /**
      * @var Context
@@ -74,6 +82,7 @@ abstract class Documents implements ActionInterface
      * @param MoloniDocumentsFactory $moloniDocumentsFactory
      * @param DocumentsRepository $documentsRepository
      * @param UrlInterface $urlBuilder
+     * @param RedirectFactory $redirectFactory
      */
     public function __construct(
         Context $context,
@@ -81,7 +90,8 @@ abstract class Documents implements ActionInterface
         Moloni $moloni,
         MoloniDocumentsFactory $moloniDocumentsFactory,
         DocumentsRepository $documentsRepository,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        RedirectFactory $redirectFactory
     )
     {
         $this->context = $context;
@@ -89,6 +99,7 @@ abstract class Documents implements ActionInterface
         $this->moloniDocumentsFactory = $moloniDocumentsFactory;
         $this->documentsRepository = $documentsRepository;
         $this->resultFactory = $resultPageFactory;
+        $this->redirectFactory = $redirectFactory;
         $this->urlBuilder = $urlBuilder;
 
         $this->redirect = $context->getRedirect();
@@ -97,17 +108,17 @@ abstract class Documents implements ActionInterface
     }
 
     /**
-     * @return false|Page
+     * @return ResultInterface|ResponseInterface
      */
     protected function initAction()
     {
+        $resultPage = $this->resultFactory->create();
+
         if (!$this->context->getAuth()->isLoggedIn()) {
             $adminUrl = $this->context->getUrl()->getUrl('admin');
-            $this->context->getRedirect()->redirect($this->context->getResponse(), $adminUrl);
-            return false;
+            return $this->redirectFactory->create()->setUrl($adminUrl);
         }
 
-        $resultPage = $this->resultFactory->create();
         $resultPage->setActiveMenu('Invoicing_Moloni::home');
         $resultPage->addBreadcrumb(__('Moloni'), __('Moloni'));
         $resultPage->getConfig()->getTitle()->prepend(__("Moloni"));

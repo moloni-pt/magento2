@@ -8,6 +8,8 @@ use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
@@ -31,10 +33,16 @@ abstract class Settings implements ActionInterface
      * @var RequestInterface
      */
     protected RequestInterface $requestInterface;
+
     /**
      * @var RedirectInterface
      */
     protected RedirectInterface $redirectInterface;
+
+    /**
+     * @var RedirectFactory
+     */
+    protected RedirectFactory $redirectFactory;
 
     /**
      * @var ResponseInterface
@@ -46,18 +54,21 @@ abstract class Settings implements ActionInterface
      *
      * @param $context Context
      * @param $resultPageFactory PageFactory
+     * @param RedirectFactory $redirectFactory
      * @param $messageManager ManagerInterface
      * @param $Moloni Moloni
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
+        RedirectFactory $redirectFactory,
         ManagerInterface $messageManager,
         Moloni $Moloni
     )
     {
         $this->context = $context;
         $this->resultFactory = $resultPageFactory;
+        $this->redirectFactory = $redirectFactory;
         $this->messageManager = $messageManager;
         $this->moloni = $Moloni;
 
@@ -67,14 +78,13 @@ abstract class Settings implements ActionInterface
     }
 
     /**
-     * @return Page|false
+     * @return Redirect|Page
      */
     protected function initAction()
     {
         if (!$this->context->getAuth()->isLoggedIn()) {
             $adminUrl = $this->context->getUrl()->getUrl('admin');
-            $this->context->getRedirect()->redirect($this->response, $adminUrl);
-            return false;
+            return $this->redirectFactory->create()->setPath($adminUrl);
         }
 
         $resultPage = $this->resultFactory->create();

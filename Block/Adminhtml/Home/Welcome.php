@@ -32,10 +32,13 @@ class Welcome extends Template
      * @var bool|array
      */
     public $messages = false;
+
     public DataPersistorInterface $dataPersistor;
+    public Context $context;
 
     public function __construct(Context $context, DataPersistorInterface $dataPersistor)
     {
+        $this->context = $context;
         $this->dataPersistor = $dataPersistor;
         parent::__construct($context);
     }

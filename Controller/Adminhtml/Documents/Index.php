@@ -22,14 +22,15 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 
 class Index extends Documents
 {
     /**
-     * Execute view action
+     * Execute action based on request and return result
      *
-     * @return ResultInterface
+     * @return ResultInterface|ResponseInterface
      */
     public function execute()
     {

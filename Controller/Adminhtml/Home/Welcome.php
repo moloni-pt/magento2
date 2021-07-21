@@ -21,11 +21,22 @@
 
 namespace Invoicing\Moloni\Controller\Adminhtml\Home;
 
+use Exception;
 use Invoicing\Moloni\Controller\Adminhtml\Home;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
 
 class Welcome extends Home
 {
 
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     *
+     * @throws Exception
+     */
     public function execute()
     {
         $page = $this->initAction();
@@ -36,15 +47,21 @@ class Welcome extends Home
             if (!$this->moloni->checkAuthorizationCode($this->request->getParam('code'))) {
                 $this->messageManager->addErrorMessage($this->moloni->errors->getErrors('last')['message']);
             } else {
-                $this->redirect->redirect($this->response, 'moloni/home/company/');
+                return $this->redirectFactory->create()->setPath('moloni/home/company/');
             }
         } else {
             $this->moloni->dropActiveSession();
+            return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         }
 
         return $page;
     }
 
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
     private function handleAuthentication(): void
     {
         $tokens = $this->tokensRepository->getTokens();

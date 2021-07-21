@@ -22,17 +22,22 @@
 namespace Invoicing\Moloni\Controller\Adminhtml\Settings;
 
 use Invoicing\Moloni\Controller\Adminhtml\Settings;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 class Save extends Settings
 {
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     */
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->redirectInterface->redirect($this->response, $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath($this->moloni->redirectTo);
         }
 
-        $page = $this->initAction();
         $settingsFormData = $this->requestInterface->getParam('general');
 
         if (is_array($settingsFormData)) {
@@ -54,8 +59,6 @@ class Save extends Settings
             $this->messageManager->addErrorMessage(__("Houve um erro ao guardar alterações"));
         }
 
-        $this->redirectInterface->redirect($this->response, 'moloni/settings/edit/invoicing/0');
-
-        return $page;
+        return $this->redirectFactory->create()->setPath('moloni/settings/edit/invoicing/0');
     }
 }

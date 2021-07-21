@@ -27,8 +27,12 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Controllers\DocumentsFactory as Mol
 use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Model\DocumentsRepository;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Result\PageFactory;
+
 
 class MassRemove extends Documents
 {
@@ -43,6 +47,7 @@ class MassRemove extends Documents
      * @param MoloniDocumentsFactory $moloniDocumentsFactory
      * @param DocumentsRepository $documentsRepository
      * @param UrlInterface $urlBuilder
+     * @param RedirectFactory $redirectFactory
      * @param array $data
      */
     public function __construct(
@@ -52,6 +57,7 @@ class MassRemove extends Documents
         MoloniDocumentsFactory $moloniDocumentsFactory,
         DocumentsRepository $documentsRepository,
         UrlInterface $urlBuilder,
+        RedirectFactory $redirectFactory,
         array $data = []
     )
     {
@@ -64,23 +70,29 @@ class MassRemove extends Documents
             $moloni,
             $moloniDocumentsFactory,
             $documentsRepository,
-            $urlBuilder
+            $urlBuilder,
+            $redirectFactory
         );
     }
 
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     *
+     * @throws \JsonException
+     */
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->redirect->redirect($this->context->getResponse(), $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath($this->moloni->redirectTo);
         }
 
         $selectedOrders = $this->request->getParam('selected');
 
         if (!is_array($selectedOrders) || empty($selectedOrders)) {
             $this->messageManager->addErrorMessage(__("Não foram seleccionadas encomendas"));
-            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-            return false;
+            return $this->redirectFactory->create()->setPath('moloni/home/index');
         }
 
         foreach ($selectedOrders as $orderId) {
@@ -100,12 +112,9 @@ class MassRemove extends Documents
 
             } catch (Exception $exception) {
                 $this->messageManager->addErrorMessage($exception->getMessage());
-                $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-                return false;
             }
         }
 
-        $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-        return true;
+        return $this->redirectFactory->create()->setPath('moloni/home/index');
     }
 }

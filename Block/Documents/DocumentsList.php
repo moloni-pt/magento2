@@ -49,6 +49,8 @@ class DocumentsList extends Template
 
     /**
      * @return array
+     *
+     * @throws \JsonException
      */
     public function getOrderDocuments(): array
     {

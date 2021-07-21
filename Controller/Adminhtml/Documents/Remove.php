@@ -23,22 +23,27 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Documents;
 
 use Exception;
 use Invoicing\Moloni\Controller\Adminhtml\Documents;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 class Remove extends Documents
 {
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     */
     public function execute()
     {
         if (!$this->moloni->checkActiveSession()) {
-            $this->redirect->redirect($this->context->getResponse(), $this->moloni->redirectTo);
-            return false;
+            return $this->redirectFactory->create()->setPath($this->moloni->redirectTo);
         }
 
         $orderId = $this->request->getParam('order_id');
 
         if (!$orderId) {
             $this->messageManager->addErrorMessage(__("Encomenda não encontrada."));
-            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-            return false;
+            return $this->redirectFactory->create()->setPath('moloni/home/index');
         }
 
         try {
@@ -54,12 +59,10 @@ class Remove extends Documents
             $this->documentsRepository->save($newDocument);
         } catch (Exception $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
-            $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-            return false;
+            return $this->redirectFactory->create()->setPath('moloni/home/index');
         }
 
         $this->messageManager->addSuccessMessage(__("O documento não irá ser gerado no Moloni."));
-        $this->redirect->redirect($this->context->getResponse(), 'moloni/home/index');
-        return false;
+        return $this->redirectFactory->create()->setPath('moloni/home/index');
     }
 }
