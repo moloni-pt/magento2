@@ -479,7 +479,7 @@ class Products
      * @return bool|int
      * @throws JsonException
      */
-    private function createCategoryTree($categoryTree, $parentId = 0)
+    private function createCategoryTree($categoryTree, int $parentId = 0)
     {
         if (!empty($categoryTree) && is_array($categoryTree)) {
             $categoryId = false;

@@ -60,7 +60,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
     }
 
-    private function setTableMoloniTokens()
+    private function setTableMoloniTokens(): Table
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
@@ -130,7 +130,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         return $table;
     }
 
-    private function setTableMoloniSettings()
+    private function setTableMoloniSettings(): Table
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
@@ -176,7 +176,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         return $table;
     }
 
-    private function setTableMoloniDocuments()
+    private function setTableMoloniDocuments(): Table
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(

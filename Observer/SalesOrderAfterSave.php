@@ -75,7 +75,7 @@ class SalesOrderAfterSave implements ObserverInterface
      * @return SalesOrderAfterSave
      * @throws JsonException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): SalesOrderAfterSave
     {
         /**
          * @var $order AbstractModel

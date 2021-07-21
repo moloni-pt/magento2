@@ -24,6 +24,7 @@ namespace Invoicing\Moloni\Controller\Adminhtml\Settings;
 use Invoicing\Moloni\Controller\Adminhtml\Settings;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Save extends Settings
 {
@@ -31,8 +32,7 @@ class Save extends Settings
      * Execute action based on request and return result
      *
      * @return ResultInterface|ResponseInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function execute()
     {

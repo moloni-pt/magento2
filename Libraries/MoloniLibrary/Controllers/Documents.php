@@ -149,7 +149,7 @@ class Documents
      * @param string $message
      * @param array $values
      */
-    public function addComplexSuccess(string $message, $values = []): void
+    public function addComplexSuccess(string $message, array $values = []): void
     {
         $this->messages['complex_success'][] = array_merge(['message' => $message], $values);
     }
@@ -158,7 +158,7 @@ class Documents
      * @param string $message
      * @param array $values
      */
-    public function addComplexWarning(string $message, $values = []): void
+    public function addComplexWarning(string $message, array $values = []): void
     {
         $this->messages['complex_warning'][] = array_merge(['message' => $message], $values);
     }

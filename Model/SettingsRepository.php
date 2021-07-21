@@ -159,7 +159,7 @@ class SettingsRepository implements SettingsRepositoryInterface
     /**
      * @return Settings
      */
-    public function newOption()
+    public function newOption(): Settings
     {
         return $this->objectFactory->create();
     }

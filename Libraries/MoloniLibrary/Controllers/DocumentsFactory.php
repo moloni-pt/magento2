@@ -29,7 +29,7 @@ class DocumentsFactory
      * @param ObjectManagerInterface $objectManager
      * @param string $instanceName
      */
-    public function __construct(ObjectManagerInterface $objectManager, $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Documents')
+    public function __construct(ObjectManagerInterface $objectManager, string $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Documents')
     {
         $this->_objectManager = $objectManager;
         $this->_instanceName = $instanceName;
@@ -41,7 +41,7 @@ class DocumentsFactory
      * @param array $data
      * @return Documents
      */
-    public function create(array $data = [])
+    public function create(array $data = []): Documents
     {
         return $this->_objectManager->create($this->_instanceName, $data);
     }

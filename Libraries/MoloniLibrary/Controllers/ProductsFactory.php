@@ -31,7 +31,7 @@ class ProductsFactory
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
-        $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Products'
+        string $instanceName = '\\Invoicing\\Moloni\\Libraries\\MoloniLibrary\\Controllers\\Products'
     )
     {
         $this->_objectManager = $objectManager;
@@ -44,7 +44,7 @@ class ProductsFactory
      * @param array $data
      * @return Products
      */
-    public function create(array $data = [])
+    public function create(array $data = []): Products
     {
         return $this->_objectManager->create($this->_instanceName, $data);
     }

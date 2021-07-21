@@ -49,11 +49,6 @@ class DocumentsRepository implements DocumentsRepositoryInterface
     public $logger;
 
     /**
-     * @var SortOrder SortOrder
-     */
-    private $sortOrder;
-
-    /**
      * @var SortOrderBuilder ortOrderBuilder
      */
     private $sortOrderBuilder;
@@ -64,7 +59,6 @@ class DocumentsRepository implements DocumentsRepositoryInterface
         CollectionFactory $collectionFactory,
         SearchResultsFactory $searchResultsFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        SortOrder $sortOrder,
         SortOrderBuilder $sortOrderBuilder,
         LoggerInterface $logger
     )
@@ -74,7 +68,6 @@ class DocumentsRepository implements DocumentsRepositoryInterface
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->sortOrder = $sortOrder;
         $this->sortOrderBuilder = $sortOrderBuilder;
         $this->logger = $logger;
     }
@@ -190,7 +183,7 @@ class DocumentsRepository implements DocumentsRepositoryInterface
             foreach ($sortOrders as $sortOrder) {
                 $collection->addOrder(
                     $sortOrder->getField(),
-                    ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+                    ($sortOrder->getDirection() === SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
                 );
             }
         }

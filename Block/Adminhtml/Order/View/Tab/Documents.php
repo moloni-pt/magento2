@@ -26,7 +26,7 @@ class Documents extends ListText implements TabInterface
     /**
      * {@inheritdoc}
      */
-    public function canShowTab()
+    public function canShowTab(): bool
     {
         return true;
     }

@@ -62,7 +62,7 @@ class InstallSchema implements InstallSchemaInterface
         $this->installer->endSetup();
     }
 
-    private function setTableMoloniTokens()
+    private function setTableMoloniTokens(): Table
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
@@ -136,7 +136,7 @@ class InstallSchema implements InstallSchemaInterface
      * @return Table
      * @throws Zend_Db_Exception
      */
-    private function setTableMoloniSettings()
+    private function setTableMoloniSettings(): Table
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
@@ -186,7 +186,7 @@ class InstallSchema implements InstallSchemaInterface
      * @return Table
      * @throws Zend_Db_Exception
      */
-    private function setTableMoloniDocuments()
+    private function setTableMoloniDocuments(): Table
     {
         $this->installer->getConnection()->createTable(
             $table = $this->installer->getConnection()->newTable(
