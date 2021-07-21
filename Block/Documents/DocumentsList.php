@@ -77,6 +77,6 @@ class DocumentsList extends Template
             }
         }
 
-        return $documentsList;
+        return $documentsList ?: [];
     }
 }
