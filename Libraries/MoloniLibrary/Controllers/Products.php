@@ -9,11 +9,13 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Tax\Api\TaxCalculationInterface;
+use Magento\Tax\Model\Config;
 
 class Products
 {
@@ -86,14 +88,29 @@ class Products
      */
     private $products;
 
+    /**
+     * @var OrderInterface
+     */
+    private $order;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    private static $TAX_CALCULATION_BASED_ON_SHIPPING = 'shipping';
+    private static $TAX_CALCULATION_BASED_ON_BILLING = 'billing';
+    private static $TAX_CALCULATION_BASED_ON_ORIGIN = 'origin';
+
     public function __construct(
         ProductRepositoryInterface $productRepository,
-        CategoryCollectionFactory $categoryCollectionFactory,
-        TaxCalculationInterface $taxHelper,
-        Item $taxItem,
-        Moloni $moloni,
-        Tools $tools,
-        ProductsFactory $products
+        CategoryCollectionFactory  $categoryCollectionFactory,
+        TaxCalculationInterface    $taxHelper,
+        Item                       $taxItem,
+        Moloni                     $moloni,
+        Tools                      $tools,
+        ProductsFactory            $products,
+        ScopeConfigInterface       $scopeConfig
     )
     {
         $this->productRepository = $productRepository;
@@ -103,15 +120,20 @@ class Products
         $this->moloni = $moloni;
         $this->tools = $tools;
         $this->products = $products;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
      * @param OrderItemInterface $orderProduct
+     * @param OrderInterface $order
+     *
      * @return array
      * @throws JsonException
      */
-    public function setProductFromOrder(OrderItemInterface $orderProduct): array
+    public function setProductFromOrder(OrderItemInterface $orderProduct, OrderInterface $order): array
     {
+        $this->order = $order;
+
         $productId = $orderProduct->getProductId();
 
         $product = [];
@@ -146,11 +168,10 @@ class Products
             $product['child_products'] = [];
             foreach ($childProducts as $child) {
                 if ($child->getProductId() !== $productId) {
-                    $product['child_products'][] = $this->products->create()->setProductFromOrder($child);
+                    $product['child_products'][] = $this->products->create()->setProductFromOrder($child, $order);
                 }
             }
         }
-
 
         $taxRate = $orderProduct->getTaxPercent();
         if ($taxRate > 0) {
@@ -186,24 +207,25 @@ class Products
      */
     public function setShippingFromOrder(OrderInterface $order): array
     {
+        $this->order = $order;
 
         $product = [];
-        $product['name'] = $order->getShippingDescription();
+        $product['name'] = $this->order->getShippingDescription();
         $product['reference'] = 'Portes';
-        $product['price'] = $order->getBaseShippingAmount();
-        $product['price_with_taxes'] = $order->getShippingInclTax();
+        $product['price'] = $this->order->getBaseShippingAmount();
+        $product['price_with_taxes'] = $this->order->getShippingInclTax();
         $product['qty'] = 1;
 
         // @todo calc shipping discount percentage
 
-        $discountPercent = $order->getShippingDiscountAmount();
+        $discountPercent = $this->order->getShippingDiscountAmount();
         if ($discountPercent > 0 && $discountPercent < 100) {
             $product['discount'] = $discountPercent;
         }
 
         // Search for shipping tax
         $taxRate = 0;
-        $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
+        $orderTaxes = $this->taxItem->getTaxItemsByOrderId($this->order->getId());
         foreach ($orderTaxes as $orderTax) {
             if ($orderTax['taxable_item_type'] === 'shipping') {
                 $taxRate = $orderTax['tax_percent'];
@@ -234,7 +256,7 @@ class Products
         if ($moloniProduct && isset($moloniProduct[0]['product_id'])) {
             $product['product_id'] = $moloniProduct[0]['product_id'];
         } else {
-            $product['product_id'] = $this->createShippingFromOrder($order);
+            $product['product_id'] = $this->createShippingFromOrder();
         }
 
         return $product;
@@ -417,19 +439,18 @@ class Products
     }
 
     /**
-     * @param OrderInterface $order
      * @return int
      */
-    private function createShippingFromOrder(OrderInterface $order): int
+    private function createShippingFromOrder(): int
     {
         try {
-            $moloniProduct['name'] = $order->getShippingDescription();
+            $moloniProduct['name'] = $this->order->getShippingDescription();
             $moloniProduct['reference'] = "Portes";
             $moloniProduct['type'] = 2;
             $moloniProduct['has_stock'] = 0;
             $moloniProduct['category_id'] = $this->createCategoryTree([['name' => 'Portes']]);
-            $moloniProduct['price'] = $order->getBaseShippingAmount();
-            $moloniProduct['price_with_taxes'] = $order->getShippingInclTax();
+            $moloniProduct['price'] = $this->order->getBaseShippingAmount();
+            $moloniProduct['price_with_taxes'] = $this->order->getShippingInclTax();
 
             if (!empty($this->moloni->settings['default_measurement_unit_id'])) {
                 $moloniProduct['unit_id'] = $this->moloni->settings['default_measurement_unit_id'];
@@ -437,7 +458,7 @@ class Products
 
             // Search for shipping tax
             $taxRate = 0;
-            $orderTaxes = $this->taxItem->getTaxItemsByOrderId($order->getId());
+            $orderTaxes = $this->taxItem->getTaxItemsByOrderId($this->order->getId());
             foreach ($orderTaxes as $orderTax) {
                 if ($orderTax['taxable_item_type'] === 'shipping') {
                     $taxRate = $orderTax['tax_percent'];
@@ -582,14 +603,51 @@ class Products
         $taxId = 0;
         $taxDefaultId = 0;
         $taxes = $this->moloni->taxes->getAll();
+
+        $taxFiscalZone = 'PT';
+        $taxesBasedOn = $this->scopeConfig->getValue(
+            Config::CONFIG_XML_PATH_BASED_ON
+        );
+
+        switch ($taxesBasedOn) {
+            case self::$TAX_CALCULATION_BASED_ON_SHIPPING:
+                $shippingAddress = $this->order->getShippingAddress();
+                if ($shippingAddress) {
+                    $countryCode = $shippingAddress->getCountryId();
+                    $country = $this->tools->getContryByISO($countryCode);
+                }
+                break;
+
+            case self::$TAX_CALCULATION_BASED_ON_BILLING:
+                $billingAddress = $this->order->getBillingAddress();
+                if ($billingAddress) {
+                    $countryCode = $billingAddress->getCountryId();
+                    $country = $this->tools->getContryByISO($countryCode);
+                }
+                break;
+
+
+            case self::$TAX_CALCULATION_BASED_ON_ORIGIN:
+            default:
+                $company = $this->moloni->companies->getOne();
+                $country = $this->tools->getCountryById((int)$company['country_id']);
+                break;
+        }
+
+
+        if (isset($country) && $country) {
+            $taxFiscalZone = strtoupper($country['iso_3166_1']);
+        }
+
         if ($taxes && is_array($taxes)) {
             foreach ($taxes as $tax) {
                 if ((int)$tax['active_by_default'] === 1) {
                     $taxDefaultId = $tax['tax_id'];
                 }
 
-                if ((int)$tax['value'] == $taxRate) {
+                if ((float)$tax['value'] === (float)$taxRate && $tax['fiscal_zone'] === $taxFiscalZone) {
                     $taxId = $tax['tax_id'];
+
                     if ($tax['name'] === 'IVA Normal') {
                         return $taxId;
                     }

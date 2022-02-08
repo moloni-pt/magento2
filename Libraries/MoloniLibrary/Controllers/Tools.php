@@ -24,26 +24,57 @@ class Tools
     /**
      * Get a country ID given a country ISO code
      * At the moment we only support ISO2 codes
-     * @param $iso
+     * @param string $iso
      * @param int $chars
+     *
      * @return int
      */
-    public function getCountryIdByISO($iso, int $chars = 2): int
+    public function getCountryIdByISO(string $iso, int $chars = 2): int
     {
-        $countryId = 1;
+        $matchCountry = $this->getContryByISO($iso, $chars);
+        return $matchCountry ? (int)$matchCountry['country_id'] : 1;
+    }
 
+    /**
+     * @param string $iso
+     * @param int $chars
+     * @return false|array
+     */
+    public function getContryByISO(string $iso, int $chars = 2)
+    {
         $countries = $this->moloni->countries->getAll();
         if ($countries && is_array($countries)) {
             $countryISO = mb_strtoupper($iso);
             foreach ($countries as $country) {
                 if ($chars === 2 && $countryISO === mb_strtoupper($country['iso_3166_1'])) {
-                    $countryId = $country['country_id'];
-                    break;
+                    return $country;
                 }
             }
         }
 
-        return $countryId;
+        return false;
+    }
+
+    /**
+     * Return a country details from a countryId
+     *
+     * @param int $countryId
+     *
+     * @return array|false
+     */
+    public function getCountryById(int $countryId)
+    {
+        $countries = $this->moloni->countries->getAll();
+
+        if ($countries && is_array($countries)) {
+            foreach ($countries as $country) {
+                if ((int)$country['country_id'] === $countryId) {
+                    return $country;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

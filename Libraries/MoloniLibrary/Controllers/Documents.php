@@ -319,8 +319,8 @@ class Documents
                     continue;
                 }
 
-                // Skip the child products of an oder
-                $documentProduct = $this->products->create()->setProductFromOrder($product);
+                // Skip the child products of an order
+                $documentProduct = $this->products->create()->setProductFromOrder($product, $this->order);
                 if ($documentProduct && is_array($documentProduct)) {
                     $this->document['products'][] = $documentProduct;
                 }
