@@ -11,6 +11,7 @@ use Invoicing\Moloni\Libraries\MoloniLibrary\Moloni;
 use Invoicing\Moloni\Model\DocumentsRepository;
 use JsonException;
 use Magento\Directory\Model\CurrencyFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -90,6 +91,11 @@ class Documents
     private $messages = [];
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * Companies constructor.
      * @param Moloni $moloni
      * @param Tools $tools
@@ -100,6 +106,7 @@ class Documents
      * @param CurrencyFactory $currencyFactory
      * @param ManagerInterface $messageManager
      * @param DocumentsRepository $documentsRepository
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         Moloni $moloni,
@@ -110,7 +117,8 @@ class Documents
         OrderRepositoryInterface $orderRepository,
         CurrencyFactory $currencyFactory,
         ManagerInterface $messageManager,
-        DocumentsRepository $documentsRepository
+        DocumentsRepository $documentsRepository,
+        ScopeConfigInterface $scopeConfig
     )
     {
         $this->moloni = $moloni;
@@ -122,6 +130,7 @@ class Documents
         $this->currencyFactory = $currencyFactory;
         $this->messageManager = $messageManager;
         $this->documentsRepository = $documentsRepository;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function getMessages()
@@ -290,6 +299,7 @@ class Documents
         $this->company = $this->moloni->companies->getOne();
 
         $customer = $this->customers->setCustomerFromOrder($this->order);
+
         $this->document['customer_id'] = $customer->customerId;
 
         $this->document['date'] = gmdate('Y-m-d');
@@ -299,6 +309,10 @@ class Documents
         $this->document['plugin_id'] = 19;
 
         $this->parseProducts();
+
+        $this->tools->getCountryIdByISO(
+            $this->order->getBillingAddress()->getCountryId()
+        );
 
         $this->parseCurrency();
         $this->parsePaymentMethods();
@@ -319,8 +333,8 @@ class Documents
                     continue;
                 }
 
-                // Skip the child products of an oder
-                $documentProduct = $this->products->create()->setProductFromOrder($product);
+                // Skip the child products of an order
+                $documentProduct = $this->products->create()->setProductFromOrder($product, $this->order);
                 if ($documentProduct && is_array($documentProduct)) {
                     $this->document['products'][] = $documentProduct;
                 }
