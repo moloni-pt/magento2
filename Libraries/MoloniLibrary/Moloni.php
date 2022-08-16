@@ -308,7 +308,7 @@ class Moloni implements MoloniApiRepositoryInterface
     {
         if ($companyId) {
             $savedSettings = $this->settingsRepository->getSettingsByCompany($companyId);
-            if (!$savedSettings) {
+            if (empty($savedSettings)) {
                 // If there are no saved settings in the table
                 foreach ($this->settings as $label => $option) {
                     $savedSettings[$label] = $option;

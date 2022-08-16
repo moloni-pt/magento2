@@ -167,7 +167,7 @@ class SettingsRepository implements SettingsRepositoryInterface
     /**
      * @param $companyId int
      *
-     * @return bool|array
+     * @return array
      */
     public function getSettingsByCompany(int $companyId)
     {
@@ -184,13 +184,13 @@ class SettingsRepository implements SettingsRepositoryInterface
                     return $this->settingsResults[$companyId];
                 }
 
-                return false;
+                return [];
             }
 
             return $this->settingsResults[$companyId];
         }
 
-        return false;
+        return [];
     }
 
     /**
