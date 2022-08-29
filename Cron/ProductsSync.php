@@ -68,10 +68,11 @@ class ProductsSync
                                 __("Artigo atualizado com successo")
                             );
                         } else {
+                            $message = $this->moloni->errors->getErrors('first');
                             $this->logger->info(
                                 $moloniProduct['reference'] . ' ' .
                                 __('Erro ao actualizar o artigo ') .
-                                $this->moloni->errors->getErrors('first')['title']
+                                ($message && $message['title'] ? $message['title'] : '')
                             );
                         }
                     }

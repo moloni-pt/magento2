@@ -609,31 +609,35 @@ class Products
             Config::CONFIG_XML_PATH_BASED_ON
         );
 
-        switch ($taxesBasedOn) {
-            case self::$TAX_CALCULATION_BASED_ON_SHIPPING:
-                $shippingAddress = $this->order->getShippingAddress();
-                if ($shippingAddress) {
-                    $countryCode = $shippingAddress->getCountryId();
-                    $country = $this->tools->getContryByISO($countryCode);
-                }
-                break;
+        if ($this->order instanceof OrderInterface) {
+            switch ($taxesBasedOn) {
+                case self::$TAX_CALCULATION_BASED_ON_SHIPPING:
+                    $shippingAddress = $this->order->getShippingAddress();
+                    if ($shippingAddress) {
+                        $countryCode = $shippingAddress->getCountryId();
+                        $country = $this->tools->getContryByISO($countryCode);
+                    }
+                    break;
 
-            case self::$TAX_CALCULATION_BASED_ON_BILLING:
-                $billingAddress = $this->order->getBillingAddress();
-                if ($billingAddress) {
-                    $countryCode = $billingAddress->getCountryId();
-                    $country = $this->tools->getContryByISO($countryCode);
-                }
-                break;
+                case self::$TAX_CALCULATION_BASED_ON_BILLING:
+                    $billingAddress = $this->order->getBillingAddress();
+                    if ($billingAddress) {
+                        $countryCode = $billingAddress->getCountryId();
+                        $country = $this->tools->getContryByISO($countryCode);
+                    }
+                    break;
 
 
-            case self::$TAX_CALCULATION_BASED_ON_ORIGIN:
-            default:
-                $company = $this->moloni->companies->getOne();
-                $country = $this->tools->getCountryById((int)$company['country_id']);
-                break;
+                case self::$TAX_CALCULATION_BASED_ON_ORIGIN:
+                default:
+                    $company = $this->moloni->companies->getOne();
+                    $country = $this->tools->getCountryById((int)$company['country_id']);
+                    break;
+            }
+        } else {
+            $company = $this->moloni->companies->getOne();
+            $country = $this->tools->getCountryById((int)$company['country_id']);
         }
-
 
         if (isset($country) && $country) {
             $taxFiscalZone = strtoupper($country['iso_3166_1']);

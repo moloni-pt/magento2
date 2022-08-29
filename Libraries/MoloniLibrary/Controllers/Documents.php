@@ -184,6 +184,12 @@ class Documents
     public function createDocumentFromOrderId(int $orderId)
     {
         $this->order = $this->orderRepository->get($orderId);
+
+        if (!$this->order instanceof OrderInterface) {
+            $this->addError(sprintf('Erro ao encontrar a encomenda com o id %s', $orderId));
+            return false;
+        }
+
         $this->parseDocument();
 
         if ((int)$this->moloni->settings['shipping_document'] === 1) {
