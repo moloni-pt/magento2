@@ -187,7 +187,7 @@ class Products
 
         // Check if the product does exist
         $moloniProduct = $this->moloni->products->getByReference([
-            'reference' => $orderProduct->getSku(),
+            'reference' => $product['reference'],
             'exact' => true
         ]);
 
@@ -271,7 +271,7 @@ class Products
     {
         try {
             $product = $this->productRepository->getById($productId);
-            $sku = $product->getSku();
+            $sku = mb_substr($product->getSku(), 0, 30);
 
             $moloniProduct = $this->moloni->products->getByReference(['reference' => $sku]);
             if (!$moloniProduct || !$moloniProduct[0]) {
@@ -342,7 +342,7 @@ class Products
 
             if ($orderProduct) {
                 $moloniProduct['name'] = $orderProduct->getName();
-                $moloniProduct['reference'] = $orderProduct->getSku();
+                $moloniProduct['reference'] = mb_substr($orderProduct->getSku(), 0, 30);
 
                 if ($orderProduct->getPrice() > 0) {
                     $moloniProduct['price'] = $orderProduct->getPrice();
@@ -353,7 +353,7 @@ class Products
                 }
             } else {
                 $moloniProduct['name'] = $product->getName();
-                $moloniProduct['reference'] = $product->getSku();
+                $moloniProduct['reference'] = mb_substr($product->getSku(), 0, 30);
 
                 if ($product->getPrice() > 0) {
                     $moloniProduct['price'] = $product->getPrice();
@@ -389,7 +389,7 @@ class Products
                     foreach ($productOptions as $requiredChildrenIds) {
                         foreach ($requiredChildrenIds as $childrenId) {
                             $childProduct = $this->productRepository->getById($childrenId);
-                            $childProductReference = $childProduct->getSku();
+                            $childProductReference = mb_substr($childProduct->getSku(), 0, 30);
 
                             $moloniProductExists = $this->moloni->products->getByReference([
                                 'reference' => $childProductReference,
