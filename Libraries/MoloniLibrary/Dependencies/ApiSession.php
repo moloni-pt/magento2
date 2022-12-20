@@ -127,7 +127,7 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
     private function handleSessionRefresh(): bool
     {
         $tokens = $this->tokens->getTokens();
-        if ($tokens && $tokens->getAccessToken()) {
+        if ($tokens->getAccessToken()) {
             $currentTime = time();
             $accessTokenExpireDate = $this->dateTime->strToTime($tokens->getExpireDate());
             $refreshTokenExpireDate = $accessTokenExpireDate + 432000; // Add 5 days until the refresh expires
@@ -145,12 +145,8 @@ class ApiSession implements MoloniApiSessionRepositoryInterface
                     );
                 }
 
-                if ($this->doRefresh()) {
-                    return true;
-                }
-
-                $tokens->delete();
-                return false;
+                $this->doRefresh();
+                $this->tokens->getTokens(true);
             }
 
             return true;

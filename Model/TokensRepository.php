@@ -123,10 +123,10 @@ class TokensRepository implements TokensRepositoryInterface
         }
     }
 
-    public function getTokens(): Tokens
+    public function getTokens($forceRefresh = false): Tokens
     {
 
-        if (empty($this->tokensRow)) {
+        if (empty($this->tokensRow) || $forceRefresh) {
             $_filter = $this->searchCriteriaBuilder
                 ->setPageSize("1")
                 ->create();
