@@ -45,7 +45,6 @@ class ProductsSync
      */
     public function execute(): void
     {
-
         if ($this->moloni->checkActiveSession()) {
             $currentDate = gmdate('Y-m-d H:i:s');
             $updateSince = $this->moloni->settings['cron_date'];
@@ -84,8 +83,6 @@ class ProductsSync
 
             $companyId = $this->moloni->session->companyId;
             $this->moloni->settingsRepository->saveSetting($companyId, "cron_date", $currentDate);
-        } else {
-            throw new Exception('Moloni session not initiated');
         }
     }
 }
