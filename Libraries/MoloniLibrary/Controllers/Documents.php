@@ -13,6 +13,7 @@ use JsonException;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -316,9 +317,13 @@ class Documents
 
         $this->parseProducts();
 
-        $this->tools->getCountryIdByISO(
-            $this->order->getBillingAddress()->getCountryId()
-        );
+        if ($this->order->getBillingAddress() instanceof OrderAddressInterface) {
+            $this->tools->getCountryIdByISO(
+                $this->order->getBillingAddress()->getCountryId()
+            );
+        } else {
+            $this->tools->getCountryIdByISO("PT");
+        }
 
         $this->parseCurrency();
         $this->parsePaymentMethods();

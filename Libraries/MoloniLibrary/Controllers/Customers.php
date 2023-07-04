@@ -153,7 +153,7 @@ class Customers
         }
 
         // If the country is Portugal validate the vat Number and the Zip Code
-        if ((int)$this->customer['country_id'] === 1) {
+        if (isset($this->customer['country_id']) && (int)$this->customer['country_id'] === 1) {
             $this->customer['zip_code'] = $this->tools->zipCheck($this->customer['zip_code']);
             $this->customer['vat'] = str_replace(' ', '', $this->customer['vat']);
             if (!$this->tools->validateVat($this->customer['vat'])) {
