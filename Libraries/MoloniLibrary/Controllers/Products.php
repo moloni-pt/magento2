@@ -444,7 +444,8 @@ class Products
     private function createShippingFromOrder(): int
     {
         try {
-            $moloniProduct['name'] = $this->order->getShippingDescription();
+            // Moloni locks a product's name once it has documents, so a fixed name keeps later orders from inheriting the first order's shipping description
+            $moloniProduct['name'] = 'Portes';
             $moloniProduct['reference'] = "Portes";
             $moloniProduct['type'] = 2;
             $moloniProduct['has_stock'] = 0;
